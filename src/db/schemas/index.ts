@@ -1,9 +1,8 @@
-import { serial, text, pgTable, pgEnum } from "drizzle-orm/pg-core";
+// AUTH SCHEMAS
+export * from "./auth/accounts";
+export * from "./auth/authenticators";
+export * from "./auth/sessions";
+export * from "./auth/verification-token";
 
-export const colors = pgEnum("colors", ["red", "green", "blue"]);
-
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  name: text("name"),
-  color: colors("color").default("red"),
-});
+// USERS
+export * from "./users";

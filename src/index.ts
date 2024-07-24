@@ -20,11 +20,10 @@ app.use("*", initAuthConfig(getAuthConfig));
 
 app.use("/auth/*", authHandler());
 
-// app.use("/*", verifyAuth());
+app.use("/*", verifyAuth());
 
 app.get("/protected", verifyAuth(), (c) => {
-  const auth = c.get("authUser");
-  return c.json(auth);
+  return c.json({ user: "user" });
 });
 
 export default app;
