@@ -8,4 +8,5 @@ export * from "./auth/verification-token";
 export * from "./users";
 
 // PUBLIC
-export * from "./psychologists";
+export * from "./public/psychologists";
+export * from "./public/clinics";

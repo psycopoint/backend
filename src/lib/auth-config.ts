@@ -1,13 +1,15 @@
 import { type AuthConfig } from "@hono/auth-js";
 import { Context } from "hono";
 import Google from "@auth/core/providers/google";
-
+import Credentials from "@auth/core/providers/credentials";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import {
+  InsertClinic,
   InsertPsychologist,
   accounts,
+  clinics,
   psychologists,
   sessions,
   users,
@@ -35,14 +37,36 @@ export const getAuthConfig = (c: Context): AuthConfig => {
         clientId: c.env.GOOGLE_CLIENT_ID,
         clientSecret: c.env.GOOGLE_CLIENT_SECRET,
       }),
+      // Credentials({
+      //   credentials: {
+      //     username: { label: "Username" },
+      //     password: { label: "Password", type: "password" },
+      //   },
+      //   authorize: async (credentials) => {
+      //     // Verifique se as credenciais foram fornecidas
+      //     if (!credentials?.username || !credentials?.password) {
+      //       return null;
+      //     }
+
+      //     // Aqui você deve implementar a lógica para verificar as credenciais
+      //     // Por exemplo, buscar o usuário no banco de dados e comparar a senha
+      //     const user = {
+      //       id: "1",
+      //       username: credentials.username,
+      //       password: credentials.password,
+      //     };
+
+      //     if (!user) {
+      //       throw new Error("Usuário não encontrado.");
+      //     }
+
+      //     // Retorne o objeto do usuário se a autenticação for bem-sucedida
+      //     return user;
+      //   },
+      // }),
     ],
     callbacks: {
       async signIn({ user }) {
-        console.log("USER: ", user);
-
-        // Type assertion to access userType
-        const customUser = user as { userType?: string };
-
         // verify if user exist inside db
         const [existing] = await db
           .select()
@@ -50,7 +74,7 @@ export const getAuthConfig = (c: Context): AuthConfig => {
           .where(eq(psychologists.userId, user.id!));
 
         // if user is psychologist create user inside psychologist table
-        if (!existing && customUser.userType === "psychologist") {
+        if (!existing && user.userType === "psychologist") {
           const data: InsertPsychologist = {
             userId: user.id!,
             email: user.email!,
@@ -61,9 +85,24 @@ export const getAuthConfig = (c: Context): AuthConfig => {
           await db.insert(psychologists).values(data);
         }
 
+        // if user is psychologist create user inside psychologist table
+        //TODO: improve this according to clinic fields inside schema db
+        if (!existing && user.userType === "clinic") {
+          const data: InsertClinic = {
+            companyName: user.name!,
+            userId: user.id!,
+            email: user.email!,
+            password: "test",
+            logo: user.image,
+          };
+          await db.insert(clinics).values(data);
+        }
+
         return true;
       },
     },
+    basePath: "/v1/auth",
+    session: { strategy: "database" },
   };
 };
 

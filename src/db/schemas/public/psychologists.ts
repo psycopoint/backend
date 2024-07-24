@@ -7,7 +7,7 @@ import {
   jsonb,
   pgEnum,
 } from "drizzle-orm/pg-core";
-import { users } from "./users";
+import { users } from "../users";
 import { createInsertSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
 

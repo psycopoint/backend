@@ -11,8 +11,9 @@
     "jsxImportSource": "hono/jsx",
     "baseUrl": "./src",
     "paths": {
-      "@": ["/*"],
-      "@db": ["db/*"]
+      "@/*": ["*"],
+      "@db/*": ["db/*"],
+      "@routes/*": ["routes/*"]
     }
   }
 }
