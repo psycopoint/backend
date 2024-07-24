@@ -6,3 +6,6 @@ export * from "./auth/verification-token";
 
 // USERS
 export * from "./users";
+
+// PUBLIC
+export * from "./psychologists";

@@ -1,18 +1,7 @@
-import { Hono, Context } from "hono";
-import {
-  authHandler,
-  initAuthConfig,
-  verifyAuth,
-  type AuthConfig,
-} from "@hono/auth-js";
-import { getAuthConfig } from "./lib/get-auth-config";
-
-type Env = {
-  DATABASE_URL: string;
-  AUTH_SECRET: string;
-  GOOGLE_CLIENT_ID: string;
-  GOOGLE_CLIENT_SECRET: string;
-};
+import { Hono } from "hono";
+import { authHandler, initAuthConfig, verifyAuth } from "@hono/auth-js";
+import { getAuth, getAuthConfig } from "./lib/auth-config";
+import { Env } from "types/bindings";
 
 const app = new Hono<{ Bindings: Env }>().basePath("/api");
 
@@ -23,7 +12,8 @@ app.use("/auth/*", authHandler());
 app.use("/*", verifyAuth());
 
 app.get("/protected", verifyAuth(), (c) => {
-  return c.json({ user: "user" });
+  const user = getAuth(c);
+  return c.json(user);
 });
 
 export default app;
