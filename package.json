@@ -1,13 +1,15 @@
 {
   "name": "psicohub-backend",
   "scripts": {
-    "dev": "wrangler dev src/index.ts",
+    "dev": "wrangler dev src/index.ts --port 3001",
     "deploy": "wrangler deploy --minify src/index.ts",
     "gen": "drizzle-kit generate",
     "up": "bun run ./scripts/migrate.ts",
     "studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@auth/core": "^0.34.1",
+    "@hono/auth-js": "^1.0.10",
     "@neondatabase/serverless": "^0.9.4",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.32.1",

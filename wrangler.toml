@@ -1,5 +1,7 @@
 name = "psicohub-backend"
 compatibility_date = "2024-04-01"
+usage_model = "unbound"
+
 
 # [vars]
 # MY_VAR = "my-variable"

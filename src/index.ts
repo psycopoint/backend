@@ -1,20 +1,30 @@
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
-import { Hono } from "hono";
-import { users } from "./db/schemas";
+import { Hono, Context } from "hono";
+import {
+  authHandler,
+  initAuthConfig,
+  verifyAuth,
+  type AuthConfig,
+} from "@hono/auth-js";
+import { getAuthConfig } from "./lib/get-auth-config";
 
 type Env = {
   DATABASE_URL: string;
+  AUTH_SECRET: string;
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
 };
-const app = new Hono<{ Bindings: Env }>();
 
-app.get("/", async (c) => {
-  const sql = neon(c.env.DATABASE_URL);
-  const db = drizzle(sql);
+const app = new Hono<{ Bindings: Env }>().basePath("/api");
 
-  const data = await db.select().from(users);
+app.use("*", initAuthConfig(getAuthConfig));
 
-  return c.json(data);
+app.use("/auth/*", authHandler());
+
+// app.use("/*", verifyAuth());
+
+app.get("/protected", verifyAuth(), (c) => {
+  const auth = c.get("authUser");
+  return c.json(auth);
 });
 
 export default app;
