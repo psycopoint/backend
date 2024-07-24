@@ -1,0 +1,8 @@
+{
+  "dialect": "postgresql",
+  "out": "./src/db/migrations",
+  "schema": "./src/db/schemas",
+  "dbCredentials": {
+    "url": "DATABASE_URL"
+  }
+}

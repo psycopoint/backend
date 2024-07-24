@@ -1,0 +1,22 @@
+{
+  "name": "psicohub-backend",
+  "scripts": {
+    "dev": "wrangler dev src/index.ts",
+    "deploy": "wrangler deploy --minify src/index.ts",
+    "gen": "drizzle-kit generate",
+    "up": "bun run ./scripts/migrate.ts",
+    "studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.9.4",
+    "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.32.1",
+    "hono": "^4.5.1",
+    "postgres": "^3.4.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240529.0",
+    "drizzle-kit": "^0.23.0",
+    "wrangler": "^3.57.2"
+  }
+}
