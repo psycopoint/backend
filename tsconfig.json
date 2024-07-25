@@ -13,7 +13,8 @@
     "paths": {
       "@/*": ["*"],
       "@db/*": ["db/*"],
-      "@routes/*": ["routes/*"]
+      "@routes/*": ["routes/*"],
+      "@lib/*": ["lib/*"]
     }
   }
 }

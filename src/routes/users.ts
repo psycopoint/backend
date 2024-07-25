@@ -1,6 +1,6 @@
 import { getUser } from "@/controllers/userControllers";
 import { clinics, psychologists } from "@/db/schemas";
-import { getAuth } from "@/lib/auth-config";
+import { getAuth } from "@/auth";
 import { zValidator } from "@hono/zod-validator";
 import { neon } from "@neondatabase/serverless";
 import { eq } from "drizzle-orm";

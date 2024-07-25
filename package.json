@@ -1,7 +1,7 @@
 {
   "name": "psicohub-backend",
   "scripts": {
-    "dev": "wrangler dev src/index.ts",
+    "dev": "wrangler dev src/index.ts --port 3001",
     "deploy": "wrangler deploy --minify src/index.ts",
     "gen": "drizzle-kit generate",
     "up": "bun run ./scripts/migrate.ts",

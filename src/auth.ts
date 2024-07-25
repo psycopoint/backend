@@ -14,7 +14,7 @@ import {
   sessions,
   users,
   verificationTokens,
-} from "../db/schemas";
+} from "@db/schemas";
 import { eq } from "drizzle-orm";
 
 export const getAuthConfig = (c: Context): AuthConfig => {

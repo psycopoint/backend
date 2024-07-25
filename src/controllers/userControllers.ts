@@ -9,7 +9,7 @@ import { eq } from "drizzle-orm";
 
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
-import { getAuth } from "@/lib/auth-config";
+import { getAuth } from "@/auth";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 
