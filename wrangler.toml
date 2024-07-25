@@ -1,10 +1,10 @@
 name = "psicohub-backend"
 compatibility_date = "2024-04-01"
-usage_model = "unbound"
 
 
-# [vars]
-# MY_VAR = "my-variable"
+[vars]
+PROJECT_NAME = "psicohub"
+
 
 # [[kv_namespaces]]
 # binding = "MY_KV_NAMESPACE"
