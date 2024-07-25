@@ -1,19 +1,26 @@
 import { relations } from "drizzle-orm";
-import { json, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  json,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+} from "drizzle-orm/pg-core";
 import { psychologists } from "./psychologists";
 import { users } from "@db/schemas";
+import { createId } from "@paralleldrive/cuid2";
 
 export const clinics = pgTable("clinics", {
-  userId: text("user_id")
+  id: text("id").notNull(),
+  userId: text("userId")
     .primaryKey()
-    .notNull()
-    .unique()
     .references(() => users.id, {
       onDelete: "cascade",
-    }),
+    })
+    .notNull()
+    .unique(),
   companyName: text("company_name").notNull(),
-  email: text("email").notNull(),
-  password: text("password").notNull(),
   phone: text("phone"),
   website: text("website"),
   cnpj: text("cnpj"),

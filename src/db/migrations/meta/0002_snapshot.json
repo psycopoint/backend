@@ -1,6 +1,6 @@
 {
-  "id": "14b35c1b-acdc-4e8f-a34b-530e88e1d898",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "198c020a-388c-4399-a588-c4c6a7d4e8ef",
+  "prevId": "bee2556d-393d-4e16-b13a-d355ced35354",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -744,7 +744,8 @@
           "name": "id",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "'xihadglqv4s6br6xvhc0vvd8'"
         },
         "userId": {
           "name": "userId",
@@ -1270,7 +1271,8 @@
           "name": "id",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "'ovpme5aamooodqlk2j8dar0o'"
         },
         "userId": {
           "name": "userId",

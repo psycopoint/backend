@@ -10,12 +10,12 @@ import {
   InsertPsychologist,
   accounts,
   clinics,
-  psychologists,
   sessions,
   users,
   verificationTokens,
 } from "@db/schemas";
 import { eq } from "drizzle-orm";
+import { psychologists } from "@/db/schemas/public/psychologists";
 
 export const getAuthConfig = (c: Context): AuthConfig => {
   // connect to db
@@ -65,40 +65,43 @@ export const getAuthConfig = (c: Context): AuthConfig => {
       //   },
       // }),
     ],
-    callbacks: {
-      async signIn({ user }) {
-        // verify if user exist inside db
-        const [existing] = await db
-          .select()
-          .from(psychologists)
-          .where(eq(psychologists.userId, user.id!));
+    events: {
+      async createUser({ user }) {
+        try {
+          // verify if user exist inside db
+          const [existing] = await db
+            .select()
+            .from(psychologists)
+            .where(eq(psychologists.userId, user.id!));
 
-        // if user is psychologist create user inside psychologist table
-        if (!existing && user.userType === "psychologist") {
-          const data: InsertPsychologist = {
-            userId: user.id!,
-            email: user.email!,
-            firstName: user.name?.split(" ")[0]!,
-            lastName: user.name?.split(" ")[1]!,
-            avatar: user.image,
-          };
-          await db.insert(psychologists).values(data);
+          // if user is psychologist create user inside psychologist table
+          if (!existing) {
+            console.log("user donot exist");
+            const data: InsertPsychologist = {
+              userId: user.id!,
+              avatar: user.image,
+            };
+            await db.insert(psychologists).values(data);
+          }
+
+          // if user is psychologist create user inside psychologist table
+          //TODO: improve this according to clinic fields inside schema db
+          if (!existing && user.userType === "clinic") {
+            const data: InsertClinic = {
+              companyName: user.name!,
+              userId: user.id!,
+              email: user.email!,
+              password: "test",
+              logo: user.image,
+            };
+            await db.insert(clinics).values(data);
+          }
+        } catch (error) {
+          console.error("Error in signIn callback:", error);
         }
-
-        // if user is psychologist create user inside psychologist table
-        //TODO: improve this according to clinic fields inside schema db
-        if (!existing && user.userType === "clinic") {
-          const data: InsertClinic = {
-            companyName: user.name!,
-            userId: user.id!,
-            email: user.email!,
-            password: "test",
-            logo: user.image,
-          };
-          await db.insert(clinics).values(data);
-        }
-
-        return true;
+      },
+      async updateUser({ user }) {
+        console.log("USER UPDATED");
       },
     },
     basePath: "/v1/auth",

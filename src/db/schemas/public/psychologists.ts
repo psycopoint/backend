@@ -6,26 +6,26 @@ import {
   date,
   jsonb,
   pgEnum,
+  unique,
 } from "drizzle-orm/pg-core";
-import { users } from "../users";
+
 import { createInsertSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
+import { clinics, users } from "@/db/schemas";
+import { createId } from "@paralleldrive/cuid2";
 
 export const genderEnum = pgEnum("gender", ["male", "female", "other"]);
 
 export const psychologists = pgTable("psychologists", {
+  id: text("id").notNull(),
   userId: text("userId")
     .primaryKey()
-    .notNull()
-    .unique()
     .references(() => users.id, {
       onDelete: "cascade",
-    }),
-  firstName: text("first_name").notNull(),
-  lastName: text("last_name"),
-  email: text("email").notNull().unique(),
+    })
+    .notNull()
+    .unique(),
   additionalEmails: jsonb("adidional_emails").default("{}"),
-  password: text("password"),
   website: text("website"),
   socialLinks: jsonb("social_links").default("{}"),
   gender: genderEnum("gender"),
@@ -35,14 +35,14 @@ export const psychologists = pgTable("psychologists", {
   addressInfo: jsonb("address_info").default([]),
   crp: varchar("crp", { length: 256 }),
   cpf: varchar("cpf", { length: 256 }),
-  avatar: text("avatar"),
+  image: text("image"),
   specialty: text("specialty"),
   preferences: jsonb("preferences").default("{}"),
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
-  // clinicId: text("clinic_id").references(() => clinics.id, {
-  //   onDelete: "cascade",
-  // }),
+  clinicId: text("clinic_id").references(() => clinics.userId, {
+    onDelete: "cascade",
+  }),
 });
 
 // RELATIONS

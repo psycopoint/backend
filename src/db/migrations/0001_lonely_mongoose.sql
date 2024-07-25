@@ -1,0 +1,1 @@
+ALTER TABLE "psychologists" ALTER COLUMN "id" SET DEFAULT 'fi2e7qsy8oufbegvlbwt3mjb';

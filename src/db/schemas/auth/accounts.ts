@@ -1,12 +1,6 @@
 import { AdapterAccountType } from "@auth/core/adapters";
-import {
-  integer,
-  pgSchema,
-  pgTable,
-  primaryKey,
-  text,
-} from "drizzle-orm/pg-core";
-import { authSchema, users } from "../users";
+import { integer, primaryKey, text } from "drizzle-orm/pg-core";
+import { authSchema, users } from "./users";
 
 export const accounts = authSchema.table(
   "account",

@@ -1,6 +1,6 @@
 {
-  "id": "14b35c1b-acdc-4e8f-a34b-530e88e1d898",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "020c219e-ad79-462c-bc02-6c8c7b2d8f3c",
+  "prevId": "198c020a-388c-4399-a588-c4c6a7d4e8ef",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -744,7 +744,8 @@
           "name": "id",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "'m1i0bg0blkb4o7upwwr6cqoo'"
         },
         "userId": {
           "name": "userId",
@@ -754,18 +755,6 @@
         },
         "company_name": {
           "name": "company_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "email": {
-          "name": "email",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "password": {
-          "name": "password",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -1270,7 +1259,8 @@
           "name": "id",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "'qkd45pz0nfsag7mfixoazy7t'"
         },
         "userId": {
           "name": "userId",

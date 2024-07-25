@@ -5,7 +5,7 @@ import {
   primaryKey,
   pgSchema,
 } from "drizzle-orm/pg-core";
-import { authSchema } from "../users";
+import { authSchema } from "./users";
 
 export const verificationTokens = authSchema.table(
   "verificationToken",
