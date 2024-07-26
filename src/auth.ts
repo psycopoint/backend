@@ -79,22 +79,13 @@ export const getAuthConfig = (c: Context): AuthConfig => {
             console.log("user donot exist");
             const data: InsertPsychologist = {
               userId: user.id!,
-              avatar: user.image,
+              image: user.image,
             };
-            await db.insert(psychologists).values(data);
-          }
 
-          // if user is psychologist create user inside psychologist table
-          //TODO: improve this according to clinic fields inside schema db
-          if (!existing && user.userType === "clinic") {
-            const data: InsertClinic = {
-              companyName: user.name!,
-              userId: user.id!,
-              email: user.email!,
-              password: "test",
-              logo: user.image,
-            };
-            await db.insert(clinics).values(data);
+            await db.insert(psychologists).values(data);
+            // await db
+            //   .insert(clinics)
+            //   .values({ ...data, companyName: user.name! });
           }
         } catch (error) {
           console.error("Error in signIn callback:", error);

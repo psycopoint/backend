@@ -1,5 +1,5 @@
 {
-  "id": "14b35c1b-acdc-4e8f-a34b-530e88e1d898",
+  "id": "cc43c2bd-ee24-4537-be6c-62f34a09371d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -740,12 +740,6 @@
       "name": "clinics",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
         "userId": {
           "name": "userId",
           "type": "text",
@@ -754,18 +748,6 @@
         },
         "company_name": {
           "name": "company_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "email": {
-          "name": "email",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "password": {
-          "name": "password",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -1266,12 +1248,6 @@
       "name": "psychologists",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
         "userId": {
           "name": "userId",
           "type": "text",
@@ -1343,8 +1319,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "avatar": {
-          "name": "avatar",
+        "image": {
+          "name": "image",
           "type": "text",
           "primaryKey": false,
           "notNull": false

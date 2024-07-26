@@ -1,14 +1,13 @@
 import { createFactory } from "hono/factory";
 
 import {
-  SelectUser,
   clinics,
   insertPsychologistsSchema,
   insertUserSchema,
   psychologists,
   users,
 } from "@/db/schemas";
-import { and, eq } from "drizzle-orm";
+import { and, eq, getTableColumns } from "drizzle-orm";
 
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
@@ -16,7 +15,6 @@ import { getAuth } from "@/auth";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { hashPassword } from "@/utils/password";
-import { createId } from "@paralleldrive/cuid2";
 
 const factory = createFactory();
 
@@ -34,37 +32,31 @@ export const getAllUsers = factory.createHandlers(async (c) => {
 
     // logic for admins
     if (user.userType === "admin") {
-      const [clinic] = await db
-        .select()
-        .from(clinics)
-        .where(eq(clinics.userId, user.id));
+      const clinic = await db.select().from(clinics);
 
-      const [psychologist] = await db
-        .select()
-        .from(psychologists)
-        .where(eq(psychologists.userId, user.id));
+      const psychologist = await db.select().from(psychologists);
 
-      if (clinic) {
-        return c.json({ data: clinic });
-      } else if (psychologist) {
-        return c.json({ data: psychologist });
-      }
+      const data = {
+        clinic,
+        psychologist,
+      };
 
-      return c.json({
-        data: null,
-        message: "No clinic or psychologist found",
-      });
+      return c.json({ data });
     }
 
     // logic for clinics
     if (user.userType === "clinic") {
-      const [psychologist] = await db
-        .select()
-        .from(psychologists)
-        .where(eq(psychologists.userId, user.id));
+      const result = await db
+        .select({
+          ...getTableColumns(users),
+          ...getTableColumns(psychologists),
+        })
+        .from(users)
+        .leftJoin(psychologists, eq(users.id, psychologists.userId))
+        .where(eq(psychologists.clinicId, user.id));
 
-      if (psychologist) {
-        return c.json({ data: psychologist });
+      if (result) {
+        return c.json({ data: result });
       }
 
       return c.json({
@@ -97,8 +89,6 @@ export const getUser = factory.createHandlers(
     const { user } = getAuth(c);
     const { id } = c.req.valid("param");
 
-    console.log("GET USER BY ID");
-
     try {
       if (!user) {
         return c.text("UNAUTHORIZED", 401);
@@ -110,16 +100,15 @@ export const getUser = factory.createHandlers(
 
       // logic for admins
       if (user.userType === "admin") {
-        console.log("VC E ADMIN");
         const [clinic] = await db
           .select()
           .from(clinics)
-          .where(eq(clinics.id, id));
+          .where(eq(clinics.userId, id));
 
         const [psychologist] = await db
           .select()
           .from(psychologists)
-          .where(eq(psychologists.id, id));
+          .where(eq(psychologists.userId, id));
 
         if (clinic) {
           return c.json({ data: clinic });
@@ -139,7 +128,7 @@ export const getUser = factory.createHandlers(
           .select()
           .from(psychologists)
           .where(
-            and(eq(psychologists.id, id), eq(psychologists.userId, user.id))
+            and(eq(psychologists.userId, id), eq(psychologists.userId, user.id))
           );
 
         if (psychologist) {
@@ -170,8 +159,6 @@ export const getMe = factory.createHandlers(async (c) => {
   const { user } = getAuth(c);
 
   try {
-    console.log(user);
-
     if (!user) {
       return c.text("UNAUTHORIZED", 401);
     }
@@ -240,7 +227,7 @@ export const createUser = factory.createHandlers(
       // hash password
       const pwHash = await hashPassword(body.password as string);
 
-      // logic for admins to add user allowing them to change the user type
+      // logic for admins to create an user allowing them to change the user type
       if (user?.userType === "admin") {
         // insert user inside users & psychologist/clinic talbes
         const [userResult] = await db
@@ -251,20 +238,16 @@ export const createUser = factory.createHandlers(
           })
           .returning({ id: users.id });
 
-        console.log(userResult);
-
         if (userResult) {
           switch (body.userType) {
             case "psychologist":
               console.log("Inserting user inside psychologists");
               await db.insert(psychologists).values({
-                id: createId(),
                 userId: userResult.id,
               });
               break;
             case "clinic":
               await db.insert(clinics).values({
-                id: createId(),
                 userId: userResult.id,
                 logo: body.image,
                 companyName: body.name as string,
@@ -276,7 +259,7 @@ export const createUser = factory.createHandlers(
         return c.json({ message: "You're an admin!" });
       }
 
-      // logic for clinics to add user
+      // logic for clinics to create an user
       if (user.userType === "clinic") {
         const [userResult] = await db
           .insert(users)
@@ -290,8 +273,8 @@ export const createUser = factory.createHandlers(
           case "psychologist":
             console.log("Inserting user inside psychologists");
             await db.insert(psychologists).values({
-              id: createId(),
               userId: userResult.id,
+              clinicId: user.id,
             });
             break;
           default:

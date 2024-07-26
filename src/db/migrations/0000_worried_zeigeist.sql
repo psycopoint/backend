@@ -142,11 +142,8 @@ CREATE TABLE IF NOT EXISTS "appointments" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "clinics" (
-	"id" text NOT NULL,
 	"userId" text PRIMARY KEY NOT NULL,
 	"company_name" text NOT NULL,
-	"email" text NOT NULL,
-	"password" text NOT NULL,
 	"phone" text,
 	"website" text,
 	"cnpj" text,
@@ -216,7 +213,6 @@ CREATE TABLE IF NOT EXISTS "payments" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "psychologists" (
-	"id" text NOT NULL,
 	"userId" text PRIMARY KEY NOT NULL,
 	"adidional_emails" jsonb DEFAULT '{}',
 	"website" text,
@@ -228,7 +224,7 @@ CREATE TABLE IF NOT EXISTS "psychologists" (
 	"address_info" jsonb DEFAULT '[]'::jsonb,
 	"crp" varchar(256),
 	"cpf" varchar(256),
-	"avatar" text,
+	"image" text,
 	"specialty" text,
 	"preferences" jsonb DEFAULT '{}',
 	"created_at" timestamp DEFAULT now(),

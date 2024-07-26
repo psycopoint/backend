@@ -12,7 +12,6 @@ import { users } from "@db/schemas";
 import { createId } from "@paralleldrive/cuid2";
 
 export const clinics = pgTable("clinics", {
-  id: text("id").notNull(),
   userId: text("userId")
     .primaryKey()
     .references(() => users.id, {

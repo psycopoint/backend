@@ -17,7 +17,6 @@ import { createId } from "@paralleldrive/cuid2";
 export const genderEnum = pgEnum("gender", ["male", "female", "other"]);
 
 export const psychologists = pgTable("psychologists", {
-  id: text("id").notNull(),
   userId: text("userId")
     .primaryKey()
     .references(() => users.id, {
@@ -52,6 +51,11 @@ export const psychologistsRelations = relations(
     user: one(users, {
       fields: [psychologists.userId],
       references: [users.id],
+    }),
+
+    clinic: one(clinics, {
+      fields: [psychologists.clinicId],
+      references: [clinics.userId],
     }),
   })
 );
