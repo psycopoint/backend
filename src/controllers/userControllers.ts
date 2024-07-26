@@ -124,12 +124,18 @@ export const getUser = factory.createHandlers(
 
       // logic for clinics
       if (user.userType === "clinic") {
+        // remove password from query
+        const { password, ...restUserColumns } = getTableColumns(users);
+        const { ...restPsychologistColumns } = getTableColumns(psychologists);
+
         const [psychologist] = await db
-          .select()
-          .from(psychologists)
-          .where(
-            and(eq(psychologists.userId, id), eq(psychologists.userId, user.id))
-          );
+          .select({
+            ...restUserColumns,
+            ...restPsychologistColumns,
+          })
+          .from(users)
+          .leftJoin(psychologists, eq(users.id, psychologists.userId))
+          .where(and(eq(psychologists.clinicId, user.id), eq(users.id, id)));
 
         if (psychologist) {
           return c.json({ data: psychologist });
@@ -144,7 +150,7 @@ export const getUser = factory.createHandlers(
       // if user is psychologists redirect to profile endpoint
       return c.redirect("/users/@me");
     } catch (error) {
-      console.error("Error updating user data:", error);
+      console.error("Error getting user data:", error);
       return c.json({ error: "Internal Server Error" }, 500);
     }
   }

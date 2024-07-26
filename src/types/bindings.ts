@@ -1,6 +1,7 @@
 export type Env = {
   DATABASE_URL: string;
   AUTH_SECRET: string;
+  AUTH_RESEND_KEY: string;
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;
   AUTH_DRIZZLE_URL: string;
