@@ -11,12 +11,55 @@ import { and, eq, getTableColumns } from "drizzle-orm";
 
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
-import { getAuth } from "@/auth";
+
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { hashPassword } from "@/utils/password";
+import { getAuth } from "@/utils/get-auth";
 
 const factory = createFactory();
+
+// GET @ME
+export const getMe = factory.createHandlers(async (c) => {
+  // connect to db
+  const sql = neon(c.env.DATABASE_URL);
+  const db = drizzle(sql);
+
+  const user = await getAuth(c);
+
+  console.log(user.id);
+
+  try {
+    if (!user) {
+      return c.text("UNAUTHORIZED", 401);
+    }
+
+    // get psychologist profile
+    const [psychologist] = await db
+      .select()
+      .from(psychologists)
+      .where(eq(psychologists.userId, user.id));
+
+    console.log("PSICO", psychologist);
+
+    // get clinic profile
+    const [clinic] = await db
+      .select()
+      .from(psychologists)
+      .where(eq(psychologists.userId, user.id));
+
+    const data = {
+      ...user,
+      ...clinic,
+      ...psychologist,
+    };
+
+    return c.json({ data }, 200);
+  } catch (error) {
+    console.error("Error updating user data:", error);
+    return c.json({ error: "Internal Server Error" }, 500);
+  }
+});
 
 // GET ALL USERS
 export const getAllUsers = factory.createHandlers(async (c) => {
@@ -24,7 +67,7 @@ export const getAllUsers = factory.createHandlers(async (c) => {
   const sql = neon(c.env.DATABASE_URL);
   const db = drizzle(sql);
   try {
-    const { user } = getAuth(c);
+    const user = await getAuth(c);
 
     if (!user) {
       return c.text("UNAUTHORIZED", 401);
@@ -86,7 +129,7 @@ export const getUser = factory.createHandlers(
     const sql = neon(c.env.DATABASE_URL);
     const db = drizzle(sql);
 
-    const { user } = getAuth(c);
+    const user = await getAuth(c);
     const { id } = c.req.valid("param");
 
     try {
@@ -156,44 +199,6 @@ export const getUser = factory.createHandlers(
   }
 );
 
-// GET @ME
-export const getMe = factory.createHandlers(async (c) => {
-  // connect to db
-  const sql = neon(c.env.DATABASE_URL);
-  const db = drizzle(sql);
-
-  const { user } = getAuth(c);
-
-  try {
-    if (!user) {
-      return c.text("UNAUTHORIZED", 401);
-    }
-
-    // get psychologist profile
-    const [psychologist] = await db
-      .select()
-      .from(psychologists)
-      .where(eq(psychologists.userId, user.id));
-
-    // get clinic profile
-    const [clinic] = await db
-      .select()
-      .from(psychologists)
-      .where(eq(psychologists.userId, user.id));
-
-    const data = {
-      ...user,
-      ...clinic,
-      ...psychologist,
-    };
-
-    return c.json({ data }, 200);
-  } catch (error) {
-    console.error("Error updating user data:", error);
-    return c.json({ error: "Internal Server Error" }, 500);
-  }
-});
-
 // CREATE USER
 export const createUser = factory.createHandlers(
   zValidator(
@@ -213,7 +218,7 @@ export const createUser = factory.createHandlers(
     const db = drizzle(sql);
 
     // get user & body data
-    const { user } = getAuth(c);
+    const user = await getAuth(c);
     const body = c.req.valid("json");
 
     try {
@@ -336,7 +341,7 @@ export const updateUser = factory.createHandlers(
     const db = drizzle(sql);
 
     // get user, body data & param id
-    const { user } = getAuth(c);
+    const user = await getAuth(c);
     const values = c.req.valid("json");
     const { id } = c.req.valid("param");
 

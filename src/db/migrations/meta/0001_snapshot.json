@@ -1,6 +1,6 @@
 {
-  "id": "81b83221-d683-440c-bc42-fb4d1cd3cce5",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "6503747d-cfcf-48ed-ae0b-6edbbc01282c",
+  "prevId": "81b83221-d683-440c-bc42-fb4d1cd3cce5",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -51,6 +51,13 @@
           "primaryKey": false,
           "notNull": false,
           "default": "'psychologist'"
+        },
+        "provider": {
+          "name": "provider",
+          "type": "providers",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
@@ -1243,6 +1250,16 @@
     }
   },
   "enums": {
+    "public.providers": {
+      "name": "providers",
+      "schema": "public",
+      "values": [
+        "google",
+        "linkedin",
+        "apple",
+        "credentials"
+      ]
+    },
     "public.user_type": {
       "name": "user_type",
       "schema": "public",

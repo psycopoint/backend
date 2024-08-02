@@ -4,7 +4,7 @@ import {
   getMe,
   getUser,
   updateUser,
-} from "@/controllers/userControllers";
+} from "@/controllers/users.controllers";
 import { Context, Hono } from "hono";
 import { z } from "zod";
 

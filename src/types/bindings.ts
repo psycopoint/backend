@@ -7,4 +7,6 @@ export type Env = {
   AUTH_DRIZZLE_URL: string;
   AUTH_URL: string;
   PROJECT_NAME: string;
+  JWT_SECRET: string;
+  JWT_EXPIRATION_TIME: number;
 };
