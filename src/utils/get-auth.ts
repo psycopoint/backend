@@ -1,4 +1,5 @@
-import { users } from "@/db/schemas";
+import { InsertUser, SelectUser, users } from "@/db/schemas";
+import { eq, getTableColumns } from "drizzle-orm";
 import { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { Context } from "hono";
 import { getCookie } from "hono/cookie";
@@ -14,10 +15,19 @@ type ReturnType = {
   nbf: number;
 };
 
-export const getAuth = async (c: Context): Promise<ReturnType> => {
+export const getAuth = async (
+  c: Context,
+  db: NeonHttpDatabase
+): Promise<InsertUser> => {
   const token = getCookie(c, "auth_user");
 
   const verification = await verify(token!, c.env.JWT_SECRET, "HS256");
 
-  return verification as ReturnType;
+  const { password, ...rest } = getTableColumns(users); // separate password from other fields to exclude it
+  const [user] = await db
+    .select({ ...rest })
+    .from(users)
+    .where(eq(users.id, verification.id as string));
+
+  return user;
 };

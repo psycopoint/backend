@@ -25,9 +25,7 @@ export const getMe = factory.createHandlers(async (c) => {
   const sql = neon(c.env.DATABASE_URL);
   const db = drizzle(sql);
 
-  const user = await getAuth(c);
-
-  console.log(user.id);
+  const user = await getAuth(c, db);
 
   try {
     if (!user) {
@@ -38,15 +36,13 @@ export const getMe = factory.createHandlers(async (c) => {
     const [psychologist] = await db
       .select()
       .from(psychologists)
-      .where(eq(psychologists.userId, user.id));
-
-    console.log("PSICO", psychologist);
+      .where(eq(psychologists.userId, user.id!));
 
     // get clinic profile
     const [clinic] = await db
       .select()
       .from(psychologists)
-      .where(eq(psychologists.userId, user.id));
+      .where(eq(psychologists.userId, user.id!));
 
     const data = {
       ...user,
@@ -67,7 +63,7 @@ export const getAllUsers = factory.createHandlers(async (c) => {
   const sql = neon(c.env.DATABASE_URL);
   const db = drizzle(sql);
   try {
-    const user = await getAuth(c);
+    const user = await getAuth(c, db);
 
     if (!user) {
       return c.text("UNAUTHORIZED", 401);
@@ -96,7 +92,7 @@ export const getAllUsers = factory.createHandlers(async (c) => {
         })
         .from(users)
         .leftJoin(psychologists, eq(users.id, psychologists.userId))
-        .where(eq(psychologists.clinicId, user.id));
+        .where(eq(psychologists.clinicId, user.id!));
 
       if (result) {
         return c.json({ data: result });
@@ -129,7 +125,7 @@ export const getUser = factory.createHandlers(
     const sql = neon(c.env.DATABASE_URL);
     const db = drizzle(sql);
 
-    const user = await getAuth(c);
+    const user = await getAuth(c, db);
     const { id } = c.req.valid("param");
 
     try {
@@ -178,7 +174,7 @@ export const getUser = factory.createHandlers(
           })
           .from(users)
           .leftJoin(psychologists, eq(users.id, psychologists.userId))
-          .where(and(eq(psychologists.clinicId, user.id), eq(users.id, id)));
+          .where(and(eq(psychologists.clinicId, user.id!), eq(users.id, id)));
 
         if (psychologist) {
           return c.json({ data: psychologist });
@@ -218,7 +214,7 @@ export const createUser = factory.createHandlers(
     const db = drizzle(sql);
 
     // get user & body data
-    const user = await getAuth(c);
+    const user = await getAuth(c, db);
     const body = c.req.valid("json");
 
     try {
@@ -341,7 +337,7 @@ export const updateUser = factory.createHandlers(
     const db = drizzle(sql);
 
     // get user, body data & param id
-    const user = await getAuth(c);
+    const user = await getAuth(c, db);
     const values = c.req.valid("json");
     const { id } = c.req.valid("param");
 
