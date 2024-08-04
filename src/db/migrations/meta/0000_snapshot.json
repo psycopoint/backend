@@ -1,12 +1,74 @@
 {
-  "id": "81b83221-d683-440c-bc42-fb4d1cd3cce5",
+  "id": "fdd13949-6bb4-4b38-9032-1c664c102afb",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.users": {
+    "auth.refresh_token": {
+      "name": "refresh_token",
+      "schema": "auth",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token": {
+          "name": "token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "refresh_token": {
+          "name": "refresh_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "refresh_token_userId_users_id_fk": {
+          "name": "refresh_token_userId_users_id_fk",
+          "tableFrom": "refresh_token",
+          "tableTo": "users",
+          "schemaTo": "auth",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "auth.users": {
       "name": "users",
-      "schema": "",
+      "schema": "auth",
       "columns": {
         "id": {
           "name": "id",
@@ -51,6 +113,13 @@
           "primaryKey": false,
           "notNull": false,
           "default": "'psychologist'"
+        },
+        "provider": {
+          "name": "provider",
+          "type": "providers",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
@@ -549,6 +618,7 @@
           "name": "clinics_userId_users_id_fk",
           "tableFrom": "clinics",
           "tableTo": "users",
+          "schemaTo": "auth",
           "columnsFrom": [
             "userId"
           ],
@@ -1097,6 +1167,7 @@
           "name": "psychologists_userId_users_id_fk",
           "tableFrom": "psychologists",
           "tableTo": "users",
+          "schemaTo": "auth",
           "columnsFrom": [
             "userId"
           ],
@@ -1243,6 +1314,16 @@
     }
   },
   "enums": {
+    "public.providers": {
+      "name": "providers",
+      "schema": "public",
+      "values": [
+        "google",
+        "linkedin",
+        "apple",
+        "credentials"
+      ]
+    },
     "public.user_type": {
       "name": "user_type",
       "schema": "public",
@@ -1287,7 +1368,9 @@
       ]
     }
   },
-  "schemas": {},
+  "schemas": {
+    "auth": "auth"
+  },
   "sequences": {},
   "_meta": {
     "columns": {},

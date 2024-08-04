@@ -21,9 +21,9 @@ export const providers = pgEnum("providers", [
   "credentials",
 ]);
 
-// export const authSchema = pgSchema("auth");
+export const authSchema = pgSchema("auth");
 
-export const users = pgTable("users", {
+export const users = authSchema.table("users", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => createId()),

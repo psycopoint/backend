@@ -8,20 +8,20 @@ import {
 import { Context, Hono } from "hono";
 import { z } from "zod";
 
-const app = new Hono()
-  // get all users
-  .get("/", ...getAllUsers)
+const app = new Hono();
+// get all users
+app.get("/", ...getAllUsers);
 
-  // get @me
-  .get("/@me", ...getMe)
+// get @me
+app.get("/@me", ...getMe);
 
-  // get user by id
-  .get("/:id", ...getUser)
+// get user by id
+app.get("/:id", ...getUser);
 
-  // create user
-  .post("/", ...createUser)
+// create user
+app.post("/", ...createUser);
 
-  // update user
-  .patch("/:id", ...updateUser);
+// update user
+app.patch("/:id", ...updateUser);
 
 export default app;

@@ -39,7 +39,7 @@ export const googleAuthentication = factory.createHandlers(
 );
 
 export const signout = factory.createHandlers(async (c) => {
-  deleteCookie(c, "auth_user");
+  deleteCookie(c, "psicohub.token");
   deleteCookie(c, "state");
 
   return c.redirect("/");

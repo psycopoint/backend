@@ -17,6 +17,7 @@ app.get(
       client_id: c.env.GOOGLE_CLIENT_ID,
       client_secret: c.env.GOOGLE_CLIENT_SECRET,
       scope: ["openid", "email", "profile"],
+      redirect_uri: "http://localhost:3001/v1/auth/google",
     });
     return googleAuthMiddleware(c, next);
   },

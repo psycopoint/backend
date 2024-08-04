@@ -38,7 +38,7 @@ export const generateNewToken = async (
   );
 
   // save the token inside a cookie
-  setCookie(c, "auth_user", tokenJwt, {
+  setCookie(c, "psicohub.token", tokenJwt, {
     path: "/",
     expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000), // 7 dias
     httpOnly: true,

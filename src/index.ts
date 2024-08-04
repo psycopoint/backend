@@ -1,19 +1,32 @@
 import { Hono } from "hono";
-import { authHandler, initAuthConfig, verifyAuth } from "@hono/auth-js";
 
 import { Env } from "types/bindings";
-type Variables = JwtVariables;
+
+import { bearerAuth } from "hono/bearer-auth";
+
+import { getCookie } from "hono/cookie";
 
 // ROUTES
 import users from "@routes/users";
 import auth from "@routes/auth";
-import { JwtVariables, jwt, verify } from "hono/jwt";
-import { getCookie } from "hono/cookie";
+import { JwtVariables, jwt } from "hono/jwt";
+
+type Variables = JwtVariables;
 
 const app = new Hono<{ Bindings: Env; Variables: Variables }>().basePath("/v1");
 
-app.route("/users", users);
-
 app.route("/auth", auth);
+
+app.use("/*", async (c, next) => {
+  const token = c.req.header("Authorization");
+
+  const bearerMiddleware = bearerAuth({
+    token: token?.split(" ")[1]!,
+  });
+
+  return bearerMiddleware(c, next);
+});
+
+app.route("/users", users);
 
 export default app;

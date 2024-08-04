@@ -1,3 +1,11 @@
+CREATE SCHEMA "auth";
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "public"."providers" AS ENUM('google', 'linkedin', 'apple', 'credentials');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
 DO $$ BEGIN
  CREATE TYPE "public"."user_type" AS ENUM('psychologist', 'clinic', 'admin');
 EXCEPTION
@@ -28,14 +36,24 @@ EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "users" (
+CREATE TABLE IF NOT EXISTS "auth"."refresh_token" (
+	"id" text PRIMARY KEY NOT NULL,
+	"userId" text NOT NULL,
+	"token" text,
+	"refresh_token" text,
+	"expires_at" integer,
+	"created_at" timestamp DEFAULT now()
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "auth"."users" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text,
 	"email" text NOT NULL,
 	"emailVerified" timestamp,
 	"password" text,
 	"image" text,
-	"user_type" "user_type" DEFAULT 'psychologist'
+	"user_type" "user_type" DEFAULT 'psychologist',
+	"provider" "providers"
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "anamnesis" (
@@ -208,6 +226,12 @@ CREATE TABLE IF NOT EXISTS "subscriptions" (
 );
 --> statement-breakpoint
 DO $$ BEGIN
+ ALTER TABLE "auth"."refresh_token" ADD CONSTRAINT "refresh_token_userId_users_id_fk" FOREIGN KEY ("userId") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  ALTER TABLE "anamnesis" ADD CONSTRAINT "anamnesis_patient_id_patients_id_fk" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -232,7 +256,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "clinics" ADD CONSTRAINT "clinics_userId_users_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "clinics" ADD CONSTRAINT "clinics_userId_users_id_fk" FOREIGN KEY ("userId") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -274,7 +298,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "psychologists" ADD CONSTRAINT "psychologists_userId_users_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "psychologists" ADD CONSTRAINT "psychologists_userId_users_id_fk" FOREIGN KEY ("userId") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

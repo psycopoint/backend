@@ -19,7 +19,7 @@ export const getAuth = async (
   c: Context,
   db: NeonHttpDatabase
 ): Promise<InsertUser> => {
-  const token = getCookie(c, "auth_user");
+  const token = c.req.header("Authorization")?.split(" ")[1];
 
   const verification = await verify(token!, c.env.JWT_SECRET, "HS256");
 
