@@ -18,7 +18,7 @@ app.use("*", async (c, next) => {
     origin: c.env.BASE_URL, // Permite apenas o frontend no localhost:3000
     allowMethods: ["GET", "POST", "PATCH", "OPTIONS"],
     allowHeaders: ["Authorization", "Content-Type"],
-    credentials: true, // Se você precisar de suporte para cookies e credenciais
+    credentials: true,
   });
 
   return corsMiddleware(c, next);

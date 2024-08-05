@@ -25,6 +25,7 @@ export const generateToken = async (
   const [user] = await db.select().from(users).where(eq(users.id, userId));
 
   const now = dayjs();
+  const expiresIn = dayjs().add(1, "hour").unix();
 
   // create a JWT token
   const token = await sign(
@@ -34,18 +35,20 @@ export const generateToken = async (
       email: user?.email!,
       userType: user?.userType,
       iat: now.unix(),
-      exp: now.add(1, "hour").unix(),
+      exp: expiresIn,
       nbf: now.unix(),
     },
     c.env.JWT_SECRET,
     "HS256"
   );
 
+  const cookieExpires = new Date(expiresIn * 1000);
+
   // save the token inside a cookie
-  setCookie(c, "psicohub_token", token, {
+  setCookie(c, "psicohub.token", token, {
     path: "/",
-    expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000), // 7 dias
-    httpOnly: true,
+    expires: cookieExpires,
+    httpOnly: false,
   });
 
   return token;
