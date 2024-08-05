@@ -2,30 +2,29 @@ import { Hono } from "hono";
 
 import { Env } from "types/bindings";
 
-import { bearerAuth } from "hono/bearer-auth";
-
-import { getCookie } from "hono/cookie";
-
 // ROUTES
 import users from "@routes/users";
 import auth from "@routes/auth";
 import { JwtVariables, jwt } from "hono/jwt";
+import { bearerMiddleware } from "./middlewares/bearer-middleware";
+import { cors } from "hono/cors";
 
 type Variables = JwtVariables;
 
 const app = new Hono<{ Bindings: Env; Variables: Variables }>().basePath("/v1");
 
-app.route("/auth", auth);
-
-app.use("/*", async (c, next) => {
-  const token = c.req.header("Authorization");
-
-  const bearerMiddleware = bearerAuth({
-    token: token?.split(" ")[1]!,
+app.use("*", async (c, next) => {
+  const corsMiddleware = cors({
+    origin: c.env.BASE_URL, // Permite apenas o frontend no localhost:3000
+    allowMethods: ["GET", "POST", "PATCH", "OPTIONS"],
+    allowHeaders: ["Authorization", "Content-Type"],
+    credentials: true, // Se você precisar de suporte para cookies e credenciais
   });
 
-  return bearerMiddleware(c, next);
+  return corsMiddleware(c, next);
 });
+
+app.route("/auth", auth);
 
 app.route("/users", users);
 

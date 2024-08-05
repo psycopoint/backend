@@ -9,4 +9,5 @@ export type Env = {
   PROJECT_NAME: string;
   JWT_SECRET: string;
   JWT_EXPIRATION_TIME: number;
+  BASE_URL: string;
 };

@@ -1,11 +1,15 @@
 import {
   InsertPsychologist,
   InsertUser,
+  SelectRefreshToken,
   SelectUser,
   psychologists,
+  refreshTokens,
   users,
 } from "@/db/schemas";
+import { refreshToken } from "@hono/oauth-providers/linkedin";
 import { createId } from "@paralleldrive/cuid2";
+import dayjs from "dayjs";
 import { eq } from "drizzle-orm";
 import { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { Context } from "hono";
@@ -13,38 +17,58 @@ import { deleteCookie, setCookie } from "hono/cookie";
 import { sign } from "hono/jwt";
 
 // GENERATE & SET TOKEN
-export const generateNewToken = async (
+export const generateToken = async (
   c: Context,
-  id: string
+  userId: string,
+  db: NeonHttpDatabase
 ): Promise<string> => {
-  const user = c.get("user-google");
+  const [user] = await db.select().from(users).where(eq(users.id, userId));
 
-  const now = Math.floor(Date.now() / 1000);
-  const expirationTime = c.env.JWT_EXPIRATION_TIME * 24 * 60 * 60;
+  const now = dayjs();
 
   // create a JWT token
-  const tokenJwt = await sign(
+  const token = await sign(
     {
-      id: id,
+      sub: userId,
       name: user?.name,
       email: user?.email!,
-      userType: "psychologist",
-      iat: now,
-      exp: now + expirationTime,
-      nbf: now,
+      userType: user?.userType,
+      iat: now.unix(),
+      exp: now.add(1, "hour").unix(),
+      nbf: now.unix(),
     },
     c.env.JWT_SECRET,
     "HS256"
   );
 
   // save the token inside a cookie
-  setCookie(c, "psicohub.token", tokenJwt, {
+  setCookie(c, "psicohub_token", token, {
     path: "/",
     expires: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000), // 7 dias
     httpOnly: true,
   });
 
-  return tokenJwt;
+  return token;
+};
+
+// CREATE/UPDATE REFRESH TOKEN INSIDE DB
+export const generateRefreshToken = async (
+  db: NeonHttpDatabase,
+  userId: string
+): Promise<SelectRefreshToken> => {
+  // delete current refresh token inside db
+  await db.delete(refreshTokens).where(eq(refreshTokens.userId, userId));
+
+  const [refreshToken] = await db
+    .insert(refreshTokens)
+    .values({
+      id: createId()!,
+      userId,
+      expiresIn: dayjs().add(30, "days").unix(),
+    })
+    .returning();
+
+  return refreshToken;
 };
 
 // GET USER BY ID

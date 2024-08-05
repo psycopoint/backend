@@ -2,7 +2,7 @@ import { InsertUser, SelectUser, users } from "@/db/schemas";
 import { eq, getTableColumns } from "drizzle-orm";
 import { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { Context } from "hono";
-import { getCookie } from "hono/cookie";
+
 import { verify } from "hono/jwt";
 
 type ReturnType = {
@@ -23,11 +23,15 @@ export const getAuth = async (
 
   const verification = await verify(token!, c.env.JWT_SECRET, "HS256");
 
+  console.log(verification);
+
   const { password, ...rest } = getTableColumns(users); // separate password from other fields to exclude it
   const [user] = await db
     .select({ ...rest })
     .from(users)
-    .where(eq(users.id, verification.id as string));
+    .where(eq(users.id, verification.sub as string));
+
+  console.log(user);
 
   return user;
 };

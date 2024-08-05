@@ -8,6 +8,27 @@
       "when": 1722800181710,
       "tag": "0000_eager_jocasta",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1722864462536,
+      "tag": "0001_slim_cammi",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1722865380958,
+      "tag": "0002_elite_umar",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1722865550072,
+      "tag": "0003_lumpy_blink",
+      "breakpoints": true
     }
   ]
 }

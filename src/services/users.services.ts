@@ -8,7 +8,6 @@ import {
   SelectUser,
   users,
 } from "@/db/schemas";
-import { connectToDb } from "@/utils/connect-to-db";
 import { getAuth } from "@/utils/get-auth";
 import { hashPassword } from "@/utils/password";
 import { and, eq, getTableColumns, ne } from "drizzle-orm";

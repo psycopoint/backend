@@ -5,7 +5,11 @@ import { googleAuth, revokeToken } from "@hono/oauth-providers/google";
 
 import { decode, sign, verify } from "hono/jwt";
 
-import { googleAuthentication, signout } from "@/controllers/auth.controllers";
+import {
+  googleAuthentication,
+  regenerateToken,
+  signout,
+} from "@/controllers/auth.controllers";
 
 const app = new Hono();
 
@@ -17,12 +21,13 @@ app.get(
       client_id: c.env.GOOGLE_CLIENT_ID,
       client_secret: c.env.GOOGLE_CLIENT_SECRET,
       scope: ["openid", "email", "profile"],
-      redirect_uri: "http://localhost:3001/v1/auth/google",
     });
     return googleAuthMiddleware(c, next);
   },
   ...googleAuthentication
 );
+
+app.post("/refresh-token", ...regenerateToken);
 
 // logout
 app.post("/signout", ...signout);

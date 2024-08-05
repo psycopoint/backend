@@ -5,10 +5,14 @@ import {
   getUser,
   updateUser,
 } from "@/controllers/users.controllers";
+import { bearerMiddleware } from "@/middlewares/bearer-middleware";
 import { Context, Hono } from "hono";
 import { z } from "zod";
 
 const app = new Hono();
+
+app.use("/*", bearerMiddleware);
+
 // get all users
 app.get("/", ...getAllUsers);
 
