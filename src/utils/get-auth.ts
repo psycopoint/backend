@@ -23,15 +23,11 @@ export const getAuth = async (
 
   const verification = await verify(token!, c.env.JWT_SECRET, "HS256");
 
-  console.log(verification);
-
   const { password, ...rest } = getTableColumns(users); // separate password from other fields to exclude it
   const [user] = await db
     .select({ ...rest })
     .from(users)
     .where(eq(users.id, verification.sub as string));
-
-  console.log(user);
 
   return user;
 };
