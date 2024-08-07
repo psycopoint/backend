@@ -1,15 +1,22 @@
 name = "psicohub-backend"
 compatibility_date = "2024-04-01"
-# route = "api.psycohub.com"
+route = "api.psycohub.com"
+main = "src/index.ts"
 
 [vars]
 PROJECT_NAME = "psicohub"
 JWT_EXPIRATION_TIME = 7
 BASE_URL = "http://localhost:3000"
 
+[env.dev]
+route = "dev.example.com"
 
-# [env.development]
-# route = "dev.api.psycohub.com"
+[env.dev.vars]
+ENVIROMENT = "dev"
+PROJECT_NAME = "psicohub"
+JWT_EXPIRATION_TIME = 7
+BASE_URL = "http://localhost:3000"
+
 
 # [[kv_namespaces]]
 # binding = "MY_KV_NAMESPACE"
