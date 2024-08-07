@@ -1,21 +1,20 @@
 import { Hono } from "hono";
 
 import { Env } from "types/bindings";
+import { cors } from "hono/cors";
+import { JwtVariables } from "hono/jwt";
 
 // ROUTES
 import users from "@routes/users";
 import auth from "@routes/auth";
-import { JwtVariables, jwt } from "hono/jwt";
-import { bearerMiddleware } from "./middlewares/bearer-middleware";
-import { cors } from "hono/cors";
 
-type Variables = JwtVariables;
-
-const app = new Hono<{ Bindings: Env; Variables: Variables }>().basePath("/v1");
+const app = new Hono<{ Bindings: Env; Variables: JwtVariables }>().basePath(
+  "/v1"
+);
 
 app.use("*", async (c, next) => {
   const corsMiddleware = cors({
-    origin: c.env.BASE_URL, // Permite apenas o frontend no localhost:3000
+    origin: c.env.BASE_URL, // allowing only localhost:3000
     allowMethods: ["GET", "POST", "PATCH", "OPTIONS"],
     allowHeaders: ["Authorization", "Content-Type"],
     credentials: true,

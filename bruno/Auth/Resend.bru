@@ -1,0 +1,17 @@
+meta {
+  name: Resend
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{url}}/auth/resend
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "francy.horray@gmail.com"
+  }
+}

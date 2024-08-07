@@ -29,5 +29,5 @@ export const getAuth = async (
     .from(users)
     .where(eq(users.id, verification.sub as string));
 
-  return user;
+  return { ...user };
 };

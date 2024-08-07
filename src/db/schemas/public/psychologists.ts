@@ -34,7 +34,6 @@ export const psychologists = pgTable("psychologists", {
   addressInfo: jsonb("address_info").default([]),
   crp: varchar("crp", { length: 256 }),
   cpf: varchar("cpf", { length: 256 }),
-  image: text("image"),
   specialty: text("specialty"),
   preferences: jsonb("preferences").default("{}"),
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),

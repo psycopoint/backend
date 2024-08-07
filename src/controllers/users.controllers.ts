@@ -174,7 +174,6 @@ export const updateUser = factory.createHandlers(
       addressInfo: true,
       cpf: true,
       phone: true,
-      image: true,
       createdAt: true,
       updatedAt: true,
       gender: true,

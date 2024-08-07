@@ -1,0 +1,21 @@
+meta {
+  name: Signout
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{url}}/auth/signout
+  body: json
+  auth: none
+}
+
+headers {
+  Cookie: psicohub.rf=c27k5thq5lmmsdpvla8btx5s
+}
+
+body:json {
+  {
+    "psicohub.rf": "test"
+  }
+}

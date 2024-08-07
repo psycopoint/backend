@@ -13,7 +13,7 @@ import dayjs from "dayjs";
 import { eq } from "drizzle-orm";
 import { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { Context } from "hono";
-import { deleteCookie, setCookie } from "hono/cookie";
+import { setCookie } from "hono/cookie";
 import { sign } from "hono/jwt";
 
 /**
@@ -51,9 +51,8 @@ export const generateToken = async (
     "HS256"
   );
 
-  const cookieExpires = new Date((expiritation || expiresIn) * 1000);
-
   // save the token inside a cookie
+  const cookieExpires = new Date((expiritation || expiresIn) * 1000);
   setCookie(c, "psicohub.token", token, {
     path: "/",
     expires: cookieExpires,
@@ -69,12 +68,14 @@ export const generateToken = async (
  * @param {Context} c - The Hono.js Context API.
  * @param {NeonHttpDatabase} db - The database instance to interact with.
  * @param {string} userId - The ID of the user for whom to generate the refresh token.
+ * @param {number} expiration - The optional expiratio time of the refresh token.
  * @returns {Promise<SelectRefreshToken>} A promise that resolves to the generated refresh token.
  */
 export const generateRefreshToken = async (
   c: Context,
   db: NeonHttpDatabase,
-  userId: string
+  userId: string,
+  expiration?: number
 ): Promise<SelectRefreshToken> => {
   // delete current refresh token inside db
   await db.delete(refreshTokens).where(eq(refreshTokens.userId, userId));
@@ -84,15 +85,15 @@ export const generateRefreshToken = async (
     .values({
       id: createId()!,
       userId,
-      expiresIn: dayjs().add(30, "days").unix(),
+      expiresIn: expiration || dayjs().add(30, "days").unix(),
     })
     .returning();
 
   // save the token inside a cookie
   setCookie(c, "psicohub.rf", refreshToken.id, {
     path: "/",
-    // expires: new Date(refreshToken.expiresIn),
-    httpOnly: true,
+    httpOnly: false,
+    secure: false,
   });
 
   return refreshToken;
@@ -135,10 +136,13 @@ export const getUserByEmail = async (
  *
  * @param {Context} c - The context containing user information.
  * @param {NeonHttpDatabase} db - The database instance to insert the user into.
- * @returns {Promise<object>} A promise that resolves to the combined user and psychologist data.
+ * @returns {Promise<SelectUser>} A promise that resolves to the combined user and psychologist data.
  * @throws {Error} If there is an error while creating the user.
  */
-export const registerUser = async (c: Context, db: NeonHttpDatabase) => {
+export const registerUser = async (
+  c: Context,
+  db: NeonHttpDatabase
+): Promise<SelectUser> => {
   console.log("inserting user inside db...");
   const user = c.get("user-google");
 

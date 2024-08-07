@@ -8,6 +8,7 @@ export const refreshTokens = authSchema.table("refresh_tokens", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   expiresIn: integer("expires_in").notNull(),
+  token: text("token"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
