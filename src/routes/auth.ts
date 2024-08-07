@@ -7,7 +7,8 @@ import { decode, sign, verify } from "hono/jwt";
 
 import {
   googleAuthentication,
-  regenerateToken,
+  refreshToken,
+  resendAuthentication,
   signout,
 } from "@/controllers/auth.controllers";
 
@@ -27,7 +28,11 @@ app.get(
   ...googleAuthentication
 );
 
-app.post("/refresh-token", ...regenerateToken);
+// resend login
+app.get("/resend", ...resendAuthentication);
+
+// refresh token
+app.post("/refresh", ...refreshToken);
 
 // logout
 app.post("/signout", ...signout);

@@ -16,16 +16,25 @@ import { Context } from "hono";
 import { deleteCookie, setCookie } from "hono/cookie";
 import { sign } from "hono/jwt";
 
-// GENERATE & SET TOKEN
+/**
+ * Generates a JWT token for a user and sets it in a cookie.
+ *
+ * @param {Context} c - The context containing environment variables and request information.
+ * @param {string} userId - The ID of the user for whom to generate the token.
+ * @param {NeonHttpDatabase} db - The database instance to query for user information.
+ * @param {number} expiritation? - Optional time for the token expiration.
+ * @returns {Promise<string>} A promise that resolves to the generated JWT token.
+ */
 export const generateToken = async (
   c: Context,
   userId: string,
-  db: NeonHttpDatabase
+  db: NeonHttpDatabase,
+  expiritation?: number
 ): Promise<string> => {
   const [user] = await db.select().from(users).where(eq(users.id, userId));
 
   const now = dayjs();
-  const expiresIn = dayjs().add(1, "hour").unix();
+  const expiresIn = dayjs().add(60, "minutes").unix();
 
   // create a JWT token
   const token = await sign(
@@ -35,14 +44,14 @@ export const generateToken = async (
       email: user?.email!,
       userType: user?.userType,
       iat: now.unix(),
-      exp: expiresIn,
+      exp: expiritation || expiresIn,
       nbf: now.unix(),
     },
     c.env.JWT_SECRET,
     "HS256"
   );
 
-  const cookieExpires = new Date(expiresIn * 1000);
+  const cookieExpires = new Date((expiritation || expiresIn) * 1000);
 
   // save the token inside a cookie
   setCookie(c, "psicohub.token", token, {
@@ -54,8 +63,16 @@ export const generateToken = async (
   return token;
 };
 
-// CREATE/UPDATE REFRESH TOKEN INSIDE DB
+/**
+ * Creates or updates a refresh token for a user in the database.
+ *
+ * @param {Context} c - The Hono.js Context API.
+ * @param {NeonHttpDatabase} db - The database instance to interact with.
+ * @param {string} userId - The ID of the user for whom to generate the refresh token.
+ * @returns {Promise<SelectRefreshToken>} A promise that resolves to the generated refresh token.
+ */
 export const generateRefreshToken = async (
+  c: Context,
   db: NeonHttpDatabase,
   userId: string
 ): Promise<SelectRefreshToken> => {
@@ -71,10 +88,23 @@ export const generateRefreshToken = async (
     })
     .returning();
 
+  // save the token inside a cookie
+  setCookie(c, "psicohub.rf", refreshToken.id, {
+    path: "/",
+    // expires: new Date(refreshToken.expiresIn),
+    httpOnly: true,
+  });
+
   return refreshToken;
 };
 
-// GET USER BY ID
+/**
+ * Retrieves a user by their ID.
+ *
+ * @param {string} id - The ID of the user to retrieve.
+ * @param {NeonHttpDatabase} db - The database instance to query.
+ * @returns {Promise<SelectUser>} A promise that resolves to the user object if found, or undefined if not found.
+ */
 export const getUserById = async (
   id: string,
   db: NeonHttpDatabase
@@ -84,7 +114,13 @@ export const getUserById = async (
   return exists;
 };
 
-// GET USER BY EMAIL
+/**
+ * Retrieves a user by their email address.
+ *
+ * @param {string} email - The email address of the user to retrieve.
+ * @param {NeonHttpDatabase} db - The database instance to query.
+ * @returns {Promise<SelectUser>} A promise that resolves to the user object if found, or undefined if not found.
+ */
 export const getUserByEmail = async (
   email: string,
   db: NeonHttpDatabase
@@ -94,7 +130,14 @@ export const getUserByEmail = async (
   return exists;
 };
 
-// REGISTER USER INSIDE DB
+/**
+ * Registers a new user in the database.
+ *
+ * @param {Context} c - The context containing user information.
+ * @param {NeonHttpDatabase} db - The database instance to insert the user into.
+ * @returns {Promise<object>} A promise that resolves to the combined user and psychologist data.
+ * @throws {Error} If there is an error while creating the user.
+ */
 export const registerUser = async (c: Context, db: NeonHttpDatabase) => {
   console.log("inserting user inside db...");
   const user = c.get("user-google");
