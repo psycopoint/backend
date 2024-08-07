@@ -22,14 +22,14 @@ import { Context } from "hono";
  *
  * @returns {Promise<Object>} A promise that resolves to an object containing the user, clinic, and psychologist data.
  *
- * @throws {Error} Throws an "UNAUTHORIZED" error if the user is not authenticated.
+ * @throws {Error} Throws an "Unauthorized" error if the user is not authenticated.
 
  */
 export const getUserDataService = async (c: Context, db: NeonHttpDatabase) => {
   const user = await getAuth(c, db);
 
   if (!user) {
-    throw new Error("UNAUTHORIZED");
+    throw new Error("Unauthorized");
   }
 
   const [psychologist] = await db
@@ -63,7 +63,7 @@ export const getAllUsersDataService = async (
   const user = await getAuth(c, db);
 
   if (!user) {
-    throw new Error("UNAUTHORIZED");
+    throw new Error("Unauthorized");
   }
 
   // logic for admins
@@ -121,7 +121,7 @@ export const getAllUsersDataService = async (
  * @returns {Promise<Object>} A promise that resolves to an object containing user data.
  * @throws {Error} Throws an error if the user is not authenticated or if no data is found.
  */
-export const getUserDataByIdService = async (
+export const getUserService = async (
   c: Context,
   id: string,
   db: NeonHttpDatabase
@@ -129,7 +129,7 @@ export const getUserDataByIdService = async (
   const user = await getAuth(c, db);
 
   if (!user) {
-    throw new Error("UNAUTHORIZED");
+    throw new Error("Unauthorized");
   }
 
   if (!id) {
@@ -197,7 +197,7 @@ export const getUserDataByIdService = async (
  * @param {Context} c - The context object containing environment variables and other request-related data.
  * @param {InsertUserSchema} userData - The data to create a new user.
  * @returns {Promise<Object>} A promise that resolves to a success message and user data if creation is successful.
- * @throws {Error} Throws an error if the user is not authenticated, if data is missing, or if an unauthorized action is attempted.
+ * @throws {Error} Throws an error if the user is not authenticated, if data is missing, or if an Unauthorized action is attempted.
  */
 export const createUserService = async (
   c: any,
@@ -207,7 +207,7 @@ export const createUserService = async (
   const user = await getAuth(c, db);
 
   if (!user) {
-    throw new Error("UNAUTHORIZED");
+    throw new Error("Unauthorized");
   }
 
   if (!userData) {
@@ -215,7 +215,7 @@ export const createUserService = async (
   }
 
   if (user.userType !== "clinic" && user.userType !== "admin") {
-    throw new Error("UNAUTHORIZED");
+    throw new Error("Unauthorized");
   }
 
   const pwHash = await hashPassword(userData.password as string);
@@ -266,12 +266,12 @@ export const createUserService = async (
         });
         break;
       default:
-        throw new Error("UNAUTHORIZED");
+        throw new Error("Unauthorized");
     }
   }
 
   if (userData.userType === "admin") {
-    throw new Error("UNAUTHORIZED");
+    throw new Error("Unauthorized");
   }
 
   return { message: "User created by clinic", data: userData };
@@ -284,7 +284,7 @@ export const createUserService = async (
  * @param {string} id - The ID of the user to update.
  * @param {InsertPsychologist} updateData - The data to update the user with.
  * @returns {Promise<Object>} A promise that resolves to an object containing updated user data.
- * @throws {Error} Throws an error if the user is not authenticated, if data is missing, or if an unauthorized action is attempted.
+ * @throws {Error} Throws an error if the user is not authenticated, if data is missing, or if an Unauthorized action is attempted.
  */
 export const updateUserService = async (
   c: Context,
@@ -295,13 +295,14 @@ export const updateUserService = async (
   const user = await getAuth(c, db);
 
   if (!user) {
-    throw new Error("UNAUTHORIZED");
+    throw new Error("Unauthorized");
   }
 
   if (!id) {
     throw new Error("Missing ID");
   }
 
+  // TODO: improve this to update users inside users table as well
   if (user.userType === "admin") {
     const [psychologist] = await db
       .update(psychologists)
@@ -318,7 +319,7 @@ export const updateUserService = async (
 
   if (user.userType === "clinic") {
     // Clinics are not authorized to update other users
-    throw new Error("UNAUTHORIZED");
+    throw new Error("Unauthorized");
   }
 
   // Self-update

@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   json,
   jsonb,
@@ -25,8 +25,13 @@ export const clinics = pgTable("clinics", {
   cnpj: text("cnpj"),
   description: text("description"),
   logo: text("logo"),
-  createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
-  updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+  createdAt: timestamp("created_at", { mode: "string", precision: 3 })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", {
+    mode: "string",
+    precision: 3,
+  }).$onUpdate(() => sql`CURRENT_TIMESTAMP(3)`),
   hoursOfOperation: json("hours_of_operation"),
   addressInfo: jsonb("address_info").default([]),
 });

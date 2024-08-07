@@ -1,0 +1,36 @@
+meta {
+  name: Update Patient
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{users}}/@me/patients/:patientId
+  body: json
+  auth: bearer
+}
+
+params:path {
+  patientId: ai0vtkkgvpkqrbq7h1mgvy57
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "firstName": "Flavissa",
+    "lastName": "Santos",
+    "email": "fer.almeida@email.com",
+    "phone": "11989347898",
+    "birthdate": null,
+    "avatar": null,
+    "cpf": "4558893902s0",
+    "gender": null,
+    "isActive": null,
+    "addressInfo": {},
+    "emergencyContacts": [],
+    "preferences": {}
+  }
+}

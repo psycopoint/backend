@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   pgTable,
   timestamp,
@@ -41,8 +41,13 @@ export const appointments = pgTable("appointments", {
   sx: jsonb("sx"), // Mui sx prop, utilizando jsonb
   appointmentMood: integer("appointment_mood"),
   appointmentDetails: text("appointment_details"),
-  createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
-  updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+  createdAt: timestamp("created_at", { mode: "string", precision: 3 })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", {
+    mode: "string",
+    precision: 3,
+  }).$onUpdate(() => sql`CURRENT_TIMESTAMP(3)`),
   isCompleted: boolean("is_completed").default(false),
 
   // additional fields about the appointments

@@ -1,13 +1,17 @@
 meta {
-  name: Get @Me
+  name: Get All Patients
   type: http
   seq: 1
 }
 
 get {
-  url: {{users}}/@me
+  url: {{users}}/@me/patients/:patientId
   body: none
   auth: bearer
+}
+
+params:path {
+  patientId: 
 }
 
 auth:bearer {

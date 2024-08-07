@@ -25,8 +25,13 @@ export const anamnesis = pgTable(
         onDelete: "cascade",
       }
     ),
-    createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
-    updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+    createdAt: timestamp("created_at", { mode: "string", precision: 3 })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", {
+      mode: "date",
+      precision: 3,
+    }).$onUpdate(() => new Date()),
     consent: boolean("consent").default(false), // Consentimento do paciente
     // followUpDate: timestamp("follow_up_date", { mode: "string" }), // Data de acompanhamento // TODO: adicionar relacionamento com sessões
 

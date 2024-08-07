@@ -10,7 +10,7 @@ import {
 import { patients } from "./patients";
 import { psychologists } from "./psychologists";
 import { appointments } from "./appointments";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { createId } from "@paralleldrive/cuid2";
 
 export const paymentStatusEnum = pgEnum("paymentStatusEnum", [
@@ -44,8 +44,13 @@ export const payments = pgTable("payments", {
   paymentDate: timestamp("payment_date", { mode: "string" }).defaultNow(),
   method: methodsEnum("method").notNull().default("pix"),
   receipts: text("receipts"),
-  createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
-  updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+  createdAt: timestamp("created_at", { mode: "string", precision: 3 })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", {
+    mode: "string",
+    precision: 3,
+  }).$onUpdate(() => sql`CURRENT_TIMESTAMP(3)`),
 });
 
 // RELATIONS

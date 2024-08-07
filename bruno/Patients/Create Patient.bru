@@ -1,0 +1,32 @@
+meta {
+  name: Create Patient
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{users}}/@me/patients
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "firstName": "Flavia",
+    "lastName": "Santos",
+    "email": "fer.almeida@email.com",
+    "phone": "11989347898",
+    "birthdate": null,
+    "avatar": null,
+    "cpf": null,
+    "gender": null,
+    "isActive": null,
+    "addressInfo": {},
+    "emergencyContacts": [],
+    "preferences": {}
+  }
+}

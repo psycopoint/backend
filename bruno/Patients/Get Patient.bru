@@ -1,0 +1,19 @@
+meta {
+  name: Get Patient
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{users}}/@me/patients/:patientId
+  body: none
+  auth: bearer
+}
+
+params:path {
+  patientId: 
+}
+
+auth:bearer {
+  token: {{token}}
+}

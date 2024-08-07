@@ -13,8 +13,13 @@ export const diagrams = pgTable("diagrams", {
   patientId: text("patient_id")
     .references(() => patients.id, { onDelete: "cascade" })
     .notNull(),
-  createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
-  updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+  createdAt: timestamp("created_at", { mode: "string", precision: 3 })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", {
+    mode: "string",
+    precision: 3,
+  }).$onUpdate(() => sql`CURRENT_TIMESTAMP(3)`),
   relevantHistory: text("relevant_history"), // Dados relevantes da história
   centralBeliefs: text("central_beliefs"), // Crenças Centrais
   ruleBeliefs: text("rule_beliefs"), // Crenças-Regra

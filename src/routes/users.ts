@@ -6,8 +6,10 @@ import {
   updateUser,
 } from "@/controllers/users.controllers";
 import { bearerMiddleware } from "@/middlewares/bearer-middleware";
-import { Context, Hono } from "hono";
-import { z } from "zod";
+import { Hono } from "hono";
+
+// ROUTES
+import patients from "@routes/patients";
 
 const app = new Hono();
 
@@ -27,5 +29,8 @@ app.post("/", ...createUser);
 
 // update user
 app.patch("/:id", ...updateUser);
+
+// NESTING PATIENT ROUTE
+app.route("/@me/patients", patients);
 
 export default app;

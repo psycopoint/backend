@@ -1,28 +1,20 @@
 import { createFactory } from "hono/factory";
 
-import {
-  clinics,
-  insertPsychologistsSchema,
-  insertUserSchema,
-  psychologists,
-  users,
-} from "@/db/schemas";
-import { and, eq, getTableColumns } from "drizzle-orm";
+import { insertPsychologistsSchema, insertUserSchema } from "@/db/schemas";
 
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
-import { hashPassword } from "@/utils/password";
-import { getAuth } from "@/utils/get-auth";
 import {
   createUserService,
   getAllUsersDataService,
   getUserDataService,
-  getUserDataByIdService,
+  getUserService,
   updateUserService,
 } from "@/services/users.services";
+import { handleError } from "@/utils/handle-error";
 
 const factory = createFactory();
 
@@ -36,13 +28,7 @@ export const getMe = factory.createHandlers(async (c) => {
     const data = await getUserDataService(c, db);
     return c.json({ data }, 200);
   } catch (error) {
-    if (error instanceof Error) {
-      if (error.message === "UNAUTHORIZED") {
-        return c.text("UNAUTHORIZED", 401);
-      }
-    }
-    console.error("Error fetching user data:", error);
-    return c.json({ error: "Internal Server Error" }, 500);
+    return handleError(c, error);
   }
 });
 
@@ -56,22 +42,7 @@ export const getAllUsers = factory.createHandlers(async (c) => {
     const data = await getAllUsersDataService(c, db);
     return c.json({ data }, 200);
   } catch (error) {
-    if (error instanceof Error) {
-      if (error.message === "UNAUTHORIZED") {
-        return c.text("UNAUTHORIZED", 401);
-      }
-      if (error.message === "Not found") {
-        return c.json({
-          data: null,
-          message: error.message,
-        });
-      }
-      if (error.message === "REDIRECT_TO_PROFILE") {
-        return c.redirect("/users/@me");
-      }
-    }
-    console.error("Error fetching users data:", error);
-    return c.json({ error: "Internal Server Error" }, 500);
+    return handleError(c, error);
   }
 });
 
@@ -91,31 +62,10 @@ export const getUser = factory.createHandlers(
     const { id } = c.req.valid("param");
 
     try {
-      const data = await getUserDataByIdService(c, id as string, db);
+      const data = await getUserService(c, id as string, db);
       return c.json({ data }, 200);
     } catch (error) {
-      if (error instanceof Error) {
-        if (error.message === "UNAUTHORIZED") {
-          return c.text("UNAUTHORIZED", 401);
-        }
-
-        if (error.message === "Missing ID") {
-          return c.text("Missing ID", 400);
-        }
-
-        if (error.message === "Not found") {
-          return c.json({
-            data: null,
-            message: error.message,
-          });
-        }
-
-        if (error.message === "REDIRECT_TO_PROFILE") {
-          return c.redirect("/users/@me");
-        }
-      }
-      console.error("Error getting user data:", error);
-      return c.json({ error: "Internal Server Error" }, 500);
+      return handleError(c, error);
     }
   }
 );
@@ -144,17 +94,7 @@ export const createUser = factory.createHandlers(
       const result = await createUserService(c, body, db);
       return c.json(result, 200);
     } catch (error) {
-      if (error instanceof Error) {
-        if (error.message === "UNAUTHORIZED") {
-          return c.text("UNAUTHORIZED", 401);
-        }
-        if (error.message === "Missing body") {
-          return c.text("Missing body", 400);
-        }
-      }
-
-      console.error("Error creating user:", error);
-      return c.json({ error: "Internal Server Error" }, 500);
+      return handleError(c, error);
     }
   }
 );
@@ -203,20 +143,7 @@ export const updateUser = factory.createHandlers(
       );
       return c.json(result, 200);
     } catch (error) {
-      if (error instanceof Error) {
-        if (error.message === "UNAUTHORIZED") {
-          return c.text("UNAUTHORIZED", 401);
-        }
-        if (error.message === "Missing ID") {
-          return c.text("Missing ID", 400);
-        }
-        if (error.message === "Not found") {
-          return c.json({ error: "Not found" }, 404);
-        }
-      }
-
-      console.error("Error updating user data:", error);
-      return c.json({ error: "Internal Server Error" }, 500);
+      return handleError(c, error);
     }
   }
 );

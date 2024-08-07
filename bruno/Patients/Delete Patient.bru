@@ -1,0 +1,19 @@
+meta {
+  name: Delete Patient
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{users}}/@me/patients/:patientId
+  body: none
+  auth: bearer
+}
+
+params:path {
+  patientId: ul305vsjhm0gxtjd7nm3ekk3
+}
+
+auth:bearer {
+  token: {{token}}
+}

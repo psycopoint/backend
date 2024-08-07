@@ -10,7 +10,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 import { createInsertSchema } from "drizzle-zod";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { clinics, users } from "@/db/schemas";
 import { createId } from "@paralleldrive/cuid2";
 
@@ -36,8 +36,13 @@ export const psychologists = pgTable("psychologists", {
   cpf: varchar("cpf", { length: 256 }),
   specialty: text("specialty"),
   preferences: jsonb("preferences").default("{}"),
-  createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
-  updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
+  createdAt: timestamp("created_at", { mode: "string", precision: 3 })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", {
+    mode: "string",
+    precision: 3,
+  }).$onUpdate(() => sql`CURRENT_TIMESTAMP(3)`),
   clinicId: text("clinic_id").references(() => clinics.userId, {
     onDelete: "cascade",
   }),
