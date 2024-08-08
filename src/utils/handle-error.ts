@@ -13,6 +13,9 @@ export const handleError = (c: Context, error: unknown) => {
       case "Unauthorized":
         return c.text("Unauthorized", 401);
 
+      case "Not authenticated":
+        return c.text("Unauthorized", 401);
+
       case "Not found":
         return c.json({
           data: null,

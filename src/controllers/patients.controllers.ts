@@ -1,10 +1,11 @@
 import {
-  anamnesis,
   InsertAnamnesis,
+  InsertDiagram,
   InsertPatient,
   insertPatientSchema,
 } from "@/db/schemas";
-import { createAnamnesisService } from "@/services/anamnesis.services";
+import { createAnamnesisService } from "@/services/anamnese.services";
+import { createDiagramService } from "@/services/diagrams.services";
 import {
   createPatientService,
   deletePatientService,
@@ -15,7 +16,6 @@ import {
 import { handleError } from "@/utils/handle-error";
 import { zValidator } from "@hono/zod-validator";
 import { neon } from "@neondatabase/serverless";
-import { createId } from "@paralleldrive/cuid2";
 import { drizzle } from "drizzle-orm/neon-http";
 import { Context } from "hono";
 import { createFactory } from "hono/factory";
@@ -99,9 +99,9 @@ export const createPatient = factory.createHandlers(
 
     const values = c.req.valid("json");
 
-    const body = await c.req.parseBody();
-    const file: File = body["file"] as File;
-    const path: string = body["path"] as string;
+    // const body = await c.req.parseBody();
+    // const file: File = body["file"] as File;
+    // const path: string = body["path"] as string;
 
     try {
       const newPatient = await createPatientService(
@@ -109,8 +109,6 @@ export const createPatient = factory.createHandlers(
         db,
         values as InsertPatient
       );
-
-      console.log(newPatient);
 
       // create pateint initial anamnesis
       const newAnamnesis = await createAnamnesisService(
@@ -121,11 +119,17 @@ export const createPatient = factory.createHandlers(
       );
 
       // create pateint initial diagram
+      const newDiagram = await createDiagramService(
+        c,
+        db,
+        values as InsertDiagram,
+        newPatient.id
+      );
 
       const data = {
         patient: newPatient,
         anamnesis: newAnamnesis,
-        diagram: null, // Add diagram
+        diagram: newDiagram,
       };
 
       return c.json({ data });

@@ -2,7 +2,7 @@ import { InsertAnamnesis, insertAnamnesisSchema } from "@/db/schemas";
 import {
   getPatientAnamnesisService,
   updateAnamnesisService,
-} from "@/services/anamnesis.services";
+} from "@/services/anamnese.services";
 import { handleError } from "@/utils/handle-error";
 import { zValidator } from "@hono/zod-validator";
 import { neon } from "@neondatabase/serverless";
@@ -19,7 +19,6 @@ const factory = createFactory();
 export const getAllAnamnese = factory.createHandlers(async (c) => {
   const { patientId } = c.req.param();
 
-  console.log("PARAM:", patientId);
   return c.text("Get All Anamnese");
 });
 
@@ -30,8 +29,6 @@ export const getPatientAnamnesis = factory.createHandlers(async (c) => {
   const db = drizzle(sql);
 
   const { patientId } = c.req.param();
-
-  console.log(patientId);
 
   if (!patientId) {
     throw new Error("Missing ID");

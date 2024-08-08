@@ -4,9 +4,11 @@ import { patients } from "./patients";
 import { relations, sql } from "drizzle-orm";
 import { createId } from "@paralleldrive/cuid2";
 import { createInsertSchema } from "drizzle-zod";
-import { DiagramSituation } from "@/types/patient-types";
+import { DiagramSituation } from "@/types/patients";
+import { z } from "zod";
+import dayjs from "dayjs";
 
-export const diagrams = pgTable("diagrams", {
+export const diagrams = pgTable("patients_diagrams", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => createId()),
@@ -29,7 +31,32 @@ export const diagrams = pgTable("diagrams", {
     .default(sql`'[]'::jsonb`),
 });
 
-export const insertDiagramsSchema = createInsertSchema(diagrams);
+// ZOD
+export const diagramSituationSchema = z.object({
+  id: z
+    .string()
+    .default("")
+    .transform(() => createId()),
+  situationNumber: z.number().optional(),
+  description: z.string(),
+  automaticThought: z.string(),
+  atMeaning: z.string(),
+  emotion: z.string(),
+  behavior: z.string(),
+  therapyFocus: z.string(),
+  createdAt: z
+    .string()
+    .default("")
+    .transform(() => dayjs().format("YYYY-MM-DD HH:mm:ss.SSS")),
+  updatedAt: z
+    .string()
+    .default("")
+    .transform(() => dayjs().format("YYYY-MM-DD HH:mm:ss.SSS")),
+});
+
+export const insertDiagramsSchema = createInsertSchema(diagrams, {
+  situations: z.array(diagramSituationSchema),
+});
 
 // DIAGRAM RELATIONS
 export const diagramRelations = relations(diagrams, ({ one, many }) => ({

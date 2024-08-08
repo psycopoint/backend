@@ -10,7 +10,7 @@ import {
 import { psychologists } from "./psychologists";
 import { anamnesis } from "./anamnesis";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { Address, PatientPreferences } from "@/types/patient-types";
+import { Address, PatientPreferences } from "@/types/patients";
 import { createId } from "@paralleldrive/cuid2";
 import { diagrams } from "./diagrams";
 import { appointments } from "./appointments";

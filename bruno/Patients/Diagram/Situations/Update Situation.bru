@@ -1,0 +1,26 @@
+meta {
+  name: Update Situation
+  type: http
+  seq: 1
+}
+
+patch {
+  url: {{patients}}/{{patientId}}/diagram/situations/{{situationId}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "emotion": "Atualizado",
+    "description": "TEST Lorem Ipsum",
+    "automaticThought": "TEST Authomatic thought dsc",
+    "atMeaning": "TEST Automatic thought meaning",
+    "behavior": "TEST patient behavior here",
+    "therapyFocus": "TEST patientId Therapy focuss"
+  }
+}

@@ -1,0 +1,35 @@
+meta {
+  name: Update Diagram
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{patients}}/{{patientId}}/diagram
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "relevantHistory": "Lorem Ipsum sit amet dolor",
+    "centralBeliefs": null,
+    "ruleBeliefs": null,
+    "beliefMaintenance": null,
+    "situations": [
+      {
+        "situationNumber": 1,
+        "description": "Lorem ipsum sit amet dolor",
+        "automaticThought": "Authomatic thought dsc",
+        "atMeaning": "Automatic thought meaning",
+        "emotion": "Patient emotion here",
+        "behavior": "Patient behavior here",
+        "therapyFocus": "Therapy focuss"
+      }
+    ]
+  }
+}

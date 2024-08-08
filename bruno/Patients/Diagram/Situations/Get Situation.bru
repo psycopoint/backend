@@ -1,0 +1,15 @@
+meta {
+  name: Get Situation
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{patients}}/{{patientId}}/diagram/situations/{{situationId}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

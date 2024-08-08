@@ -11,6 +11,7 @@ import { Hono } from "hono";
 
 // ROUTES
 import anamnesis from "./anamnesis.route";
+import diagrams from "./diagrams.route";
 
 const app = new Hono();
 
@@ -33,5 +34,6 @@ app.patch("/:id", ...updatePatient);
 
 // NESTING ROUTES
 app.route("/:patientId/anamnesis", anamnesis);
+app.route("/:patientId/diagram", diagrams);
 
 export default app;

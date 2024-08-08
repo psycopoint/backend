@@ -13,7 +13,7 @@ import { psychologists } from "./psychologists";
 import { createInsertSchema } from "drizzle-zod";
 
 export const anamnesis = pgTable(
-  "anamnesis",
+  "patients_anamnesis",
   {
     id: text("id").primaryKey(),
     patientId: text("patient_id")

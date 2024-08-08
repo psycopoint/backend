@@ -11,25 +11,25 @@ export interface Address {
   country?: string | null;
 }
 
-export type EmergencyContact = {
+export interface EmergencyContact {
   id: string;
   contactName: string;
   contactRelation: string;
   contactPhone: string;
-};
+}
 
-export type DiagramSituation = {
+export interface DiagramSituation {
   id: string;
-  situationNumber: string | null;
-  description: string | null;
-  automaticThought: string | null;
-  atMeaning: string | null;
-  emotion: string | null;
-  behavior: string | null;
-  therapyFocus: string | null;
+  situationNumber?: number | null | undefined;
+  description?: string | null | undefined;
+  automaticThought?: string | null | undefined;
+  atMeaning?: string | null | undefined;
+  emotion?: string | null | undefined;
+  behavior?: string | null | undefined;
+  therapyFocus?: string | null | undefined;
   createdAt: string;
   updatedAt: string;
-};
+}
 
 // life info schema
 export interface AnamnesisLifeInfoSchema {

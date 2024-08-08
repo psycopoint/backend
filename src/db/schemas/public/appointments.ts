@@ -13,7 +13,7 @@ import { createInsertSchema } from "drizzle-zod";
 import { createId } from "@paralleldrive/cuid2";
 import { payments } from "./payments";
 
-export const appointments = pgTable("appointments", {
+export const appointments = pgTable("patients_appointments", {
   id: text("id").primaryKey(),
   eventId: text("event_id")
     .$defaultFn(() => createId())

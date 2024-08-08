@@ -1,0 +1,27 @@
+meta {
+  name: Create Situation
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{patients}}/{{patientId}}/diagram/situations
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "emotion": "TEST EMOTIONSSSSS",
+    "description": "Lorem Ipsum",
+    "automaticThought": "Authomatic thought dsc",
+    "atMeaning": "Automatic thought meaning",
+    "emotion": "Patient emotion here",
+    "behavior": "Patient behavior here",
+    "therapyFocus": "Therapy focuss"
+  }
+}

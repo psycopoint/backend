@@ -84,8 +84,6 @@ export const resendAuthentication = factory.createHandlers(
         html: `<a href="${magicLink}">Click here to login</a>`,
       });
 
-      console.log(data);
-
       return c.json({ message: "success" });
     } catch (error) {
       return c.json({ error });
@@ -167,8 +165,6 @@ export const signout = factory.createHandlers(
     const db = drizzle(sql);
 
     const cookie = c.req.valid("json");
-
-    console.log(cookie["psicohub.rf"]);
 
     if (!cookie["psicohub.rf"]) {
       return c.json({ error: "Missing token" }, 400);

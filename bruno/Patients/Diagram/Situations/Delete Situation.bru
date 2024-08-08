@@ -1,0 +1,32 @@
+meta {
+  name: Delete Situation
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{patients}}/{{patientId}}/diagram/situations/:situationId
+  body: json
+  auth: bearer
+}
+
+params:path {
+  situationId: cjipvawmdr9ltb1avv520ld7
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "situationNumber": 2,
+    "emotion": "TEST EMOTIONSS",
+    "description": "Lorem Ipsum",
+    "automaticThought": "Authomatic thought dsc",
+    "atMeaning": "Automatic thought meaning",
+    "emotion": "Patient emotion here",
+    "behavior": "Patient behavior here",
+    "therapyFocus": "Therapy focuss"
+  }
+}

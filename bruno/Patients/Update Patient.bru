@@ -11,7 +11,7 @@ patch {
 }
 
 params:path {
-  patientId: ai0vtkkgvpkqrbq7h1mgvy57
+  patientId: yyy6fgn2g2wvwwcgpy0dikfo
 }
 
 auth:bearer {
@@ -29,8 +29,30 @@ body:json {
     "cpf": "4558893902s0",
     "gender": null,
     "isActive": null,
-    "addressInfo": {},
-    "emergencyContacts": [],
-    "preferences": {}
+    "addressInfo": {
+      "street": "Rua XYZ",
+      "number": 123,
+      "complement": null,
+      "neighborhood": "Bairro ZYX",
+      "city": "São Paulo",
+      "state": "SP",
+      "postal": "07862-060",
+      "country": "Brasil"
+    },
+    "emergencyContacts": [
+      {
+        "contactName": "Francy Santos",
+        "contactRelation": "Conjugê",
+        "contactPhone": "119874587456"
+      },
+          {
+        "contactName": "Rafaela Barreto",
+        "contactRelation": "Conjugê",
+        "contactPhone": "119874587456"
+      }
+    ],
+    "preferences": {
+      "calendarColor": "#0BF1DC"
+    }
   }
 }
