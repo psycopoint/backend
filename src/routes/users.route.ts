@@ -9,7 +9,7 @@ import { bearerMiddleware } from "@/middlewares/bearer-middleware";
 import { Hono } from "hono";
 
 // ROUTES
-import patients from "@routes/patients";
+import patients from "@/routes/patients.route";
 
 const app = new Hono();
 

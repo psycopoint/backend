@@ -1,9 +1,6 @@
 import { Context, Hono } from "hono";
-import { z } from "zod";
 
-import { googleAuth, revokeToken } from "@hono/oauth-providers/google";
-
-import { decode, sign, verify } from "hono/jwt";
+import { googleAuth } from "@hono/oauth-providers/google";
 
 import {
   googleAuthentication,

@@ -1,0 +1,41 @@
+meta {
+  name: Update Anamnesis
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{patients}}/:id/anamnesis
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: ct7aroq4lpjasug5fmyppqd8
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "consent": false,
+    "eeh": 1234,
+    "hama": null,
+    "bdi": null,
+    "chiefComplaint": null,
+    "historyOfPresentIllness": null,
+    "pastPsychiatricHistory": null,
+    "medicalHistory": null,
+    "familyHistory": null,
+    "socialHistory": null,
+    "substanceUse": null,
+    "medications": null,
+    "allergies": null,
+    "mentalStatusExam": null,
+    "diagnosis": null,
+    "riskAssessment": null,
+    "lifeInfos": null
+  }
+}

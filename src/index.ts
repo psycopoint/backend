@@ -5,9 +5,9 @@ import { cors } from "hono/cors";
 import { JwtVariables } from "hono/jwt";
 
 // ROUTES
-import auth from "@routes/auth";
+import auth from "@routes/auth.route";
 
-import users from "@routes/users";
+import users from "@routes/users.route";
 
 const app = new Hono<{ Bindings: Env; Variables: JwtVariables }>().basePath(
   "/v1"

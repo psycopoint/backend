@@ -1,17 +1,17 @@
 meta {
-  name: Get All Patients
+  name: Get Anamnesis
   type: http
   seq: 1
 }
 
 get {
-  url: {{users}}/@me/patients/:patientId
+  url: {{patients}}/:patientId/anamnesis
   body: none
   auth: bearer
 }
 
 params:path {
-  patientId: 
+  patientId: ct7aroq4lpjasug5fmyppqd8
 }
 
 auth:bearer {

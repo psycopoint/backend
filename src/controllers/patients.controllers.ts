@@ -1,4 +1,10 @@
-import { InsertPatient, insertPatientSchema } from "@/db/schemas";
+import {
+  anamnesis,
+  InsertAnamnesis,
+  InsertPatient,
+  insertPatientSchema,
+} from "@/db/schemas";
+import { createAnamnesisService } from "@/services/anamnesis.services";
 import {
   createPatientService,
   deletePatientService,
@@ -69,7 +75,6 @@ export const getPatient = factory.createHandlers(
 
 // CREATE PATIENT
 export const createPatient = factory.createHandlers(
-  // isAuthenticated,
   zValidator(
     "json",
     insertPatientSchema.pick({
@@ -108,10 +113,22 @@ export const createPatient = factory.createHandlers(
       console.log(newPatient);
 
       // create pateint initial anamnesis
+      const newAnamnesis = await createAnamnesisService(
+        c,
+        db,
+        values as InsertAnamnesis,
+        newPatient.id
+      );
 
       // create pateint initial diagram
 
-      return c.json({ data: newPatient });
+      const data = {
+        patient: newPatient,
+        anamnesis: newAnamnesis,
+        diagram: null, // Add diagram
+      };
+
+      return c.json({ data });
     } catch (error) {
       return handleError(c, error);
     }

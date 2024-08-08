@@ -8,7 +8,9 @@ import {
 
 import { bearerMiddleware } from "@/middlewares/bearer-middleware";
 import { Hono } from "hono";
-import { z } from "zod";
+
+// ROUTES
+import anamnesis from "./anamnesis.route";
 
 const app = new Hono();
 
@@ -28,5 +30,8 @@ app.delete("/:id", ...deletePatient);
 
 // delete patient by id
 app.patch("/:id", ...updatePatient);
+
+// NESTING ROUTES
+app.route("/:patientId/anamnesis", anamnesis);
 
 export default app;

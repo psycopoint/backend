@@ -14,7 +14,7 @@ import { and, eq, gt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
 
 import { createFactory } from "hono/factory";
-import { decode, verify } from "hono/jwt";
+import { decode } from "hono/jwt";
 import { Resend } from "resend";
 import { z } from "zod";
 
@@ -31,19 +31,20 @@ export const googleAuthentication = factory.createHandlers(async (c) => {
   // verify if user exist inside db
   const userDb = await getUserByEmail(googleUser?.email as string, db);
 
+  const expiration = dayjs().add(1, "hour").unix();
   // register user inside db
   if (!userDb) {
     const newUser = await registerUser(c, db);
 
     // generate token & refresh token
-    const token = await generateToken(c, newUser.id, db);
+    const token = await generateToken(c, newUser.id, db, expiration);
     const refreshToken = await generateRefreshToken(c, db, newUser.id);
 
     return c.redirect(c.env.BASE_URL);
   }
 
   // generate token & refresh token
-  const expiration = dayjs().add(1, "minute").unix();
+
   const token = await generateToken(c, userDb.id, db, expiration);
   const refreshToken = await generateRefreshToken(c, db, userDb.id);
 
