@@ -1,17 +1,14 @@
 import { refreshTokens } from "@/db/schemas";
 
-import {
-  generateRefreshToken,
-  generateToken,
-  getUserByEmail,
-  registerUser,
-} from "@/services/auth.services";
+import { getUserByEmail, registerUser } from "@/services/auth.services";
+import { generateRefreshToken, generateToken } from "@/utils/tokens";
 import { zValidator } from "@hono/zod-validator";
 import { neon } from "@neondatabase/serverless";
 import dayjs from "dayjs";
 import { and, eq, gt } from "drizzle-orm";
 
 import { drizzle } from "drizzle-orm/neon-http";
+import { setCookie } from "hono/cookie";
 
 import { createFactory } from "hono/factory";
 import { decode } from "hono/jwt";
@@ -28,6 +25,9 @@ export const googleAuthentication = factory.createHandlers(async (c) => {
 
   const googleUser = c.get("user-google");
 
+  // get cookie session (from hono-sessions)
+  const session = c.get("session");
+
   // verify if user exist inside db
   const userDb = await getUserByEmail(googleUser?.email as string, db);
 
@@ -40,6 +40,28 @@ export const googleAuthentication = factory.createHandlers(async (c) => {
     const token = await generateToken(c, newUser.id, db, expiration);
     const refreshToken = await generateRefreshToken(c, db, newUser.id);
 
+    if (!session.get("psicohub.token")) {
+      session.set("psicohub.token", token);
+
+      setCookie(c, "psicohub.token", token, {
+        path: "/",
+        expires: new Date(expiration * 1000),
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+      });
+
+      setCookie(c, "session", session.get("session"), {
+        path: "/",
+        expires: new Date(expiration * 1000),
+        httpOnly: false,
+        sameSite: "none",
+        secure: true,
+      });
+    } else {
+      // verify if token has expired to renew it
+    }
+
     return c.redirect(c.env.BASE_URL);
   }
 
@@ -47,6 +69,20 @@ export const googleAuthentication = factory.createHandlers(async (c) => {
 
   const token = await generateToken(c, userDb.id, db, expiration);
   const refreshToken = await generateRefreshToken(c, db, userDb.id);
+
+  if (!session.get("psicohub.token")) {
+    session.set("psicohub.token", token);
+
+    setCookie(c, "psicohub.token", token, {
+      path: "/",
+      expires: new Date(expiration * 1000),
+      httpOnly: true,
+      sameSite: "none",
+      // secure: true,
+    });
+  } else {
+    // verify if token has expired to renew it
+  }
 
   return c.redirect(c.env.BASE_URL);
 });
@@ -90,6 +126,40 @@ export const resendAuthentication = factory.createHandlers(
     }
   }
 );
+
+// SIGN OUT
+export const signout = factory.createHandlers(
+  zValidator(
+    "json",
+    z.object({
+      "psicohub.rf": z.string(),
+    })
+  ),
+  async (c) => {
+    // connect to db
+    const sql = neon(c.env.DATABASE_URL);
+    const db = drizzle(sql);
+
+    const cookie = c.req.valid("json");
+
+    if (!cookie["psicohub.rf"]) {
+      return c.json({ error: "Missing token" }, 400);
+    }
+
+    // delete rf cookie inside db
+    await db
+      .delete(refreshTokens)
+      .where(eq(refreshTokens.id, cookie["psicohub.rf"]));
+
+    return c.text("success");
+  }
+);
+
+/**
+ * ===============================================================
+ *                  T O K E N S   U T I L S
+ * ===============================================================
+ */
 
 // REFRESH TOKEN
 export const refreshToken = factory.createHandlers(
@@ -148,33 +218,5 @@ export const refreshToken = factory.createHandlers(
       console.error("Error generating token:", error);
       return c.json({ error: "Internal Server Error" }, 500);
     }
-  }
-);
-
-// SIGN OUT
-export const signout = factory.createHandlers(
-  zValidator(
-    "json",
-    z.object({
-      "psicohub.rf": z.string(),
-    })
-  ),
-  async (c) => {
-    // connect to db
-    const sql = neon(c.env.DATABASE_URL);
-    const db = drizzle(sql);
-
-    const cookie = c.req.valid("json");
-
-    if (!cookie["psicohub.rf"]) {
-      return c.json({ error: "Missing token" }, 400);
-    }
-
-    // delete rf cookie inside db
-    await db
-      .delete(refreshTokens)
-      .where(eq(refreshTokens.id, cookie["psicohub.rf"]));
-
-    return c.text("success");
   }
 );
