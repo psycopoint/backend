@@ -1,13 +1,16 @@
-import { refreshTokens } from "@/db/schemas";
+import { refreshTokens, sessions } from "@/db/schemas";
 
 import { getUserByEmail, registerUser } from "@/services/auth.services";
+import { handleSession } from "@/utils/auth";
 import { generateRefreshToken, generateToken } from "@/utils/tokens";
 import { zValidator } from "@hono/zod-validator";
 import { neon } from "@neondatabase/serverless";
+import { createId } from "@paralleldrive/cuid2";
 import dayjs from "dayjs";
 import { and, eq, gt } from "drizzle-orm";
 
 import { drizzle } from "drizzle-orm/neon-http";
+import { Context } from "hono";
 import { setCookie } from "hono/cookie";
 
 import { createFactory } from "hono/factory";
@@ -24,64 +27,33 @@ export const googleAuthentication = factory.createHandlers(async (c) => {
   const db = drizzle(sql);
 
   const googleUser = c.get("user-google");
-
-  // get cookie session (from hono-sessions)
   const session = c.get("session");
 
-  // verify if user exist inside db
+  // get user inside db & verify if exists
   const userDb = await getUserByEmail(googleUser?.email as string, db);
-
-  const expiration = dayjs().add(1, "hour").unix();
-  // register user inside db
   if (!userDb) {
     const newUser = await registerUser(c, db);
 
-    // generate token & refresh token
-    const token = await generateToken(c, newUser.id, db, expiration);
-    const refreshToken = await generateRefreshToken(c, db, newUser.id);
-
-    if (!session.get("psicohub.token")) {
-      session.set("psicohub.token", token);
-
-      setCookie(c, "psicohub.token", token, {
-        path: "/",
-        expires: new Date(expiration * 1000),
-        httpOnly: true,
-        sameSite: "none",
-        secure: true,
-      });
-
-      setCookie(c, "session", session.get("session"), {
-        path: "/",
-        expires: new Date(expiration * 1000),
-        httpOnly: false,
-        sameSite: "none",
-        secure: true,
-      });
-    } else {
-      // verify if token has expired to renew it
-    }
+    await handleSession(c, db, newUser.id);
 
     return c.redirect(c.env.BASE_URL);
   }
 
-  // generate token & refresh token
+  // user already exists inside db
+  // verify if session exists and is active
+  const currentSession = session.get("session_id");
 
-  const token = await generateToken(c, userDb.id, db, expiration);
-  const refreshToken = await generateRefreshToken(c, db, userDb.id);
-
-  if (!session.get("psicohub.token")) {
-    session.set("psicohub.token", token);
-
-    setCookie(c, "psicohub.token", token, {
-      path: "/",
-      expires: new Date(expiration * 1000),
-      httpOnly: true,
-      sameSite: "none",
-      // secure: true,
-    });
+  if (!currentSession) {
+    await handleSession(c, db, userDb.id);
   } else {
-    // verify if token has expired to renew it
+    const sessionDb = await db
+      .select()
+      .from(sessions)
+      .where(eq(sessions.sessionToken, currentSession));
+
+    if (!session.length || dayjs(sessionDb[0].expires).isBefore(dayjs())) {
+      await handleSession(c, db, userDb.id);
+    }
   }
 
   return c.redirect(c.env.BASE_URL);

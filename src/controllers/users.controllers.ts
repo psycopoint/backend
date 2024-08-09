@@ -26,6 +26,7 @@ export const getMe = factory.createHandlers(async (c) => {
 
   try {
     const data = await getUserDataService(c, db);
+
     return c.json({ data }, 200);
   } catch (error) {
     return handleError(c, error);

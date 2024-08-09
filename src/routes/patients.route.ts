@@ -12,10 +12,16 @@ import { Hono } from "hono";
 // ROUTES
 import anamnesis from "./anamnesis.route";
 import diagrams from "./diagrams.route";
+import { Env } from "@/types/bindings";
+import { JwtVariables } from "hono/jwt";
+import { Session } from "hono-sessions";
 
-const app = new Hono();
-
-app.use("/*", bearerMiddleware);
+const app = new Hono<{
+  Bindings: Env;
+  Variables: JwtVariables & {
+    session: Session;
+  };
+}>();
 
 // get all patients
 app.get("/", ...getAllPatients);

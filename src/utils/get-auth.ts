@@ -1,9 +1,8 @@
-import { InsertUser, SelectUser, users } from "@/db/schemas";
+import { InsertUser, SelectUser, sessions, users } from "@/db/schemas";
+import dayjs from "dayjs";
 import { eq, getTableColumns } from "drizzle-orm";
 import { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { Context } from "hono";
-
-import { verify } from "hono/jwt";
 
 type ReturnType = {
   id: string;
@@ -17,20 +16,33 @@ type ReturnType = {
 
 export const getAuth = async (
   c: Context,
-  db: NeonHttpDatabase
-): Promise<InsertUser> => {
-  const token = c.req.header("Authorization")?.split(" ")[1];
+  db: NeonHttpDatabase,
+  sessionToken: string
+): Promise<SelectUser> => {
+  // Obter o cookie da sessão da requisição
 
-  const verification = await verify(token!, c.env.JWT_SECRET, "HS256");
+  if (!sessionToken) {
+    throw new Error("Not authenticated");
+  }
 
-  const { password, ...rest } = getTableColumns(users); // separate password from other fields to exclude it
+  // Recuperar a sessão do banco de dados
+  const [sessionRecord] = await db
+    .select()
+    .from(sessions)
+    .where(eq(sessions.sessionToken, sessionToken as string));
+
+  if (!sessionRecord || dayjs(sessionRecord.expires).isBefore(dayjs())) {
+    throw new Error("Expired or invalid session");
+  }
+
+  // Recuperar os dados do usuário usando o userId da sessão
   const [user] = await db
-    .select({ ...rest })
+    .select()
     .from(users)
-    .where(eq(users.id, verification.sub as string));
+    .where(eq(users.id, sessionRecord.userId));
 
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Not found");
   }
 
   return { ...user };

@@ -8,8 +8,16 @@ import {
   resendAuthentication,
   signout,
 } from "@/controllers/auth.controllers";
+import { Env } from "@/types/bindings";
+import { JwtVariables } from "hono/jwt";
+import { Session } from "hono-sessions";
 
-const app = new Hono();
+const app = new Hono<{
+  Bindings: Env;
+  Variables: JwtVariables & {
+    session: Session;
+  };
+}>();
 
 // google login
 app.get(
@@ -19,6 +27,7 @@ app.get(
       client_id: c.env.GOOGLE_CLIENT_ID,
       client_secret: c.env.GOOGLE_CLIENT_SECRET,
       scope: ["openid", "email", "profile"],
+      prompt: "select_account",
     });
     return googleAuthMiddleware(c, next);
   },

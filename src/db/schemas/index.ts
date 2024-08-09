@@ -1,7 +1,7 @@
 // AUTH SCHEMAS
 // export * from "./auth/accounts";
 // export * from "./auth/authenticators";
-// export * from "./auth/sessions";
+export * from "./auth/sessions";
 export * from "./auth/refresh-tokens";
 export * from "./auth/users";
 
