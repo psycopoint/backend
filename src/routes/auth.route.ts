@@ -4,7 +4,6 @@ import { googleAuth } from "@hono/oauth-providers/google";
 
 import {
   googleAuthentication,
-  refreshToken,
   resendAuthentication,
   signout,
 } from "@/controllers/auth.controllers";
@@ -38,7 +37,6 @@ app.get(
 app.get("/resend", ...resendAuthentication);
 
 // refresh token
-app.post("/refresh", ...refreshToken);
 
 // logout
 app.post("/signout", ...signout);

@@ -7,13 +7,9 @@ meta {
 delete {
   url: {{users}}/@me/patients/:patientId
   body: none
-  auth: bearer
+  auth: none
 }
 
 params:path {
   patientId: og6wyz24sdjoz4th0bwsdht0
-}
-
-auth:bearer {
-  token: {{token}}
 }

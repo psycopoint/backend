@@ -7,9 +7,5 @@ meta {
 get {
   url: {{patients}}/{{patientId}}/diagram/situations/{{situationId}}
   body: json
-  auth: bearer
-}
-
-auth:bearer {
-  token: {{token}}
+  auth: none
 }

@@ -7,16 +7,12 @@ meta {
 patch {
   url: {{patients}}/{{patientId}}/diagram/situations/{{situationId}}
   body: json
-  auth: bearer
-}
-
-auth:bearer {
-  token: {{token}}
+  auth: none
 }
 
 body:json {
   {
-    "emotion": "Atualizado",
+    "emotion": "Atualizado v2",
     "description": "TEST Lorem Ipsum",
     "automaticThought": "TEST Authomatic thought dsc",
     "atMeaning": "TEST Automatic thought meaning",

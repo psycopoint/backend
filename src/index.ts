@@ -11,13 +11,6 @@ import { Session, sessionMiddleware, CookieStore } from "hono-sessions";
 import authRoute from "@routes/auth.route";
 import usersRoute from "@routes/users.route";
 
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
-import { eq } from "drizzle-orm";
-import { sessions, users } from "./db/schemas";
-import dayjs from "dayjs";
-import { getAuth } from "./utils/get-auth";
-
 const app = new Hono<{
   Bindings: Env;
   Variables: JwtVariables & {
@@ -25,13 +18,13 @@ const app = new Hono<{
   };
 }>().basePath("/v1");
 
-// app.use(
-//   csrf({
-//     origin: (origin) => /https:\/\/(?:\w+\.)?psicohub\.co$/.test(origin),
-//   })
-// );
+app.use(
+  csrf({
+    origin: (origin) => /https:\/\/(?:\w+\.)?psicohub\.co$/.test(origin),
+  })
+);
 
-// app.use(csrf({ origin: "http://localhost:3000" }));
+app.use(csrf({ origin: "http://localhost:3000" }));
 
 // CORS
 app.use("*", async (c, next) => {
@@ -50,11 +43,13 @@ app.use("*", async (c, next) => {
   const sessionMid = sessionMiddleware({
     store,
     encryptionKey: c.env.JWT_SECRET, // Required for CookieStore, recommended for others
-    expireAfterSeconds: 900, // Expire session after 15 minutes of inactivity
+    expireAfterSeconds: 86400, // 1 days
     cookieOptions: {
-      sameSite: "Lax", // Recommended for basic CSRF protection in modern browsers
+      sameSite: "None", // Recommended for basic CSRF protection in modern browsers
       path: "/", // Required for this library to work properly
       httpOnly: true, // Recommended to avoid XSS attacks
+      secure: true,
+      // signingSecret: "test123879asbd9ae7q9adshd091823hd",
     },
     sessionCookieName: "psicohub.session",
   });
@@ -66,5 +61,11 @@ app.use("*", async (c, next) => {
 app.route("/auth", authRoute);
 app.route("/users", usersRoute);
 // app.route("/patients", patients);
+
+app.get("/test", async (c) => {
+  const session = c.get("session");
+
+  return c.text("test");
+});
 
 export default app;

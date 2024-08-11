@@ -28,7 +28,7 @@ export const users = authSchema.table("users", {
     .primaryKey()
     .$defaultFn(() => createId()),
   name: text("name"),
-  email: text("email").notNull(),
+  email: text("email").unique().notNull(),
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   password: text("password"),
   image: text("image"),

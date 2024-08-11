@@ -71,6 +71,20 @@
       "when": 1723210590389,
       "tag": "0009_cultured_supernaut",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1723407813547,
+      "tag": "0010_fair_jocasta",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1723408356583,
+      "tag": "0011_flat_karen_page",
+      "breakpoints": true
     }
   ]
 }

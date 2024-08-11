@@ -16,10 +16,11 @@ type ReturnType = {
 
 export const getAuth = async (
   c: Context,
-  db: NeonHttpDatabase,
-  sessionToken: string
+  db: NeonHttpDatabase
 ): Promise<SelectUser> => {
   // Obter o cookie da sessão da requisição
+  const session = c.get("session");
+  const sessionToken = session.get("session_id");
 
   if (!sessionToken) {
     throw new Error("Not authenticated");

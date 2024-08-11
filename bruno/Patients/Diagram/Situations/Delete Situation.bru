@@ -7,15 +7,11 @@ meta {
 delete {
   url: {{patients}}/{{patientId}}/diagram/situations/:situationId
   body: json
-  auth: bearer
+  auth: none
 }
 
 params:path {
   situationId: cjipvawmdr9ltb1avv520ld7
-}
-
-auth:bearer {
-  token: {{token}}
 }
 
 body:json {

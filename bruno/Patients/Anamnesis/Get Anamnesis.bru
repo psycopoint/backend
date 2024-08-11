@@ -7,13 +7,9 @@ meta {
 get {
   url: {{patients}}/:patientId/anamnesis
   body: none
-  auth: bearer
+  auth: none
 }
 
 params:path {
   patientId: ct7aroq4lpjasug5fmyppqd8
-}
-
-auth:bearer {
-  token: {{token}}
 }

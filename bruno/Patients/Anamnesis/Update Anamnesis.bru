@@ -7,15 +7,11 @@ meta {
 patch {
   url: {{patients}}/:patientId/anamnesis
   body: json
-  auth: bearer
+  auth: none
 }
 
 params:path {
   patientId: yyy6fgn2g2wvwwcgpy0dikfo
-}
-
-auth:bearer {
-  token: {{token}}
 }
 
 body:json {

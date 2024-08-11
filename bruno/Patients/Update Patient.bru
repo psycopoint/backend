@@ -7,15 +7,15 @@ meta {
 patch {
   url: {{users}}/@me/patients/:patientId
   body: json
-  auth: bearer
+  auth: none
 }
 
 params:path {
   patientId: yyy6fgn2g2wvwwcgpy0dikfo
 }
 
-auth:bearer {
-  token: {{token}}
+headers {
+  : 
 }
 
 body:json {
