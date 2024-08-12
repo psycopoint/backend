@@ -10,6 +10,7 @@ import { Context } from "hono";
 
 import * as crypto from "node:crypto";
 import { Buffer } from "node:buffer";
+import { upsertSubscription } from "@/utils/subscription";
 
 // GET CURRENT SUBSCRIPTION
 export const getCurrentSubscriptionService = async (
@@ -123,65 +124,14 @@ export const subscriptionWebhookService = async (
     .from(subscriptions)
     .where(eq(subscriptions.subscriptionId, subscriptionId));
 
-  // CREATED EVENT
-  if (event === "subscription_created") {
-    if (existing) {
-      await db
-        .update(subscriptions)
-        .set({
-          statusFormatted: payload.data.attributes.status_formatted,
-          endsAt: payload.data.attributes.ends_at,
-          renewsAt: payload.data.attributes.renews_at,
-        })
-        .where(eq(subscriptions.subscriptionId, subscriptionId));
-    } else {
-      await db.insert(subscriptions).values({
-        id: createId(),
-        subscriptionId,
-        userId,
-        status,
-        statusFormatted: payload.data.attributes.status_formatted,
-        userName: payload.data.attributes.user_name,
-        endsAt: payload.data.attributes.ends_at,
-        renewsAt: payload.data.attributes.renews_at,
-        trialEndsAt: payload.data.attributes.trial_ends_at,
-        billingAnchor: payload.data.attributes.billing_anchor,
-        cardBrand: payload.data.attributes.card_brand,
-        cardLastFour: payload.data.attributes.card_last_four,
-        variantName: payload.data.attributes.variant_name,
-        productName: payload.data.attributes.product_name,
-      });
-    }
-  }
-
-  // UPDATED EVENT
-  if (event === "subscription_updated") {
-    if (existing) {
-      await db
-        .update(subscriptions)
-        .set({
-          statusFormatted: payload.data.attributes.status_formatted,
-          endsAt: payload.data.attributes.ends_at,
-          renewsAt: payload.data.attributes.renews_at,
-        })
-        .where(eq(subscriptions.subscriptionId, subscriptionId));
-    } else {
-      await db.insert(subscriptions).values({
-        id: createId(),
-        subscriptionId,
-        userId,
-        status,
-        statusFormatted: payload.data.attributes.status_formatted,
-        userName: payload.data.attributes.user_name,
-        endsAt: payload.data.attributes.ends_at,
-        renewsAt: payload.data.attributes.renews_at,
-        trialEndsAt: payload.data.attributes.trial_ends_at,
-        billingAnchor: payload.data.attributes.billing_anchor,
-        cardBrand: payload.data.attributes.card_brand,
-        cardLastFour: payload.data.attributes.card_last_four,
-        variantName: payload.data.attributes.variant_name,
-        productName: payload.data.attributes.product_name,
-      });
-    }
+  if (event === "subscription_created" || event === "subscription_updated") {
+    await upsertSubscription(
+      db,
+      existing,
+      subscriptionId,
+      userId,
+      status,
+      payload.data.attributes
+    );
   }
 };
