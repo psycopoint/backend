@@ -10,6 +10,7 @@ import { Session, sessionMiddleware, CookieStore } from "hono-sessions";
 // ROUTES
 import authRoute from "@routes/auth.route";
 import usersRoute from "@routes/users.route";
+import subscriptionRoute from "@routes/subscription.route";
 
 const app = new Hono<{
   Bindings: Env;
@@ -44,20 +45,20 @@ app.use("*", async (c, next) => {
     store,
     encryptionKey: c.env.SESSION_SECRET, // Required for CookieStore, recommended for others
     expireAfterSeconds: 86400, // 1 days
-    // cookieOptions: {
-    //   sameSite: "none", // Recommended for basic CSRF protection in modern browsers
-    //   path: "/", // Required for this library to work properly
-    //   httpOnly: true, // Recommended to avoid XSS attacks
-    //   secure: true,
-    //   domain: c.env.COOKIE_DOMAIN,
-    // },
-
     cookieOptions: {
-      sameSite: "None", // Recommended for basic CSRF protection in modern browsers
+      sameSite: "none", // Recommended for basic CSRF protection in modern browsers
       path: "/", // Required for this library to work properly
       httpOnly: true, // Recommended to avoid XSS attacks
       secure: true,
+      domain: c.env.COOKIE_DOMAIN,
     },
+
+    // cookieOptions: {
+    //   sameSite: "None", // Recommended for basic CSRF protection in modern browsers
+    //   path: "/", // Required for this library to work properly
+    //   httpOnly: true, // Recommended to avoid XSS attacks
+    //   secure: true,
+    // },
     sessionCookieName: "psicohub.session",
   });
 
@@ -67,14 +68,7 @@ app.use("*", async (c, next) => {
 // ROUTES
 app.route("/auth", authRoute);
 app.route("/users", usersRoute);
+app.route("/subscription", subscriptionRoute);
 // app.route("/patients", patients);
-
-app.get("/test", async (c) => {
-  const session = c.get("session");
-
-  // session.deleteSession()
-
-  return c.text("test");
-});
 
 export default app;

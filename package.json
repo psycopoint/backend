@@ -11,11 +11,13 @@
   "dependencies": {
     "@hono/oauth-providers": "^0.6.0",
     "@hono/zod-validator": "^0.2.2",
+    "@lemonsqueezy/lemonsqueezy.js": "^3.2.0",
     "@neondatabase/serverless": "^0.9.4",
     "@paralleldrive/cuid2": "^2.2.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/bun": "^1.1.6",
     "bcryptjs": "^2.4.3",
+    "crypto": "^1.0.1",
     "dayjs": "^1.11.12",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.32.1",
