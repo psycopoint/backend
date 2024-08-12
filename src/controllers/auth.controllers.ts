@@ -33,7 +33,7 @@ export const googleAuthentication = factory.createHandlers(async (c) => {
 
     await handleSession(c, db, newUser.id);
 
-    return c.redirect(c.env.BASE_URL);
+    return c.redirect(c.env.FRONTEND_URL);
   }
 
   // user already exists inside db
@@ -53,7 +53,7 @@ export const googleAuthentication = factory.createHandlers(async (c) => {
     }
   }
 
-  return c.redirect(c.env.BASE_URL);
+  return c.redirect(c.env.FRONTEND_URL);
 });
 
 // RESEND AUTH
@@ -79,7 +79,7 @@ export const resendAuthentication = factory.createHandlers(
       // generate a token using the email & creates a magic link with it
       const expiration = dayjs().add(15, "minutes").unix();
       // const token = await generateRefreshToken(c, db, user.id, expiration);
-      const magicLink = `${c.env.BASE_URL}/magic-link?token=${"token.id"}`;
+      const magicLink = `${c.env.FRONTEND_URL}/magic-link?token=${"token.id"}`;
 
       // send token to user email
       const data = await resend.emails.send({
@@ -104,11 +104,10 @@ export const signout = factory.createHandlers(async (c) => {
 
   const session = c.get("session");
   const sessionToken = session.get("session_id");
+  await session.deleteSession();
 
   // delete rf cookie inside db
   await db.delete(sessions).where(eq(sessions.sessionToken, sessionToken));
-
-  session.deleteSession();
 
   return c.text("success");
 });

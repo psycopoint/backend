@@ -18,18 +18,18 @@ const app = new Hono<{
   };
 }>().basePath("/v1");
 
-app.use(
-  csrf({
-    origin: (origin) => /https:\/\/(?:\w+\.)?psicohub\.co$/.test(origin),
-  })
-);
+app.use("*", async (c, next) => {
+  const csrfMiddleware = csrf({
+    origin: ["api.psycohub.com", "http://localhost:3000"],
+  });
 
-app.use(csrf({ origin: "http://localhost:3000" }));
+  return csrfMiddleware(c, next);
+});
 
 // CORS
 app.use("*", async (c, next) => {
   const corsMiddleware = cors({
-    origin: c.env.BASE_URL, // allowing only localhost:3000
+    origin: c.env.FRONTEND_URL, // allowing only localhost:3000
     allowMethods: ["GET", "POST", "PATCH", "OPTIONS"],
     allowHeaders: ["Authorization", "Content-Type"],
     credentials: true,
@@ -42,14 +42,21 @@ const store = new CookieStore();
 app.use("*", async (c, next) => {
   const sessionMid = sessionMiddleware({
     store,
-    encryptionKey: c.env.JWT_SECRET, // Required for CookieStore, recommended for others
+    encryptionKey: c.env.SESSION_SECRET, // Required for CookieStore, recommended for others
     expireAfterSeconds: 86400, // 1 days
+    // cookieOptions: {
+    //   sameSite: "none", // Recommended for basic CSRF protection in modern browsers
+    //   path: "/", // Required for this library to work properly
+    //   httpOnly: true, // Recommended to avoid XSS attacks
+    //   secure: true,
+    //   domain: c.env.COOKIE_DOMAIN,
+    // },
+
     cookieOptions: {
       sameSite: "None", // Recommended for basic CSRF protection in modern browsers
       path: "/", // Required for this library to work properly
       httpOnly: true, // Recommended to avoid XSS attacks
       secure: true,
-      // signingSecret: "test123879asbd9ae7q9adshd091823hd",
     },
     sessionCookieName: "psicohub.session",
   });
@@ -64,6 +71,8 @@ app.route("/users", usersRoute);
 
 app.get("/test", async (c) => {
   const session = c.get("session");
+
+  // session.deleteSession()
 
   return c.text("test");
 });

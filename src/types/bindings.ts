@@ -3,7 +3,8 @@ export type Env = {
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;
   PROJECT_NAME: string;
-  JWT_SECRET: string;
-  BASE_URL: string;
+  SESSION_SECRET: string;
+  FRONTEND_URL: string;
   RESEND_API_KEY: string;
+  COOKIE_DOMAIN: string;
 };

@@ -4,8 +4,8 @@ compatibility_date = "2024-04-01"
 
 [vars]
 PROJECT_NAME = "psicohub"
-JWT_EXPIRATION_TIME = 7
-BASE_URL = "http://localhost:3000"
+FRONTEND_URL = "http://localhost:3000"
+COOKIE_DOMAIN = ".psycohub.com"
 
 
 # [env.development]
