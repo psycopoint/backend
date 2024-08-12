@@ -1,0 +1,11 @@
+meta {
+  name: Get Appointments
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{users}}/@me/patients/{{patientId}}/appointments
+  body: none
+  auth: none
+}

@@ -9,9 +9,6 @@ import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 
 import { createFactory } from "hono/factory";
-import { decode } from "hono/jwt";
-import { Resend } from "resend";
-import { z } from "zod";
 
 const factory = createFactory();
 

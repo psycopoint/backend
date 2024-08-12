@@ -1,0 +1,45 @@
+meta {
+  name: Create Appointments
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{users}}/@me/appointments/{{patientId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "title": "Therapy Session",
+    "disabled": false,
+    "color": "#FF5733",
+    "textColor": "#FFFFFF",
+    "editable": true,
+    "deletable": true,
+    "draggable": true,
+    "allDay": false,
+    "agendaAvatar": {
+      "src": "avatar.jpg",
+      "alt": "Avatar"
+    },
+    "sx": {
+      "backgroundColor": "#EFEFEF"
+    },
+    "appointmentMood": 7,
+    "appointmentDetails": "Discussed progress and challenges.",
+    "isCompleted": false,
+    "patientMood": 6,
+    "patientNotes": "Patient is feeling better than last week.",
+    "psychologistNotes": "Focus on cognitive-behavioral techniques.",
+    "appointmentFocus": "Cognitive-behavioral therapy",
+    "appointmentOutcome": "Patient showed improvement.",
+    "nextSteps": "Continue with current therapy plan.",
+    "followUpDate": "2024-08-19T10:00:00Z",
+    "patientConcerns": "Difficulty sleeping.",
+    "appointmentFeedback": "Patient was satisfied with the session.",
+    "appointmentDuration": 60
+  }
+  
+}

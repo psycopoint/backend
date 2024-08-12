@@ -5,14 +5,15 @@ import {
   getUser,
   updateUser,
 } from "@/controllers/users.controllers";
-import { bearerMiddleware } from "@/middlewares/bearer-middleware";
+
 import { Hono } from "hono";
+import { Env } from "@/types/bindings";
+import { JwtVariables } from "hono/jwt";
+import { Session } from "hono-sessions";
 
 // ROUTES
 import patients from "@/routes/patients.route";
-import { JwtVariables } from "hono/jwt";
-import { Session } from "hono-sessions";
-import { Env } from "@/types/bindings";
+import appointments from "@/routes/appointments.route";
 
 const app = new Hono<{
   Bindings: Env;
@@ -38,5 +39,8 @@ app.patch("/:id", ...updateUser);
 
 // NESTING PATIENT ROUTE
 app.route("/@me/patients", patients);
+
+// NESTING SESSION ROUTE
+app.route("/@me", appointments);
 
 export default app;
