@@ -4,8 +4,9 @@ import { psychologists } from "./psychologists";
 
 export const subscriptions = pgTable("subscriptions", {
   id: text("id").primaryKey(),
-  psychologistId: text("user_id")
+  userId: text("user_id")
     .notNull()
+    .unique()
     .references(() => psychologists.userId, { onDelete: "cascade" }),
   userName: text("user_name").notNull(),
   status: text("status").notNull(),
@@ -13,6 +14,7 @@ export const subscriptions = pgTable("subscriptions", {
   subscriptionId: text("subscription_id").notNull().unique(),
   renewsAt: text("renews_at"),
   endsAt: text("ends_at"),
+  productName: text("product_name"),
   variantName: text("variant_name"),
   trialEndsAt: text("trial_ends_at"),
   cardBrand: text("visa"),

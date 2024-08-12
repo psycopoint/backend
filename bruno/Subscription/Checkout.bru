@@ -1,0 +1,15 @@
+meta {
+  name: Checkout
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{url}}/subscription/checkout?variant=123
+  body: none
+  auth: none
+}
+
+params:query {
+  variant: 123
+}

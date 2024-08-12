@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240529.0",
+    "@types/crypto-js": "^4.2.2",
     "drizzle-kit": "^0.23.0",
     "wrangler": "^3.57.2"
   }
