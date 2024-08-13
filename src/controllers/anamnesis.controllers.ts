@@ -14,6 +14,7 @@ const factory = createFactory();
 
 // GET ALL ANAMNESIS
 export const getAllAnamnese = factory.createHandlers(async (c) => {
+  // TODO: implement this
   const { patientId } = c.req.param();
 
   return c.text("Get All Anamnese");

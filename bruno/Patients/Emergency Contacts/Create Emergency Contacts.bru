@@ -1,0 +1,19 @@
+meta {
+  name: Create Emergency Contacts
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{url}}/users/@me/patients/{{patientId}}/emergency-contacts
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "contactName": "Pedro Ramos",
+    "contactRelation": "Amigo",
+    "contactPhone": "11 957689847"
+  }
+}

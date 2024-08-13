@@ -5,13 +5,9 @@ meta {
 }
 
 patch {
-  url: {{patients}}/:patientId/anamnesis
+  url: {{patients}}/{{patientId}}/anamnesis
   body: json
   auth: none
-}
-
-params:path {
-  patientId: yyy6fgn2g2wvwwcgpy0dikfo
 }
 
 body:json {
@@ -20,7 +16,7 @@ body:json {
     "eeh": 1234,
     "hama": null,
     "bdi": null,
-    "chiefComplaint": null,
+    "chiefComplaint": "Test 12345",
     "historyOfPresentIllness": null,
     "pastPsychiatricHistory": null,
     "medicalHistory": null,

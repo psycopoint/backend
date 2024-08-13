@@ -1,0 +1,15 @@
+meta {
+  name: Delete Emergency Contact
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{url}}/users/@me/patients/{{patientId}}/emergency-contacts/:contactId
+  body: none
+  auth: none
+}
+
+params:path {
+  contactId: dvocmmbs28i99xa6vil54g8m
+}

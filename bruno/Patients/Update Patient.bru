@@ -5,13 +5,9 @@ meta {
 }
 
 patch {
-  url: {{users}}/@me/patients/:patientId
+  url: {{users}}/@me/patients/{{patientId}}
   body: json
   auth: none
-}
-
-params:path {
-  patientId: yyy6fgn2g2wvwwcgpy0dikfo
 }
 
 headers {

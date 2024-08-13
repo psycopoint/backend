@@ -19,13 +19,13 @@ const app = new Hono<{
   };
 }>().basePath("/v1");
 
-app.use("*", async (c, next) => {
-  const csrfMiddleware = csrf({
-    origin: ["https://api.psycohub.com", "http://localhost:3000"],
-  });
+// app.use("*", async (c, next) => {
+//   const csrfMiddleware = csrf({
+//     origin: ["https://api.psycohub.com", "http://localhost:3000"],
+//   });
 
-  return csrfMiddleware(c, next);
-});
+//   return csrfMiddleware(c, next);
+// });
 
 // CORS
 app.use("*", async (c, next) => {
@@ -54,7 +54,7 @@ app.use("*", async (c, next) => {
     // },
 
     cookieOptions: {
-      sameSite: "None", // Recommended for basic CSRF protection in modern browsers
+      sameSite: "none", // Recommended for basic CSRF protection in modern browsers
       path: "/", // Required for this library to work properly
       httpOnly: true, // Recommended to avoid XSS attacks
       secure: true,

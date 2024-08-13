@@ -27,16 +27,16 @@ const app = new Hono<{
  */
 
 // get all appointments
-app.get("/appointments/:patientId?", ...getAppointments);
+app.get("/:patientId?", ...getAppointments);
 
 // get appointment by id
 app.get("/appointment/:appointmentId", ...getAppointment);
 
 // create appointment
-app.post("/appointments/:patientId?", ...createAppointment);
+app.post("/:patientId?", ...createAppointment);
 
 // delete appointment
-app.delete("/appointments/:appointmentId", ...deleteAppointment);
+app.delete("/:appointmentId", ...deleteAppointment);
 
 // update appointment
 app.patch("/appointment/:appointmentId", ...updateAppointment);

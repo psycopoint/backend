@@ -1,4 +1,5 @@
 import { InsertPatient, SelectPatient, patients } from "@/db/schemas";
+import { EmergencyContact } from "@/types/patients";
 import { getAuth } from "@/utils/get-auth";
 import { createId } from "@paralleldrive/cuid2";
 import { and, eq } from "drizzle-orm";
@@ -197,4 +198,149 @@ export const updatePatientService = async (
     .returning();
 
   return patient as SelectPatient;
+};
+
+/**
+ * ===============================================================
+ *              E M E R G E N C Y   C O N T A C T S
+ * ===============================================================
+ */
+// GET EMERGENCY CONTACTS
+export const getPatientEmergencyContactsService = async (
+  c: Context,
+  db: NeonHttpDatabase,
+  patientId: string
+): Promise<EmergencyContact[]> => {
+  const user = await getAuth(c, db);
+
+  if (!user) {
+    throw new Error("Not authenticated");
+  }
+
+  // verify if the patient exists
+  const [existing] = await db
+    .select()
+    .from(patients)
+    .where(
+      and(eq(patients.id, patientId), eq(patients.psychologistId, user.id!))
+    );
+
+  if (!existing) {
+    throw new Error("Not found");
+  }
+
+  const contacts = existing.emergencyContacts;
+
+  return contacts as EmergencyContact[];
+};
+
+// GET EMERGENCY CONTACT BY ID
+export const getPatientEmergencyContactService = async (
+  c: Context,
+  db: NeonHttpDatabase,
+  patientId: string,
+  contactId: string
+): Promise<EmergencyContact> => {
+  const user = await getAuth(c, db);
+
+  if (!user) {
+    throw new Error("Not authenticated");
+  }
+
+  // verify if the patient exists
+  const [existing] = await db
+    .select()
+    .from(patients)
+    .where(
+      and(eq(patients.id, patientId), eq(patients.psychologistId, user.id!))
+    );
+
+  if (!existing) {
+    throw new Error("Not found");
+  }
+
+  const contacts = existing.emergencyContacts as EmergencyContact[];
+  const foundContact = contacts.find((contact) => contact.id === contactId);
+
+  return foundContact as EmergencyContact;
+};
+
+// CREATE EMERGENCY CONTACT
+export const createEmergencyContactService = async (
+  c: Context,
+  db: NeonHttpDatabase,
+  values: EmergencyContact,
+  patientId: string
+) => {
+  const user = await getAuth(c, db);
+
+  if (!user) {
+    throw new Error("Not authenticated");
+  }
+
+  // verify if the patient exists
+  const [existing] = await db
+    .select()
+    .from(patients)
+    .where(
+      and(eq(patients.id, patientId), eq(patients.psychologistId, user.id!))
+    );
+
+  if (!existing) {
+    throw new Error("Not found");
+  }
+
+  const contacts = (existing.emergencyContacts as EmergencyContact[]) || [];
+
+  // update inside db
+  const updatedContacts = [...contacts, values];
+  await db
+    .update(patients)
+    .set({
+      emergencyContacts: updatedContacts,
+    })
+    .where(
+      and(eq(patients.id, patientId), eq(patients.psychologistId, user.id!))
+    );
+
+  // get the last one and return it
+  const newContact = updatedContacts[updatedContacts.length - 1];
+
+  return newContact as EmergencyContact;
+};
+
+// DELETE EMERGENCY CONTACT BY ID
+export const deletePatientEmergencyContactService = async (
+  c: Context,
+  db: NeonHttpDatabase,
+  patientId: string,
+  contactId: string
+): Promise<EmergencyContact[]> => {
+  const user = await getAuth(c, db);
+
+  if (!user) {
+    throw new Error("Not authenticated");
+  }
+
+  // verify if the patient exists
+  const [existing] = await db
+    .select()
+    .from(patients)
+    .where(
+      and(eq(patients.id, patientId), eq(patients.psychologistId, user.id!))
+    );
+
+  if (!existing) {
+    throw new Error("Not found");
+  }
+
+  const contacts = existing.emergencyContacts as EmergencyContact[];
+  const updatedContacts = contacts.filter(
+    (contact) => contact.id !== contactId
+  );
+  await db.update(patients).set({
+    emergencyContacts: updatedContacts,
+  });
+
+  return updatedContacts as EmergencyContact[];
 };

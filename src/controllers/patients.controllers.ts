@@ -7,6 +7,12 @@ import {
 import { createAnamnesisService } from "@/services/anamnese.services";
 import { createDiagramService } from "@/services/diagrams.services";
 import {
+  createEmergencyContactService,
+  deletePatientEmergencyContactService,
+  getPatientEmergencyContactService,
+  getPatientEmergencyContactsService,
+} from "@/services/patients.services";
+import {
   createPatientService,
   deletePatientService,
   getAllPatientsService,
@@ -16,6 +22,7 @@ import {
 import { handleError } from "@/utils/handle-error";
 import { zValidator } from "@hono/zod-validator";
 import { neon } from "@neondatabase/serverless";
+import { createId } from "@paralleldrive/cuid2";
 import { drizzle } from "drizzle-orm/neon-http";
 import { Context } from "hono";
 import { createFactory } from "hono/factory";
@@ -205,6 +212,8 @@ export const updatePatient = factory.createHandlers(
     const { id } = c.req.valid("param");
     const values = c.req.valid("json");
 
+    console.log(values);
+
     if (!id) {
       return c.json({ error: "Missing id" });
     }
@@ -218,6 +227,151 @@ export const updatePatient = factory.createHandlers(
       );
 
       return c.json({ data: patient }, 200);
+    } catch (error) {
+      return handleError(c, error);
+    }
+  }
+);
+
+/**
+ * ===============================================================
+ *              E M E R G E N C Y   C O N T A C T S
+ * ===============================================================
+ */
+
+// get all contacts
+export const getEmergencyContacts = factory.createHandlers(async (c) => {
+  // connect to db
+  const sql = neon(c.env.DATABASE_URL);
+  const db = drizzle(sql);
+
+  const { patientId } = c.req.param();
+
+  if (!patientId) {
+    throw new Error("Missing ID");
+  }
+
+  try {
+    const data = await getPatientEmergencyContactsService(c, db, patientId);
+
+    return c.json({ data });
+  } catch (error) {
+    return handleError(c, error);
+  }
+});
+
+// get contact by id
+export const getEmergencyContact = factory.createHandlers(
+  zValidator(
+    "param",
+    z.object({
+      contactId: z.string(),
+      patientId: z.string(),
+    })
+  ),
+  async (c) => {
+    // connect to db
+    const sql = neon(c.env.DATABASE_URL);
+    const db = drizzle(sql);
+
+    const { contactId, patientId } = c.req.valid("param");
+
+    if (!patientId) {
+      throw new Error("Missing ID");
+    }
+
+    try {
+      const data = await getPatientEmergencyContactService(
+        c,
+        db,
+        patientId,
+        contactId
+      );
+
+      console.log(data);
+
+      return c.json({ data });
+    } catch (error) {
+      return handleError(c, error);
+    }
+  }
+);
+
+// create a new emergency contact
+export const createEmergencyContact = factory.createHandlers(
+  zValidator(
+    "param",
+    z.object({
+      patientId: z.string(),
+    })
+  ),
+  zValidator(
+    "json",
+    z.object({
+      id: z.string().default(() => createId()),
+      contactName: z.string(),
+      contactRelation: z.string(),
+      contactPhone: z.string(),
+    })
+  ),
+  async (c) => {
+    // connect to db
+    const sql = neon(c.env.DATABASE_URL);
+    const db = drizzle(sql);
+
+    const { patientId } = c.req.valid("param");
+    const values = c.req.valid("json");
+
+    console.log(patientId);
+
+    if (!patientId) {
+      throw new Error("Missing ID");
+    }
+
+    try {
+      const data = await createEmergencyContactService(
+        c,
+        db,
+        values,
+        patientId
+      );
+
+      return c.json({ data });
+    } catch (error) {
+      return handleError(c, error);
+    }
+  }
+);
+
+// delete contact by id
+export const deleteEmergencyContact = factory.createHandlers(
+  zValidator(
+    "param",
+    z.object({
+      contactId: z.string(),
+      patientId: z.string(),
+    })
+  ),
+  async (c) => {
+    // connect to db
+    const sql = neon(c.env.DATABASE_URL);
+    const db = drizzle(sql);
+
+    const { contactId, patientId } = c.req.valid("param");
+
+    if (!patientId) {
+      throw new Error("Missing ID");
+    }
+
+    try {
+      const data = await deletePatientEmergencyContactService(
+        c,
+        db,
+        patientId,
+        contactId
+      );
+
+      return c.json({ data });
     } catch (error) {
       return handleError(c, error);
     }

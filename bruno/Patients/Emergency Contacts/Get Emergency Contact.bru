@@ -1,0 +1,15 @@
+meta {
+  name: Get Emergency Contact
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{url}}/users/@me/patients/{{patientId}}/emergency-contacts/:contactId
+  body: none
+  auth: none
+}
+
+params:path {
+  contactId: bf1lj8wob0kfr14emoek2sqv
+}
