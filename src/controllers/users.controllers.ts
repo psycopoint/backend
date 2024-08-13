@@ -15,6 +15,7 @@ import {
   updateUserService,
 } from "@/services/users.services";
 import { handleError } from "@/utils/handle-error";
+import { getAuth } from "@/utils/get-auth";
 
 const factory = createFactory();
 
@@ -103,12 +104,6 @@ export const createUser = factory.createHandlers(
 // UPDATE USER
 export const updateUser = factory.createHandlers(
   zValidator(
-    "param",
-    z.object({
-      id: z.string(),
-    })
-  ),
-  zValidator(
     "json",
     insertPsychologistsSchema.pick({
       birthdate: true,
@@ -132,14 +127,15 @@ export const updateUser = factory.createHandlers(
     const sql = neon(c.env.DATABASE_URL);
     const db = drizzle(sql);
 
-    const { id } = c.req.valid("param");
+    const user = await getAuth(c, db);
+
     const values = c.req.valid("json");
 
     try {
       const result = await updateUserService(
         c,
-        id,
-        { ...values, userId: id },
+        user.id,
+        { ...values, userId: user.id },
         db
       );
       return c.json(result, 200);
