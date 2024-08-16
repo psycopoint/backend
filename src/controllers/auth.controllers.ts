@@ -2,6 +2,7 @@ import { sessions } from "@/db/schemas";
 
 import { getUserByEmail, registerUser } from "@/services/auth.services";
 import { handleSession } from "@/utils/auth";
+import { getAuth } from "@/utils/get-auth";
 import { zValidator } from "@hono/zod-validator";
 import { neon } from "@neondatabase/serverless";
 
@@ -110,4 +111,23 @@ export const signout = factory.createHandlers(async (c) => {
   await db.delete(sessions).where(eq(sessions.sessionToken, sessionToken));
 
   return c.json({ success: true });
+});
+
+export const verifySession = factory.createHandlers(async (c) => {
+  // connect to db
+  const sql = neon(c.env.DATABASE_URL);
+  const db = drizzle(sql);
+
+  const session = c.get("session");
+  const sessionToken = session.get("session_id");
+  await session.deleteSession();
+
+  // const user = await getAuth(c, db);
+  console.log(session);
+
+  if (!sessionToken) {
+    return c.json({ status: "invalid" });
+  }
+
+  return c.json({ status: "valid" });
 });
