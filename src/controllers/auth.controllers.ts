@@ -106,8 +106,8 @@ export const signout = factory.createHandlers(async (c) => {
   const sessionToken = session.get("session_id");
   await session.deleteSession();
 
-  // delete rf cookie inside db
+  // delete cookie inside db
   await db.delete(sessions).where(eq(sessions.sessionToken, sessionToken));
 
-  return c.text("success");
+  return c.json({ success: true });
 });

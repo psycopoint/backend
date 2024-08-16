@@ -31,16 +31,16 @@ const app = new Hono<{
 app.get("/", ...getAllPatients);
 
 // get patient by id
-app.get("/:id", ...getPatient);
+app.get("/:patientId", ...getPatient);
 
 // create patient
 app.post("/", ...createPatient);
 
 // delete patient by id
-app.delete("/:id", ...deletePatient);
+app.delete("/:patientId", ...deletePatient);
 
 // delete patient by id
-app.patch("/:id", ...updatePatient);
+app.patch("/:patientId", ...updatePatient);
 
 // NESTING ROUTES
 app.route("/:patientId/anamnesis", anamnesis);

@@ -86,8 +86,6 @@ export const getAppointmentService = async (
       )
     );
 
-  console.log(data);
-
   return data;
 };
 

@@ -170,8 +170,6 @@ export const updatePatientService = async (
   patientId: string,
   values: InsertPatient
 ): Promise<SelectPatient> => {
-  console.log(values);
-
   const user = await getAuth(c, db);
 
   if (!user) {

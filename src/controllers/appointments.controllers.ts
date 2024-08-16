@@ -45,15 +45,11 @@ export const getAppointment = factory.createHandlers(
     const sql = neon(c.env.DATABASE_URL);
     const db = drizzle(sql);
 
-    console.log("here");
-
     const { appointmentId } = c.req.valid("param");
-    console.log(appointmentId);
 
     try {
       const appointment = await getAppointmentService(c, db, appointmentId);
 
-      console.log(appointment);
       return c.json({ data: appointment });
     } catch (error) {
       return handleError(c, error);

@@ -31,7 +31,7 @@ const app = new Hono<{
 app.use("*", async (c, next) => {
   const corsMiddleware = cors({
     origin: c.env.FRONTEND_URL, // allowing only localhost:3000
-    allowMethods: ["GET", "POST", "PATCH", "OPTIONS"],
+    allowMethods: ["GET", "POST", "PATCH", "OPTIONS", "DELETE"],
     allowHeaders: ["Authorization", "Content-Type"],
     credentials: true,
   });

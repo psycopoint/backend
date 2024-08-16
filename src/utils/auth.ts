@@ -28,9 +28,6 @@ export const handleSession = async (
   const session = c.get("session");
   let sessionToken = session.get("session_id");
 
-  console.log("SESSION: ", session);
-  console.log("TOKEN: ", sessionToken);
-
   const expiration = dayjs().add(1, "hour").toDate();
 
   // remove any existing sessions for the same user

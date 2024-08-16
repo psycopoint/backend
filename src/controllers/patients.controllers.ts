@@ -49,7 +49,7 @@ export const getPatient = factory.createHandlers(
   zValidator(
     "param",
     z.object({
-      id: z.string().optional(),
+      patientId: z.string().optional(),
     })
   ),
   async (c) => {
@@ -57,15 +57,15 @@ export const getPatient = factory.createHandlers(
     const sql = neon(c.env.DATABASE_URL);
     const db = drizzle(sql);
 
-    const { id } = c.req.valid("param");
+    const { patientId } = c.req.valid("param");
 
-    if (!id) {
+    if (!patientId) {
       return c.json({ error: "Missing Id" }, 400);
     }
 
     try {
       // get a single user's patient inside db
-      const patient = await getPatientService(c, db, id);
+      const patient = await getPatientService(c, db, patientId);
 
       // get sessions
       // TODO: add sessions
@@ -151,7 +151,7 @@ export const deletePatient = factory.createHandlers(
   zValidator(
     "param",
     z.object({
-      id: z.string().optional(),
+      patientId: z.string().optional(),
     })
   ),
   async (c) => {
@@ -159,15 +159,15 @@ export const deletePatient = factory.createHandlers(
     const sql = neon(c.env.DATABASE_URL);
     const db = drizzle(sql);
 
-    const { id } = c.req.valid("param");
+    const { patientId } = c.req.valid("param");
 
-    if (!id) {
+    if (!patientId) {
       return c.json({ error: "Missing Id" }, 400);
     }
 
     try {
       // get a single user's patient inside db
-      const patient = await deletePatientService(c, db, id);
+      const patient = await deletePatientService(c, db, patientId);
 
       return c.json({ data: patient }, 200);
     } catch (error) {
@@ -181,7 +181,7 @@ export const updatePatient = factory.createHandlers(
   zValidator(
     "param",
     z.object({
-      id: z.string().optional(),
+      patientId: z.string().optional(),
     })
   ),
   zValidator(
@@ -209,12 +209,10 @@ export const updatePatient = factory.createHandlers(
     const db = drizzle(sql);
 
     // get body data
-    const { id } = c.req.valid("param");
+    const { patientId } = c.req.valid("param");
     const values = c.req.valid("json");
 
-    console.log(values);
-
-    if (!id) {
+    if (!patientId) {
       return c.json({ error: "Missing id" });
     }
 
@@ -222,7 +220,7 @@ export const updatePatient = factory.createHandlers(
       const patient = await updatePatientService(
         c,
         db,
-        id,
+        patientId,
         values as InsertPatient
       );
 
@@ -288,8 +286,6 @@ export const getEmergencyContact = factory.createHandlers(
         contactId
       );
 
-      console.log(data);
-
       return c.json({ data });
     } catch (error) {
       return handleError(c, error);
@@ -321,8 +317,6 @@ export const createEmergencyContact = factory.createHandlers(
 
     const { patientId } = c.req.valid("param");
     const values = c.req.valid("json");
-
-    console.log(patientId);
 
     if (!patientId) {
       throw new Error("Missing ID");

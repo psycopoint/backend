@@ -46,7 +46,6 @@ export const goToCheckoutUrl = factory.createHandlers(
     const db = drizzle(sql);
 
     const { variant } = c.req.valid("query");
-    console.log(variant);
 
     try {
       const data = await generateCheckoutUrlService(c, db, variant);

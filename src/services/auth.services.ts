@@ -1,10 +1,8 @@
 import {
   InsertPsychologist,
   InsertUser,
-  SelectRefreshToken,
   SelectUser,
   psychologists,
-  refreshTokens,
   users,
 } from "@/db/schemas";
 
@@ -60,7 +58,6 @@ export const registerUser = async (
   c: Context,
   db: NeonHttpDatabase
 ): Promise<SelectUser> => {
-  console.log("inserting user inside db...");
   const user = c.get("user-google");
 
   if (!user) {
