@@ -112,22 +112,3 @@ export const signout = factory.createHandlers(async (c) => {
 
   return c.json({ success: true });
 });
-
-export const verifySession = factory.createHandlers(async (c) => {
-  // connect to db
-  const sql = neon(c.env.DATABASE_URL);
-  const db = drizzle(sql);
-
-  const session = c.get("session");
-  const sessionToken = session.get("session_id");
-  await session.deleteSession();
-
-  // const user = await getAuth(c, db);
-  console.log(session);
-
-  if (!sessionToken) {
-    return c.json({ status: "invalid" });
-  }
-
-  return c.json({ status: "valid" });
-});

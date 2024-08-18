@@ -28,8 +28,8 @@ export const appointments = pgTable("patients_appointments", {
     }
   ),
   title: text("title"),
-  start: timestamp("start", { mode: "string" }),
-  end: timestamp("end", { mode: "string" }),
+  start: timestamp("start", { mode: "string", precision: 3 }),
+  end: timestamp("end", { mode: "string", precision: 3 }),
   disabled: boolean("disabled").default(false),
   color: text("color"), // String ou "palette.path", mantido como text
   textColor: text("text_color"), // String ou "palette.path", mantido como text

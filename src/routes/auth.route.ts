@@ -6,7 +6,6 @@ import {
   googleAuthentication,
   resendAuthentication,
   signout,
-  verifySession,
 } from "@/controllers/auth.controllers";
 import { Env } from "@/types/bindings";
 import { JwtVariables } from "hono/jwt";
@@ -39,8 +38,5 @@ app.get("/resend", ...resendAuthentication);
 
 // logout
 app.post("/signout", ...signout);
-
-// verify session
-app.get("/verify-session", ...verifySession);
 
 export default app;

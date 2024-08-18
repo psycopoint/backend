@@ -75,10 +75,10 @@ export const createAppointment = factory.createHandlers(
       disabled: true,
       draggable: true,
       editable: true,
+      start: true,
       end: true,
       appointmentDetails: true,
       appointmentMood: true,
-      start: true,
       sx: true,
       textColor: true,
       title: true,
@@ -93,6 +93,7 @@ export const createAppointment = factory.createHandlers(
       patientMood: true,
       patientNotes: true,
       psychologistNotes: true,
+      updatedAt: true,
     })
   ),
   async (c) => {
@@ -102,6 +103,8 @@ export const createAppointment = factory.createHandlers(
 
     const { patientId } = c.req.valid("param");
     const values = c.req.valid("json");
+
+    console.log(values);
 
     const data = await createAppointmentService(
       c,
@@ -113,7 +116,7 @@ export const createAppointment = factory.createHandlers(
   }
 );
 
-// create appointment
+// update appointment
 export const updateAppointment = factory.createHandlers(
   zValidator(
     "param",

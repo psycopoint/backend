@@ -111,6 +111,8 @@ export const createAppointmentService = async (
     throw new Error("Not authenticated");
   }
 
+  console.log(values);
+
   const [data] = await db
     .insert(appointments)
     .values({
