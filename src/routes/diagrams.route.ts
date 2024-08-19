@@ -9,6 +9,7 @@ import {
   updateDiagram,
   updateSituation,
   deleteSituation,
+  getAllSituations,
 } from "@/controllers/diagrams.controllers";
 import { Env } from "@/types/bindings";
 import { Hono } from "hono";
@@ -34,6 +35,7 @@ app.patch("/", ...updateDiagram);
  * ===============================================================
  */
 
+app.get("/situations", ...getAllSituations);
 app.get("/situations/:situationId", ...getSituation);
 app.post("/situations", ...createSituation);
 app.delete("/situations/:situationId", ...deleteSituation);

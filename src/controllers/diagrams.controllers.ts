@@ -8,6 +8,7 @@ import {
   deleteSituationService,
   getPatientDiagramService,
   getSituationService,
+  getSituationsService,
   updateDiagramService,
   updateSituationService,
 } from "@/services/diagrams.services";
@@ -89,6 +90,28 @@ export const updateDiagram = factory.createHandlers(
  * ===============================================================
  */
 
+// GET ALL SITUATIONS
+export const getAllSituations = factory.createHandlers(async (c) => {
+  // connect to db
+  const sql = neon(c.env.DATABASE_URL);
+  const db = drizzle(sql);
+
+  const { patientId } = c.req.param();
+
+  if (!patientId) {
+    throw new Error("Missing ID");
+  }
+
+  try {
+    // get situations from user :id inside db
+    const data = await getSituationsService(c, db, patientId);
+
+    return c.json({ data }, 200);
+  } catch (error) {
+    return handleError(c, error);
+  }
+});
+
 // CREATE DIAGRAM SITUATION
 export const createSituation = factory.createHandlers(
   zValidator("json", diagramSituationSchema),
@@ -116,31 +139,28 @@ export const createSituation = factory.createHandlers(
 );
 
 // DELETE DIAGRAM SITUATION
-export const deleteSituation = factory.createHandlers(
-  zValidator("json", diagramSituationSchema),
-  async (c) => {
-    // connect to db
-    const sql = neon(c.env.DATABASE_URL);
-    const db = drizzle(sql);
+export const deleteSituation = factory.createHandlers(async (c) => {
+  // connect to db
+  const sql = neon(c.env.DATABASE_URL);
+  const db = drizzle(sql);
 
-    const patientId = c.req.param("patientId");
-    const situationId = c.req.param("situationId");
-    const values = c.req.valid("json");
-    try {
-      // get updated situation to retriev it
-      const deletedSituation = await deleteSituationService(
-        c,
-        db,
-        patientId,
-        situationId
-      );
+  const patientId = c.req.param("patientId");
+  const situationId = c.req.param("situationId");
 
-      return c.json({ data: deletedSituation });
-    } catch (error) {
-      return handleError(c, error);
-    }
+  try {
+    // get updated situation to retriev it
+    const deletedSituation = await deleteSituationService(
+      c,
+      db,
+      patientId,
+      situationId
+    );
+
+    return c.json({ data: deletedSituation });
+  } catch (error) {
+    return handleError(c, error);
   }
-);
+});
 
 // UPDATE DIAGRAM SITUATIONS
 export const updateSituation = factory.createHandlers(

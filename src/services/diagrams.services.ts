@@ -177,6 +177,45 @@ export const updateDiagramService = async (
  */
 
 // GET SITUATION BY ID
+export const getSituationsService = async (
+  c: Context,
+  db: NeonHttpDatabase,
+  patientId: string
+): Promise<DiagramSituation[]> => {
+  const user = await getAuth(c, db);
+
+  if (!user) {
+    throw new Error("Not authenticated");
+  }
+
+  // verify if patient exists and is associated to the authenticated psychologist
+  const [existingPatient] = await db
+    .select()
+    .from(patients)
+    .where(
+      and(eq(patients.id, patientId), eq(patients.psychologistId, user.id!))
+    );
+
+  if (!existingPatient) {
+    throw new Error("Not found");
+  }
+
+  // search the diagram associated to the patient
+  const [existingDiagram] = await db
+    .select()
+    .from(diagrams)
+    .where(eq(diagrams.patientId, patientId));
+
+  if (!existingDiagram) {
+    throw new Error("Not found");
+  }
+
+  console.log(existingDiagram.situations);
+
+  return existingDiagram.situations as DiagramSituation[];
+};
+
+// GET SITUATION BY ID
 export const getSituationService = async (
   c: Context,
   db: NeonHttpDatabase,

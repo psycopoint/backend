@@ -1,5 +1,5 @@
 import { lemonSqueezySetup } from "@lemonsqueezy/lemonsqueezy.js";
-import { Context, Next } from "hono";
+import { Context } from "hono";
 
 export const setupLemon = (c: Context) => {
   const setupLemon = lemonSqueezySetup({

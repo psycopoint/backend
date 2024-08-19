@@ -1,0 +1,11 @@
+meta {
+  name: Get Situations
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{patients}}/{{patientId}}/diagram/situations
+  body: json
+  auth: none
+}
