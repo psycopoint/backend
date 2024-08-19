@@ -165,7 +165,7 @@ export const updateAppointment = factory.createHandlers(
     const data = await updateAppointmentService(
       c,
       db,
-      { ...values, id: createId() },
+      { ...values, id: appointmentId },
       appointmentId
     );
     return c.json({ data });

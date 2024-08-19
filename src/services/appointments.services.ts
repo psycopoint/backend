@@ -148,12 +148,20 @@ export const updateAppointmentService = async (
     throw new Error("Not authenticated");
   }
 
+  console.log(values);
+
   const [data] = await db
     .update(appointments)
     .set({
       ...values,
       updatedAt: dayjs().format("YYYY-MM-DD HH:mm:ss.SSS"),
     })
+    .where(
+      or(
+        eq(appointments.id, appointmentId),
+        eq(appointments.eventId, appointmentId)
+      )
+    )
     .returning();
 
   return data;

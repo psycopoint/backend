@@ -39,8 +39,7 @@ app.patch("/:id", ...updateUser);
 
 // NESTING PATIENT ROUTE
 app.route("/@me/patients", patients);
-
-// NESTING SESSION ROUTE
-app.route("/@me", appointments);
+// NESTING APPOINTMENTS ROUTE
+app.route("/@me/appointments", appointments);
 
 export default app;
