@@ -18,7 +18,7 @@ import { Session } from "hono-sessions";
 // ROUTES
 import anamnesis from "./anamnesis.route";
 import diagrams from "./diagrams.route";
-import appointments from "@/routes/appointments.route";
+import events from "@/routes/events.route";
 
 const app = new Hono<{
   Bindings: Env;
@@ -45,7 +45,7 @@ app.patch("/:patientId", ...updatePatient);
 // NESTING ROUTES
 app.route("/:patientId/anamnesis", anamnesis);
 app.route("/:patientId/diagram", diagrams);
-app.route("/:patientId/appointments", appointments);
+app.route("/:patientId/events", events);
 
 /**
  * ===============================================================

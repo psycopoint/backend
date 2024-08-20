@@ -1,1 +1,0 @@
-ALTER TABLE "psychologists" DROP COLUMN IF EXISTS "image";

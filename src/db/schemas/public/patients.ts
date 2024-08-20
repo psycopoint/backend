@@ -13,7 +13,7 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { Address, PatientPreferences } from "@/types/patients";
 import { createId } from "@paralleldrive/cuid2";
 import { diagrams } from "./diagrams";
-import { appointments } from "../events/events";
+import { events } from "./events";
 import { payments } from "./payments";
 
 const genderEnum = pgEnum("gender", ["male", "female", "other"]);
@@ -66,7 +66,7 @@ export const patientsRelations = relations(patients, ({ one, many }) => ({
     references: [diagrams.patientId],
   }),
 
-  sessions: many(appointments),
+  sessions: many(events),
   payments: many(payments),
 }));
 

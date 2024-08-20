@@ -1,1 +1,0 @@
-ALTER TABLE "auth"."refresh_tokens" RENAME COLUMN "expires_at" TO "expires_in";

@@ -1,71 +1,9 @@
 {
-  "id": "34203656-59a9-48dd-83ca-57b2bc2f0573",
-  "prevId": "fdd13949-6bb4-4b38-9032-1c664c102afb",
+  "id": "ff246975-ec11-4b1a-8754-bfa8dc7bd5e3",
+  "prevId": "5cdd680e-9d8c-477d-be0d-b495957f336b",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "auth.refresh_tokens": {
-      "name": "refresh_tokens",
-      "schema": "auth",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "userId": {
-          "name": "userId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "token": {
-          "name": "token",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "refresh_token": {
-          "name": "refresh_token",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "expires_at": {
-          "name": "expires_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "refresh_tokens_userId_users_id_fk": {
-          "name": "refresh_tokens_userId_users_id_fk",
-          "tableFrom": "refresh_tokens",
-          "tableTo": "users",
-          "schemaTo": "auth",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
     "auth.users": {
       "name": "users",
       "schema": "auth",
@@ -109,7 +47,7 @@
         "user_type": {
           "name": "user_type",
           "type": "user_type",
-          "typeSchema": "public",
+          "typeSchema": "auth",
           "primaryKey": false,
           "notNull": false,
           "default": "'psychologist'"
@@ -117,7 +55,7 @@
         "provider": {
           "name": "provider",
           "type": "providers",
-          "typeSchema": "public",
+          "typeSchema": "auth",
           "primaryKey": false,
           "notNull": false
         }
@@ -125,10 +63,210 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      }
+    },
+    "auth.sessions": {
+      "name": "sessions",
+      "schema": "auth",
+      "columns": {
+        "sessionToken": {
+          "name": "sessionToken",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires": {
+          "name": "expires",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "sessions_userId_users_id_fk": {
+          "name": "sessions_userId_users_id_fk",
+          "tableFrom": "sessions",
+          "tableTo": "users",
+          "schemaTo": "auth",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.anamnesis": {
-      "name": "anamnesis",
+    "public.events": {
+      "name": "events",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "psychologist_id": {
+          "name": "psychologist_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "clinic_id": {
+          "name": "clinic_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "start": {
+          "name": "start",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end": {
+          "name": "end",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "disabled": {
+          "name": "disabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "event_type": {
+          "name": "event_type",
+          "type": "event_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "color": {
+          "name": "color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "editable": {
+          "name": "editable",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "deletable": {
+          "name": "deletable",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "all_day": {
+          "name": "all_day",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "is_completed": {
+          "name": "is_completed",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "event_content": {
+          "name": "event_content",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'{}'::jsonb"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "events_psychologist_id_psychologists_userId_fk": {
+          "name": "events_psychologist_id_psychologists_userId_fk",
+          "tableFrom": "events",
+          "tableTo": "psychologists",
+          "columnsFrom": [
+            "psychologist_id"
+          ],
+          "columnsTo": [
+            "userId"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "events_clinic_id_clinics_userId_fk": {
+          "name": "events_clinic_id_clinics_userId_fk",
+          "tableFrom": "events",
+          "tableTo": "clinics",
+          "columnsFrom": [
+            "clinic_id"
+          ],
+          "columnsTo": [
+            "userId"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "events_id_unique": {
+          "name": "events_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id"
+          ]
+        }
+      }
+    },
+    "public.patients_anamnesis": {
+      "name": "patients_anamnesis",
       "schema": "",
       "columns": {
         "id": {
@@ -151,17 +289,16 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp(3)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp (3)",
           "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
+          "notNull": false
         },
         "consent": {
           "name": "consent",
@@ -269,9 +406,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "anamnesis_patient_id_patients_id_fk": {
-          "name": "anamnesis_patient_id_patients_id_fk",
-          "tableFrom": "anamnesis",
+        "patients_anamnesis_patient_id_patients_id_fk": {
+          "name": "patients_anamnesis_patient_id_patients_id_fk",
+          "tableFrom": "patients_anamnesis",
           "tableTo": "patients",
           "columnsFrom": [
             "patient_id"
@@ -282,9 +419,9 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "anamnesis_psychologist_id_psychologists_userId_fk": {
-          "name": "anamnesis_psychologist_id_psychologists_userId_fk",
-          "tableFrom": "anamnesis",
+        "patients_anamnesis_psychologist_id_psychologists_userId_fk": {
+          "name": "patients_anamnesis_psychologist_id_psychologists_userId_fk",
+          "tableFrom": "patients_anamnesis",
           "tableTo": "psychologists",
           "columnsFrom": [
             "psychologist_id"
@@ -298,245 +435,14 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "anamnesis_patient_id_unique": {
-          "name": "anamnesis_patient_id_unique",
+        "patients_anamnesis_patient_id_unique": {
+          "name": "patients_anamnesis_patient_id_unique",
           "nullsNotDistinct": false,
           "columns": [
             "patient_id"
           ]
         }
       }
-    },
-    "public.appointments": {
-      "name": "appointments",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "event_id": {
-          "name": "event_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "patient_id": {
-          "name": "patient_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "psychologist_id": {
-          "name": "psychologist_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "start": {
-          "name": "start",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "end": {
-          "name": "end",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "disabled": {
-          "name": "disabled",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": false
-        },
-        "color": {
-          "name": "color",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "text_color": {
-          "name": "text_color",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "editable": {
-          "name": "editable",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": false
-        },
-        "deletable": {
-          "name": "deletable",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": false
-        },
-        "draggable": {
-          "name": "draggable",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": false
-        },
-        "all_day": {
-          "name": "all_day",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": false
-        },
-        "agenda_avatar": {
-          "name": "agenda_avatar",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "sx": {
-          "name": "sx",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "appointment_mood": {
-          "name": "appointment_mood",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "appointment_details": {
-          "name": "appointment_details",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        },
-        "is_completed": {
-          "name": "is_completed",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": false
-        },
-        "patient_mood": {
-          "name": "patient_mood",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "patient_notes": {
-          "name": "patient_notes",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "psychologist_notes": {
-          "name": "psychologist_notes",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "appointment_focus": {
-          "name": "appointment_focus",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "appointment_outcome": {
-          "name": "appointment_outcome",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "next_steps": {
-          "name": "next_steps",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "follow_up_date": {
-          "name": "follow_up_date",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "patient_concerns": {
-          "name": "patient_concerns",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "appointment_feedback": {
-          "name": "appointment_feedback",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "appointment_duration": {
-          "name": "appointment_duration",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "appointments_patient_id_patients_id_fk": {
-          "name": "appointments_patient_id_patients_id_fk",
-          "tableFrom": "appointments",
-          "tableTo": "patients",
-          "columnsFrom": [
-            "patient_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "appointments_psychologist_id_psychologists_userId_fk": {
-          "name": "appointments_psychologist_id_psychologists_userId_fk",
-          "tableFrom": "appointments",
-          "tableTo": "psychologists",
-          "columnsFrom": [
-            "psychologist_id"
-          ],
-          "columnsTo": [
-            "userId"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
     },
     "public.clinics": {
       "name": "clinics",
@@ -586,17 +492,16 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp(3)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp(3)",
           "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
+          "notNull": false
         },
         "hours_of_operation": {
           "name": "hours_of_operation",
@@ -640,8 +545,8 @@
         }
       }
     },
-    "public.diagrams": {
-      "name": "diagrams",
+    "public.patients_diagrams": {
+      "name": "patients_diagrams",
       "schema": "",
       "columns": {
         "id": {
@@ -658,17 +563,16 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp(3)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp(3)",
           "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
+          "notNull": false
         },
         "relevant_history": {
           "name": "relevant_history",
@@ -704,9 +608,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "diagrams_patient_id_patients_id_fk": {
-          "name": "diagrams_patient_id_patients_id_fk",
-          "tableFrom": "diagrams",
+        "patients_diagrams_patient_id_patients_id_fk": {
+          "name": "patients_diagrams_patient_id_patients_id_fk",
+          "tableFrom": "patients_diagrams",
           "tableTo": "patients",
           "columnsFrom": [
             "patient_id"
@@ -745,17 +649,16 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp(3)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp(3)",
           "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
+          "notNull": false
         },
         "status": {
           "name": "status",
@@ -891,17 +794,16 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp(3)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp(3)",
           "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
+          "notNull": false
         }
       },
       "indexes": {},
@@ -988,25 +890,24 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp(3)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp(3)",
           "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
+          "notNull": false
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "payments_appointment_id_appointments_id_fk": {
-          "name": "payments_appointment_id_appointments_id_fk",
+        "payments_appointment_id_events_id_fk": {
+          "name": "payments_appointment_id_events_id_fk",
           "tableFrom": "payments",
-          "tableTo": "appointments",
+          "tableTo": "events",
           "columnsFrom": [
             "appointment_id"
           ],
@@ -1121,12 +1022,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "image": {
-          "name": "image",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "specialty": {
           "name": "specialty",
           "type": "text",
@@ -1142,17 +1037,16 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp(3)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp(3)",
           "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
+          "notNull": false
         },
         "clinic_id": {
           "name": "clinic_id",
@@ -1254,6 +1148,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "product_name": {
+          "name": "product_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "variant_name": {
           "name": "variant_name",
           "type": "text",
@@ -1303,6 +1203,13 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
+        "subscriptions_user_id_unique": {
+          "name": "subscriptions_user_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "user_id"
+          ]
+        },
         "subscriptions_subscription_id_unique": {
           "name": "subscriptions_subscription_id_unique",
           "nullsNotDistinct": false,
@@ -1314,9 +1221,9 @@
     }
   },
   "enums": {
-    "public.providers": {
+    "auth.providers": {
       "name": "providers",
-      "schema": "public",
+      "schema": "auth",
       "values": [
         "google",
         "linkedin",
@@ -1324,13 +1231,24 @@
         "credentials"
       ]
     },
-    "public.user_type": {
+    "auth.user_type": {
       "name": "user_type",
-      "schema": "public",
+      "schema": "auth",
       "values": [
         "psychologist",
         "clinic",
         "admin"
+      ]
+    },
+    "public.event_type": {
+      "name": "event_type",
+      "schema": "public",
+      "values": [
+        "social_post",
+        "patient_session",
+        "administrative_task",
+        "unavailability",
+        "other"
       ]
     },
     "public.status": {

@@ -25,6 +25,7 @@ export const clinics = pgTable("clinics", {
   cnpj: text("cnpj"),
   description: text("description"),
   logo: text("logo"),
+
   createdAt: timestamp("created_at", { mode: "string", precision: 3 })
     .defaultNow()
     .notNull(),

@@ -1,4 +1,5 @@
 import { createId } from "@paralleldrive/cuid2";
+import { relations } from "drizzle-orm";
 import {
   pgEnum,
   pgSchema,
@@ -7,21 +8,22 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { events } from "../public/events";
 
-export const userType = pgEnum("user_type", [
+export const authSchema = pgSchema("auth");
+
+export const userType = authSchema.enum("user_type", [
   "psychologist",
   "clinic",
   "admin",
 ]);
 
-export const providers = pgEnum("providers", [
+export const providers = authSchema.enum("providers", [
   "google",
   "linkedin",
   "apple",
   "credentials",
 ]);
-
-export const authSchema = pgSchema("auth");
 
 export const users = authSchema.table("users", {
   id: text("id")
@@ -35,6 +37,11 @@ export const users = authSchema.table("users", {
   userType: userType("user_type").default("psychologist"),
   provider: providers("provider"),
 });
+
+//  RELATIONS
+export const usersRelations = relations(users, ({ one, many }) => ({
+  events: many(events),
+}));
 
 // ZOD
 export const insertUserSchema = createInsertSchema(users);

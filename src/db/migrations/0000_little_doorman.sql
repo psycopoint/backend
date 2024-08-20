@@ -1,13 +1,19 @@
 CREATE SCHEMA "auth";
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "public"."providers" AS ENUM('google', 'linkedin', 'apple', 'credentials');
+ CREATE TYPE "auth"."providers" AS ENUM('google', 'linkedin', 'apple', 'credentials');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "public"."user_type" AS ENUM('psychologist', 'clinic', 'admin');
+ CREATE TYPE "auth"."user_type" AS ENUM('psychologist', 'clinic', 'admin');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "public"."event_type" AS ENUM('social_post', 'patient_session', 'administrative_task', 'unavailability', 'other');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -36,15 +42,6 @@ EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "auth"."refresh_token" (
-	"id" text PRIMARY KEY NOT NULL,
-	"userId" text NOT NULL,
-	"token" text,
-	"refresh_token" text,
-	"expires_at" integer,
-	"created_at" timestamp DEFAULT now()
-);
---> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "auth"."users" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text,
@@ -52,16 +49,43 @@ CREATE TABLE IF NOT EXISTS "auth"."users" (
 	"emailVerified" timestamp,
 	"password" text,
 	"image" text,
-	"user_type" "user_type" DEFAULT 'psychologist',
-	"provider" "providers"
+	"user_type" "auth"."user_type" DEFAULT 'psychologist',
+	"provider" "auth"."providers",
+	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "anamnesis" (
+CREATE TABLE IF NOT EXISTS "auth"."sessions" (
+	"sessionToken" text PRIMARY KEY NOT NULL,
+	"userId" text NOT NULL,
+	"expires" timestamp NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "events" (
+	"id" text PRIMARY KEY NOT NULL,
+	"psychologist_id" text,
+	"clinic_id" text,
+	"title" text NOT NULL,
+	"start" timestamp(3),
+	"end" timestamp(3),
+	"disabled" boolean DEFAULT false,
+	"event_type" "event_type" NOT NULL,
+	"color" text,
+	"editable" boolean DEFAULT false,
+	"deletable" boolean DEFAULT false,
+	"all_day" boolean DEFAULT false,
+	"is_completed" boolean DEFAULT false,
+	"created_at" timestamp(3) DEFAULT now() NOT NULL,
+	"updated_at" timestamp(3),
+	"event_content" jsonb DEFAULT '[]'::jsonb,
+	CONSTRAINT "events_id_unique" UNIQUE("id")
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "patients_anamnesis" (
 	"id" text PRIMARY KEY NOT NULL,
 	"patient_id" text NOT NULL,
 	"psychologist_id" text,
-	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now(),
+	"created_at" timestamp(3) DEFAULT now() NOT NULL,
+	"updated_at" timestamp (3),
 	"consent" boolean DEFAULT false,
 	"eeh" integer,
 	"ham_a" integer,
@@ -79,41 +103,7 @@ CREATE TABLE IF NOT EXISTS "anamnesis" (
 	"diagnosis" text,
 	"risk_assessment" text,
 	"lifeInfos" text,
-	CONSTRAINT "anamnesis_patient_id_unique" UNIQUE("patient_id")
-);
---> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "appointments" (
-	"id" text PRIMARY KEY NOT NULL,
-	"event_id" text NOT NULL,
-	"patient_id" text,
-	"psychologist_id" text,
-	"title" text,
-	"start" timestamp,
-	"end" timestamp,
-	"disabled" boolean DEFAULT false,
-	"color" text,
-	"text_color" text,
-	"editable" boolean DEFAULT false,
-	"deletable" boolean DEFAULT false,
-	"draggable" boolean DEFAULT false,
-	"all_day" boolean DEFAULT false,
-	"agenda_avatar" jsonb,
-	"sx" jsonb,
-	"appointment_mood" integer,
-	"appointment_details" text,
-	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now(),
-	"is_completed" boolean DEFAULT false,
-	"patient_mood" integer,
-	"patient_notes" text,
-	"psychologist_notes" text,
-	"appointment_focus" text,
-	"appointment_outcome" text,
-	"next_steps" text,
-	"follow_up_date" timestamp,
-	"patient_concerns" text,
-	"appointment_feedback" text,
-	"appointment_duration" integer
+	CONSTRAINT "patients_anamnesis_patient_id_unique" UNIQUE("patient_id")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "clinics" (
@@ -124,18 +114,18 @@ CREATE TABLE IF NOT EXISTS "clinics" (
 	"cnpj" text,
 	"description" text,
 	"logo" text,
-	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now(),
+	"created_at" timestamp(3) DEFAULT now() NOT NULL,
+	"updated_at" timestamp(3),
 	"hours_of_operation" json,
 	"address_info" jsonb DEFAULT '[]'::jsonb,
 	CONSTRAINT "clinics_userId_unique" UNIQUE("userId")
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "diagrams" (
+CREATE TABLE IF NOT EXISTS "patients_diagrams" (
 	"id" text PRIMARY KEY NOT NULL,
 	"patient_id" text NOT NULL,
-	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now(),
+	"created_at" timestamp(3) DEFAULT now() NOT NULL,
+	"updated_at" timestamp(3),
 	"relevant_history" text,
 	"central_beliefs" text,
 	"rule_beliefs" text,
@@ -147,8 +137,8 @@ CREATE TABLE IF NOT EXISTS "notes" (
 	"id" text PRIMARY KEY NOT NULL,
 	"title" text,
 	"content" text,
-	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now(),
+	"created_at" timestamp(3) DEFAULT now() NOT NULL,
+	"updated_at" timestamp(3),
 	"status" "status" DEFAULT 'active',
 	"patient_id" text,
 	"psychologists_id" text NOT NULL
@@ -169,8 +159,8 @@ CREATE TABLE IF NOT EXISTS "patients" (
 	"emergency_contacts" jsonb DEFAULT '[]',
 	"preferences" jsonb DEFAULT '{}',
 	"psychologist_id" text,
-	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now()
+	"created_at" timestamp(3) DEFAULT now() NOT NULL,
+	"updated_at" timestamp(3)
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "payments" (
@@ -183,8 +173,8 @@ CREATE TABLE IF NOT EXISTS "payments" (
 	"payment_date" timestamp DEFAULT now(),
 	"method" "methodsEnum" DEFAULT 'pix' NOT NULL,
 	"receipts" text,
-	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now()
+	"created_at" timestamp(3) DEFAULT now() NOT NULL,
+	"updated_at" timestamp(3)
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "psychologists" (
@@ -199,11 +189,10 @@ CREATE TABLE IF NOT EXISTS "psychologists" (
 	"address_info" jsonb DEFAULT '[]'::jsonb,
 	"crp" varchar(256),
 	"cpf" varchar(256),
-	"image" text,
 	"specialty" text,
 	"preferences" jsonb DEFAULT '{}',
-	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now(),
+	"created_at" timestamp(3) DEFAULT now() NOT NULL,
+	"updated_at" timestamp(3),
 	"clinic_id" text,
 	CONSTRAINT "psychologists_userId_unique" UNIQUE("userId")
 );
@@ -217,40 +206,42 @@ CREATE TABLE IF NOT EXISTS "subscriptions" (
 	"subscription_id" text NOT NULL,
 	"renews_at" text,
 	"ends_at" text,
+	"product_name" text,
 	"variant_name" text,
 	"trial_ends_at" text,
 	"visa" text,
 	"billing_anchor" integer,
 	"card_last_four" text,
+	CONSTRAINT "subscriptions_user_id_unique" UNIQUE("user_id"),
 	CONSTRAINT "subscriptions_subscription_id_unique" UNIQUE("subscription_id")
 );
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "auth"."refresh_token" ADD CONSTRAINT "refresh_token_userId_users_id_fk" FOREIGN KEY ("userId") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "auth"."sessions" ADD CONSTRAINT "sessions_userId_users_id_fk" FOREIGN KEY ("userId") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "anamnesis" ADD CONSTRAINT "anamnesis_patient_id_patients_id_fk" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "events" ADD CONSTRAINT "events_psychologist_id_psychologists_userId_fk" FOREIGN KEY ("psychologist_id") REFERENCES "public"."psychologists"("userId") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "anamnesis" ADD CONSTRAINT "anamnesis_psychologist_id_psychologists_userId_fk" FOREIGN KEY ("psychologist_id") REFERENCES "public"."psychologists"("userId") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "events" ADD CONSTRAINT "events_clinic_id_clinics_userId_fk" FOREIGN KEY ("clinic_id") REFERENCES "public"."clinics"("userId") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "appointments" ADD CONSTRAINT "appointments_patient_id_patients_id_fk" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "patients_anamnesis" ADD CONSTRAINT "patients_anamnesis_patient_id_patients_id_fk" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "appointments" ADD CONSTRAINT "appointments_psychologist_id_psychologists_userId_fk" FOREIGN KEY ("psychologist_id") REFERENCES "public"."psychologists"("userId") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "patients_anamnesis" ADD CONSTRAINT "patients_anamnesis_psychologist_id_psychologists_userId_fk" FOREIGN KEY ("psychologist_id") REFERENCES "public"."psychologists"("userId") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -262,7 +253,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "diagrams" ADD CONSTRAINT "diagrams_patient_id_patients_id_fk" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "patients_diagrams" ADD CONSTRAINT "patients_diagrams_patient_id_patients_id_fk" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -280,7 +271,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "payments" ADD CONSTRAINT "payments_appointment_id_appointments_id_fk" FOREIGN KEY ("appointment_id") REFERENCES "public"."appointments"("id") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "payments" ADD CONSTRAINT "payments_appointment_id_events_id_fk" FOREIGN KEY ("appointment_id") REFERENCES "public"."events"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

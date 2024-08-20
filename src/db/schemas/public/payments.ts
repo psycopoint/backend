@@ -9,7 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { patients } from "./patients";
 import { psychologists } from "./psychologists";
-import { appointments } from "../events/events";
+import { events } from "./events";
 import { relations, sql } from "drizzle-orm";
 import { createId } from "@paralleldrive/cuid2";
 
@@ -25,7 +25,7 @@ export const payments = pgTable("payments", {
     .$defaultFn(() => createId())
     .primaryKey(),
   appointmentId: text("appointment_id")
-    .references(() => appointments.id, {
+    .references(() => events.id, {
       onDelete: "cascade",
     })
     .notNull(),
@@ -55,9 +55,9 @@ export const payments = pgTable("payments", {
 
 // RELATIONS
 export const paymentsRelations = relations(payments, ({ one }) => ({
-  session: one(appointments, {
+  session: one(events, {
     fields: [payments.appointmentId],
-    references: [appointments.id],
+    references: [events.id],
   }),
   psychologist: one(psychologists, {
     fields: [payments.psychologistId],

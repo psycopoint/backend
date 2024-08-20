@@ -1,1 +1,0 @@
-DROP TABLE "auth"."refresh_tokens";

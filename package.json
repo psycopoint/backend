@@ -1,5 +1,7 @@
 {
   "name": "psicohub-backend",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
     "dev": "wrangler dev src/index.ts --port 3001",
     "deploy": "wrangler deploy --minify src/index.ts",

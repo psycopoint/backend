@@ -1,13 +1,31 @@
-import { pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { psychologists } from "./psychologists";
 import { sql } from "drizzle-orm";
 
 export const statusEnum = pgEnum("status", ["active", "inactive"]);
+export const priorityEnum = pgEnum("priority", ["low", "medium", "high"]);
 
 export const notes = pgTable("notes", {
   id: text("id").primaryKey(),
+  psychologistId: text("psychologist_id")
+    .notNull()
+    .references(() => psychologists.userId),
   title: text("title"),
-  content: text("content"),
+  content: text("content")
+    .$type<any>()
+    .default(sql`'{}'::jsonb`),
+  status: statusEnum("status").default("active"),
+  priority: priorityEnum("priority").default("medium"),
+  attachments: text("attachments"),
+  archived: boolean("archived").default(false),
+
   createdAt: timestamp("created_at", { mode: "string", precision: 3 })
     .defaultNow()
     .notNull(),
@@ -15,11 +33,6 @@ export const notes = pgTable("notes", {
     mode: "string",
     precision: 3,
   }).$onUpdate(() => sql`CURRENT_TIMESTAMP(3)`),
-  status: statusEnum("status").default("active"),
-  patientId: text("patient_id"),
-  psychologistsId: text("psychologists_id")
-    .notNull()
-    .references(() => psychologists.userId),
 });
 
 // RELATIONS

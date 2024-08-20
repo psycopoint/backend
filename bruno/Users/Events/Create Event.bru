@@ -1,0 +1,33 @@
+meta {
+  name: Create Event
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{users}}/@me/events
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "title": "Administrative Task Event",
+    "start": "2024-08-20T14:00:00.000Z",
+    "end": "2024-08-20T15:00:00.000Z",
+    "disabled": false,
+    "type": "administrative_task",
+    "color": "#FFC107",
+    "editable": true,
+    "deletable": true,
+    "allDay": false,
+    "isCompleted": false,
+    "eventContent": {
+      "taskType": "Prepare monthly report",
+      "dueDate": "2024-08-21T17:00:00.000Z",
+      "content": "Compile and prepare the report for the month of August."
+    },
+    "createdAt": "2024-08-20T08:00:00.000Z",
+    "updatedAt": "2024-08-20T08:00:00.000Z"
+  }
+}
