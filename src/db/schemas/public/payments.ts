@@ -9,7 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { patients } from "./patients";
 import { psychologists } from "./psychologists";
-import { appointments } from "./appointments";
+import { appointments } from "../events/events";
 import { relations, sql } from "drizzle-orm";
 import { createId } from "@paralleldrive/cuid2";
 

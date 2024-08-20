@@ -7,7 +7,7 @@ export * from "./auth/users";
 
 // PUBLIC SCHEMAS
 export * from "./public/anamnesis";
-export * from "./public/appointments";
+export * from "./events/events";
 export * from "./public/clinics";
 export * from "./public/diagrams";
 export * from "./public/notes";
