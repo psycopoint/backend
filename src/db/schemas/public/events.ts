@@ -41,6 +41,7 @@ export const events = pgTable("events", {
   editable: boolean("editable").default(false),
   deletable: boolean("deletable").default(false),
   allDay: boolean("all_day").default(false),
+  resource: jsonb("resource"),
   isCompleted: boolean("is_completed").default(false),
   createdAt: timestamp("created_at", { mode: "string", precision: 3 })
     .defaultNow()

@@ -82,6 +82,7 @@ export const createEvent = factory.createHandlers(
       type: true,
       updatedAt: true,
       eventContent: true,
+      resource: true,
     }),
     (result, c) => {
       if (result.data.type === "patient_session") {
@@ -157,6 +158,7 @@ export const updateEvent = factory.createHandlers(
       type: true,
       updatedAt: true,
       eventContent: true,
+      resource: true,
     }),
     (result, c) => {
       if (result.data.type === "patient_session") {
