@@ -32,8 +32,8 @@ export const AdministrativeTaskSchema = z.object({
   content: z.string(),
 });
 
-// EventContent Schema (Union of the above)
-export const EventContentSchema = z.union([
+// EventData Schema (Union of the above)
+export const EventDataSchema = z.union([
   PatientSessionSchema,
   SocialPostSchema,
   AdministrativeTaskSchema,
@@ -43,4 +43,4 @@ export const EventContentSchema = z.union([
 export type PatientSession = z.infer<typeof PatientSessionSchema>;
 export type SocialPost = z.infer<typeof SocialPostSchema>;
 export type AdministrativeTask = z.infer<typeof AdministrativeTaskSchema>;
-export type EventContent = z.infer<typeof EventContentSchema>;
+export type EventData = z.infer<typeof EventDataSchema>;

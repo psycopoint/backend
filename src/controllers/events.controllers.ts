@@ -8,7 +8,7 @@ import {
 } from "@/services/events.services";
 import {
   AdministrativeTaskSchema,
-  EventContent,
+  EventData,
   PatientSessionSchema,
   SocialPostSchema,
 } from "@/types/events";
@@ -81,24 +81,22 @@ export const createEvent = factory.createHandlers(
       title: true,
       type: true,
       updatedAt: true,
-      eventContent: true,
+      data: true,
       resource: true,
     }),
     (result, c) => {
       if (result.data.type === "patient_session") {
-        const parsed = PatientSessionSchema.safeParse(result.data.eventContent);
+        const parsed = PatientSessionSchema.safeParse(result.data.data);
         if (!parsed.success) {
           return c.json({ error: parsed.error });
         }
       } else if (result.data.type === "social_post") {
-        const parsed = SocialPostSchema.safeParse(result.data.eventContent);
+        const parsed = SocialPostSchema.safeParse(result.data.data);
         if (!parsed.success) {
           return c.json({ error: parsed.error });
         }
       } else if (result.data.type === "administrative_task") {
-        const parsed = AdministrativeTaskSchema.safeParse(
-          result.data.eventContent
-        );
+        const parsed = AdministrativeTaskSchema.safeParse(result.data.data);
         if (!parsed.success) {
           return c.json({ error: parsed.error });
         }
@@ -124,7 +122,7 @@ export const createEvent = factory.createHandlers(
       {
         ...values,
         id: createId(),
-        eventContent: values.eventContent as EventContent,
+        data: values.data as EventData,
         createdAt: new Date().toISOString(),
       },
       patientId
@@ -157,24 +155,22 @@ export const updateEvent = factory.createHandlers(
       title: true,
       type: true,
       updatedAt: true,
-      eventContent: true,
+      data: true,
       resource: true,
     }),
     (result, c) => {
       if (result.data.type === "patient_session") {
-        const parsed = PatientSessionSchema.safeParse(result.data.eventContent);
+        const parsed = PatientSessionSchema.safeParse(result.data.data);
         if (!parsed.success) {
           return c.json({ error: parsed.error });
         }
       } else if (result.data.type === "social_post") {
-        const parsed = SocialPostSchema.safeParse(result.data.eventContent);
+        const parsed = SocialPostSchema.safeParse(result.data.data);
         if (!parsed.success) {
           return c.json({ error: parsed.error });
         }
       } else if (result.data.type === "administrative_task") {
-        const parsed = AdministrativeTaskSchema.safeParse(
-          result.data.eventContent
-        );
+        const parsed = AdministrativeTaskSchema.safeParse(result.data.data);
         if (!parsed.success) {
           return c.json({ error: parsed.error });
         }

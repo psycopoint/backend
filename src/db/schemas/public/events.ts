@@ -8,12 +8,12 @@ import {
 } from "drizzle-orm/pg-core";
 import { psychologists } from "./psychologists";
 import { clinics } from "./clinics";
-import { EventContent } from "@/types/events";
+import { EventData } from "@/types/events";
 import { relations, sql } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 
 // Enum para o tipo de evento
-export const eventTypeEnum = pgEnum("event_type", [
+export const eventTypeEnum = pgEnum("type", [
   "social_post",
   "patient_session",
   "administrative_task",
@@ -36,7 +36,7 @@ export const events = pgTable("events", {
   start: timestamp("start", { mode: "string", precision: 3 }),
   end: timestamp("end", { mode: "string", precision: 3 }),
   disabled: boolean("disabled").default(false),
-  type: eventTypeEnum("event_type").notNull(),
+  type: eventTypeEnum("type").notNull(),
   color: text("color"),
   editable: boolean("editable").default(false),
   deletable: boolean("deletable").default(false),
@@ -51,8 +51,8 @@ export const events = pgTable("events", {
     precision: 3,
   }).$onUpdate(() => sql`CURRENT_TIMESTAMP(3)`),
   // Coluna JSONB que armazena o conteúdo do evento
-  eventContent: jsonb("event_content")
-    .$type<EventContent>()
+  data: jsonb("data")
+    .$type<EventData>()
     .default(sql`'{}'::jsonb`),
 });
 

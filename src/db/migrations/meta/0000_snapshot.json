@@ -1,5 +1,5 @@
 {
-  "id": "5cdd680e-9d8c-477d-be0d-b495957f336b",
+  "id": "a2b996b1-31c9-4846-93c3-2500b4201df9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -163,9 +163,9 @@
           "notNull": false,
           "default": false
         },
-        "event_type": {
-          "name": "event_type",
-          "type": "event_type",
+        "type": {
+          "name": "type",
+          "type": "type",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
@@ -197,6 +197,12 @@
           "notNull": false,
           "default": false
         },
+        "resource": {
+          "name": "resource",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
         "is_completed": {
           "name": "is_completed",
           "type": "boolean",
@@ -217,12 +223,12 @@
           "primaryKey": false,
           "notNull": false
         },
-        "event_content": {
-          "name": "event_content",
+        "data": {
+          "name": "data",
           "type": "jsonb",
           "primaryKey": false,
           "notNull": false,
-          "default": "'[]'::jsonb"
+          "default": "'{}'::jsonb"
         }
       },
       "indexes": {},
@@ -635,6 +641,12 @@
           "primaryKey": true,
           "notNull": true
         },
+        "psychologist_id": {
+          "name": "psychologist_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "title": {
           "name": "title",
           "type": "text",
@@ -645,7 +657,37 @@
           "name": "content",
           "type": "text",
           "primaryKey": false,
+          "notNull": false,
+          "default": "'{}'::jsonb"
+        },
+        "status": {
+          "name": "status",
+          "type": "status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'active'"
+        },
+        "priority": {
+          "name": "priority",
+          "type": "priority",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'medium'"
+        },
+        "attachments": {
+          "name": "attachments",
+          "type": "text",
+          "primaryKey": false,
           "notNull": false
+        },
+        "archived": {
+          "name": "archived",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
         },
         "created_at": {
           "name": "created_at",
@@ -659,36 +701,16 @@
           "type": "timestamp(3)",
           "primaryKey": false,
           "notNull": false
-        },
-        "status": {
-          "name": "status",
-          "type": "status",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'active'"
-        },
-        "patient_id": {
-          "name": "patient_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "psychologists_id": {
-          "name": "psychologists_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "notes_psychologists_id_psychologists_userId_fk": {
-          "name": "notes_psychologists_id_psychologists_userId_fk",
+        "notes_psychologist_id_psychologists_userId_fk": {
+          "name": "notes_psychologist_id_psychologists_userId_fk",
           "tableFrom": "notes",
           "tableTo": "psychologists",
           "columnsFrom": [
-            "psychologists_id"
+            "psychologist_id"
           ],
           "columnsTo": [
             "userId"
@@ -962,7 +984,14 @@
           "type": "jsonb",
           "primaryKey": false,
           "notNull": false,
-          "default": "'{}'"
+          "default": "'[]'::jsonb"
+        },
+        "additional_phones": {
+          "name": "additional_phones",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::jsonb"
         },
         "website": {
           "name": "website",
@@ -996,13 +1025,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "additional_phones": {
-          "name": "additional_phones",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'{}'"
-        },
         "address_info": {
           "name": "address_info",
           "type": "jsonb",
@@ -1033,7 +1055,7 @@
           "type": "jsonb",
           "primaryKey": false,
           "notNull": false,
-          "default": "'{}'"
+          "default": "'[]'::jsonb"
         },
         "created_at": {
           "name": "created_at",
@@ -1240,8 +1262,8 @@
         "admin"
       ]
     },
-    "public.event_type": {
-      "name": "event_type",
+    "public.type": {
+      "name": "type",
       "schema": "public",
       "values": [
         "social_post",
@@ -1249,6 +1271,15 @@
         "administrative_task",
         "unavailability",
         "other"
+      ]
+    },
+    "public.priority": {
+      "name": "priority",
+      "schema": "public",
+      "values": [
+        "low",
+        "medium",
+        "high"
       ]
     },
     "public.status": {

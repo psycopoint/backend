@@ -1,1 +1,0 @@
-ALTER TABLE "events" ALTER COLUMN "event_content" SET DEFAULT '{}'::jsonb;

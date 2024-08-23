@@ -13,7 +13,13 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "public"."event_type" AS ENUM('social_post', 'patient_session', 'administrative_task', 'unavailability', 'other');
+ CREATE TYPE "public"."type" AS ENUM('social_post', 'patient_session', 'administrative_task', 'unavailability', 'other');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "public"."priority" AS ENUM('low', 'medium', 'high');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -68,15 +74,16 @@ CREATE TABLE IF NOT EXISTS "events" (
 	"start" timestamp(3),
 	"end" timestamp(3),
 	"disabled" boolean DEFAULT false,
-	"event_type" "event_type" NOT NULL,
+	"type" "type" NOT NULL,
 	"color" text,
 	"editable" boolean DEFAULT false,
 	"deletable" boolean DEFAULT false,
 	"all_day" boolean DEFAULT false,
+	"resource" jsonb,
 	"is_completed" boolean DEFAULT false,
 	"created_at" timestamp(3) DEFAULT now() NOT NULL,
 	"updated_at" timestamp(3),
-	"event_content" jsonb DEFAULT '[]'::jsonb,
+	"data" jsonb DEFAULT '{}'::jsonb,
 	CONSTRAINT "events_id_unique" UNIQUE("id")
 );
 --> statement-breakpoint
@@ -135,13 +142,15 @@ CREATE TABLE IF NOT EXISTS "patients_diagrams" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "notes" (
 	"id" text PRIMARY KEY NOT NULL,
+	"psychologist_id" text NOT NULL,
 	"title" text,
-	"content" text,
-	"created_at" timestamp(3) DEFAULT now() NOT NULL,
-	"updated_at" timestamp(3),
+	"content" text DEFAULT '{}'::jsonb,
 	"status" "status" DEFAULT 'active',
-	"patient_id" text,
-	"psychologists_id" text NOT NULL
+	"priority" "priority" DEFAULT 'medium',
+	"attachments" text,
+	"archived" boolean DEFAULT false,
+	"created_at" timestamp(3) DEFAULT now() NOT NULL,
+	"updated_at" timestamp(3)
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "patients" (
@@ -179,18 +188,18 @@ CREATE TABLE IF NOT EXISTS "payments" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "psychologists" (
 	"userId" text PRIMARY KEY NOT NULL,
-	"adidional_emails" jsonb DEFAULT '{}',
+	"adidional_emails" jsonb DEFAULT '[]'::jsonb,
+	"additional_phones" jsonb DEFAULT '[]'::jsonb,
 	"website" text,
 	"social_links" jsonb DEFAULT '{}',
 	"gender" "gender",
 	"birthdate" date,
 	"phone" varchar(256),
-	"additional_phones" jsonb DEFAULT '{}',
 	"address_info" jsonb DEFAULT '[]'::jsonb,
 	"crp" varchar(256),
 	"cpf" varchar(256),
 	"specialty" text,
-	"preferences" jsonb DEFAULT '{}',
+	"preferences" jsonb DEFAULT '[]'::jsonb,
 	"created_at" timestamp(3) DEFAULT now() NOT NULL,
 	"updated_at" timestamp(3),
 	"clinic_id" text,
@@ -259,7 +268,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "notes" ADD CONSTRAINT "notes_psychologists_id_psychologists_userId_fk" FOREIGN KEY ("psychologists_id") REFERENCES "public"."psychologists"("userId") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "notes" ADD CONSTRAINT "notes_psychologist_id_psychologists_userId_fk" FOREIGN KEY ("psychologist_id") REFERENCES "public"."psychologists"("userId") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
