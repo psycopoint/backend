@@ -27,7 +27,7 @@ const app = new Hono<{
  */
 
 // get all eventss
-app.get("/:patientId?", ...getEvents);
+app.get("/", ...getEvents);
 
 // get events by id
 app.get("/:eventId", ...getEvent);

@@ -20,6 +20,14 @@ export const eventTypeEnum = pgEnum("type", [
   "unavailability",
   "other",
 ]);
+// enum para o tipo de evento recorrente
+export const recurringEnum = pgEnum("recurring", [
+  "daily",
+  "weekly",
+  "monthly",
+  "yearly",
+  "once",
+]);
 
 export const events = pgTable("events", {
   id: text("id").primaryKey().notNull().unique(),
@@ -41,6 +49,7 @@ export const events = pgTable("events", {
   editable: boolean("editable").default(false),
   deletable: boolean("deletable").default(false),
   allDay: boolean("all_day").default(false),
+  recurring: recurringEnum("recurring").default("once"),
   resource: jsonb("resource"),
   isCompleted: boolean("is_completed").default(false),
   createdAt: timestamp("created_at", { mode: "string", precision: 3 })

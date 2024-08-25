@@ -16,6 +16,11 @@ import {
 } from "@/services/users.services";
 import { handleError } from "@/utils/handle-error";
 import { getAuth } from "@/utils/get-auth";
+import {
+  AdditionalEmails,
+  AdditionalPhones,
+  UserPreferences,
+} from "@/types/psychologists";
 
 const factory = createFactory();
 
@@ -131,13 +136,22 @@ export const updateUser = factory.createHandlers(
 
     const values = c.req.valid("json");
 
+    console.log({ values });
+
     try {
       const result = await updateUserService(
         c,
         user.id,
-        { ...values, userId: user.id },
+        {
+          ...values,
+          userId: user.id,
+          additionalEmails: values.additionalEmails as AdditionalEmails[],
+          additionalPhones: values.additionalPhones as AdditionalPhones[],
+          preferences: values.preferences as UserPreferences,
+        },
         db
       );
+
       return c.json(result, 200);
     } catch (error) {
       return handleError(c, error);

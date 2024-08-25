@@ -1,5 +1,5 @@
-import { InsertEvent, events } from "@/db/schemas";
-import { EventContent } from "@/types/events";
+import { InsertEvent, SelectEvent, events } from "@/db/schemas";
+import { EventData } from "@/types/events";
 import { getAuth } from "@/utils/get-auth";
 import { createId } from "@paralleldrive/cuid2";
 import dayjs from "dayjs";
@@ -13,13 +13,13 @@ import { Context } from "hono";
  *
  * @param {Context} c - The context object containing request and response details.
  * @param {NeonHttpDatabase} db - The database instance for executing queries.
- * @returns {Promise<EventContent>} A promise that resolves to an array of Events.
+ * @returns {Promise<SelectEvent[]>} A promise that resolves to an array of Events.
  * @throws {Error} Throws an error if the user is not authenticated or if no Events are found.
  */
 export const getEventsService = async (
   c: Context,
   db: NeonHttpDatabase
-): Promise<EventContent[]> => {
+): Promise<SelectEvent[]> => {
   const user = await getAuth(c, db);
 
   if (!user) {
@@ -41,7 +41,7 @@ export const getEventsService = async (
     .from(events)
     .where(eq(events.psychologistId, user.id));
 
-  return data as any;
+  return data as SelectEvent[];
 };
 
 /**
@@ -50,14 +50,14 @@ export const getEventsService = async (
  * @param {Context} c - The context object containing request and response details.
  * @param {NeonHttpDatabase} db - The database instance for executing queries.
  * @param {string} eventId - The ID of the Event to retrieve.
- * @returns {Promise<EventContent>} A promise that resolves to the Event data.
+ * @returns {Promise<SelectEvent>} A promise that resolves to the Event data.
  * @throws {Error} Throws an error if the user is not authenticated, or if the Event is not found.
  */
 export const getEventService = async (
   c: Context,
   db: NeonHttpDatabase,
   eventId: string
-): Promise<EventContent> => {
+): Promise<SelectEvent> => {
   const user = await getAuth(c, db);
 
   if (!user) {
@@ -79,7 +79,7 @@ export const getEventService = async (
     .from(events)
     .where(and(eq(events.id, eventId), eq(events.psychologistId, user.id)));
 
-  return data as any;
+  return data as SelectEvent;
 };
 
 /**
@@ -89,7 +89,7 @@ export const getEventService = async (
  * @param {NeonHttpDatabase} db - The database instance for executing queries.
  * @param {InsertEvent} values - The values for the new Event.
  * @param {string} patientId - The ID of the patient associated with the Event.
- * @returns {Promise<EventContent>} A promise that resolves to the created Event data.
+ * @returns {Promise<SelectEvent>} A promise that resolves to the created Event data.
  * @throws {Error} Throws an error if the user is not authenticated.
  */
 export const createEventService = async (
@@ -97,7 +97,7 @@ export const createEventService = async (
   db: NeonHttpDatabase,
   values: InsertEvent,
   patientId?: string
-): Promise<EventContent> => {
+): Promise<SelectEvent> => {
   const user = await getAuth(c, db);
 
   if (!user) {
@@ -112,7 +112,7 @@ export const createEventService = async (
     })
     .returning();
 
-  return data as any;
+  return data as SelectEvent;
 };
 
 /**
@@ -122,7 +122,7 @@ export const createEventService = async (
  * @param {NeonHttpDatabase} db - The database instance for executing queries.
  * @param {InsertEvent} values - The values to update for the Event.
  * @param {string} eventId - The ID of the Event to update.
- * @returns {Promise<EventContent>} A promise that resolves to the updated Event data.
+ * @returns {Promise<SelectEvent>} A promise that resolves to the updated Event data.
  * @throws {Error} Throws an error if the user is not authenticated.
  */
 export const updateEventService = async (
@@ -130,7 +130,7 @@ export const updateEventService = async (
   db: NeonHttpDatabase,
   values: any,
   eventId: string
-): Promise<EventContent> => {
+): Promise<SelectEvent> => {
   const user = await getAuth(c, db);
 
   if (!user) {
@@ -148,7 +148,7 @@ export const updateEventService = async (
     .where(eq(events.id, eventId))
     .returning();
 
-  return data as any;
+  return data as SelectEvent;
 };
 
 /**
@@ -157,14 +157,14 @@ export const updateEventService = async (
  * @param {Context} c - The context object containing request and response details.
  * @param {NeonHttpDatabase} db - The database instance for executing queries.
  * @param {string} eventId - The ID of the Event to delete.
- * @returns {Promise<EventContent>} A promise that resolves to the deleted Event data.
+ * @returns {Promise<SelectEvent>} A promise that resolves to the deleted Event data.
  * @throws {Error} Throws an error if the user is not authenticated or if the Event is not found.
  */
 export const deleteEventService = async (
   c: Context,
   db: NeonHttpDatabase,
   eventId: string
-): Promise<EventContent> => {
+): Promise<SelectEvent> => {
   const user = await getAuth(c, db);
 
   if (!user) {
@@ -176,5 +176,5 @@ export const deleteEventService = async (
     .where(and(eq(events.psychologistId, user.id), eq(events.id, eventId)))
     .returning();
 
-  return data as any;
+  return data as SelectEvent;
 };

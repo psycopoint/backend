@@ -8,6 +8,13 @@
       "when": 1724436368280,
       "tag": "0000_reflective_albert_cleary",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1724621689794,
+      "tag": "0001_thin_magneto",
+      "breakpoints": true
     }
   ]
 }

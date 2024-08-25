@@ -16,7 +16,7 @@ import { createId } from "@paralleldrive/cuid2";
 import {
   AdditionalEmails,
   AdditionalPhones,
-  Preferences,
+  UserPreferences,
 } from "@/types/psychologists";
 
 export const genderEnum = pgEnum("gender", ["male", "female", "other"]);
@@ -30,10 +30,10 @@ export const psychologists = pgTable("psychologists", {
     .notNull()
     .unique(),
   additionalEmails: jsonb("adidional_emails")
-    .$type<AdditionalEmails[]>()
+    .$type<AdditionalEmails[] | undefined>()
     .default(sql`'[]'::jsonb`),
   additionalPhones: jsonb("additional_phones")
-    .$type<AdditionalPhones[]>()
+    .$type<AdditionalPhones[] | undefined>()
     .default(sql`'[]'::jsonb`),
   website: text("website"),
   socialLinks: jsonb("social_links").default("{}"),
@@ -45,7 +45,7 @@ export const psychologists = pgTable("psychologists", {
   cpf: varchar("cpf", { length: 256 }),
   specialty: text("specialty"),
   preferences: jsonb("preferences")
-    .$type<Preferences>()
+    .$type<UserPreferences>()
     .default(sql`'[]'::jsonb`),
 
   createdAt: timestamp("created_at", { mode: "string", precision: 3 })

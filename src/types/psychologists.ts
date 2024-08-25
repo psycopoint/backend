@@ -34,15 +34,19 @@ export const preferencesSchema = z.object({
 export const additionalPhonesSchema = z
   .array(
     z
-      .string()
-      .min(1)
-      .regex(/^\+?[1-9]\d{1,14}$/)
+      .array(
+        z
+          .string()
+          .min(1)
+          .regex(/^\+?[1-9]\d{1,14}$/)
+      )
+      .optional()
   )
   .optional();
 
 // ADICIONAL EMAILS
 export const additionalEmailsSchema = z.array(z.string().email()).optional();
 
-export type Preferences = z.infer<typeof preferencesSchema>;
+export type UserPreferences = z.infer<typeof preferencesSchema>;
 export type AdditionalPhones = z.infer<typeof additionalPhonesSchema>;
 export type AdditionalEmails = z.infer<typeof additionalEmailsSchema>;
