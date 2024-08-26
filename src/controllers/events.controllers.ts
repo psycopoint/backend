@@ -1,4 +1,4 @@
-import { InsertEvent, insertEventSchema } from "@/db/schemas";
+import { insertEventSchema } from "@/db/schemas";
 import {
   createEventService,
   deleteEventService,
@@ -15,11 +15,11 @@ import {
 import { handleError } from "@/utils/handle-error";
 import { zValidator } from "@hono/zod-validator";
 import { neon } from "@neondatabase/serverless";
-import { createId } from "@paralleldrive/cuid2";
-import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
 import { createFactory } from "hono/factory";
 import { z } from "zod";
+
+import { init } from "@paralleldrive/cuid2";
 
 const factory = createFactory();
 
@@ -118,7 +118,10 @@ export const createEvent = factory.createHandlers(
     if (!values) {
       return c.text("values not provided");
     }
-    console.log(values);
+
+    const createId = init({
+      length: 10,
+    });
 
     const data = await createEventService(
       c,

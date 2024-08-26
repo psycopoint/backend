@@ -1,7 +1,7 @@
 import { diagrams, InsertDiagram, patients, SelectDiagram } from "@/db/schemas";
 import { DiagramSituation } from "@/types/patients";
 import { getAuth } from "@/utils/get-auth";
-import { createId } from "@paralleldrive/cuid2";
+import { init } from "@paralleldrive/cuid2";
 import dayjs from "dayjs";
 import { and, eq } from "drizzle-orm";
 import { NeonHttpDatabase } from "drizzle-orm/neon-http";
@@ -68,6 +68,9 @@ export const createDiagramService = async (
   if (!user) {
     throw new Error("Not authenticated");
   }
+  const createId = init({
+    length: 10,
+  });
 
   const anamneseData = {
     ...values,
@@ -296,6 +299,10 @@ export const createSituationService = async (
   }
 
   const existingSituations = existingDiagram.situations || [];
+
+  const createId = init({
+    length: 5,
+  });
 
   // Create a new situation
   const newSituation: DiagramSituation = {

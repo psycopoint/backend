@@ -5,7 +5,7 @@ import {
   SelectAnamnesis,
 } from "@/db/schemas";
 import { getAuth } from "@/utils/get-auth";
-import { createId } from "@paralleldrive/cuid2";
+import { init } from "@paralleldrive/cuid2";
 import { and, eq } from "drizzle-orm";
 import { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { Context } from "hono";
@@ -76,6 +76,10 @@ export const createAnamnesisService = async (
   if (!user) {
     throw new Error("Not authenticated");
   }
+
+  const createId = init({
+    length: 10,
+  });
 
   const anamneseData = {
     ...values,

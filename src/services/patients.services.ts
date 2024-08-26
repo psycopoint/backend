@@ -1,7 +1,7 @@
 import { InsertPatient, SelectPatient, patients } from "@/db/schemas";
 import { EmergencyContact } from "@/types/patients";
 import { getAuth } from "@/utils/get-auth";
-import { createId } from "@paralleldrive/cuid2";
+import { init } from "@paralleldrive/cuid2";
 import { and, eq } from "drizzle-orm";
 import { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { Context } from "hono";
@@ -97,6 +97,10 @@ export const createPatientService = async (
   if (!user) {
     throw new Error("Not authenticated");
   }
+
+  const createId = init({
+    length: 10,
+  });
 
   const patientData = {
     id: createId(),

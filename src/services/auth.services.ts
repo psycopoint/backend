@@ -6,13 +6,11 @@ import {
   users,
 } from "@/db/schemas";
 
-import { createId } from "@paralleldrive/cuid2";
-import dayjs from "dayjs";
+import { init } from "@paralleldrive/cuid2";
+
 import { eq } from "drizzle-orm";
 import { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { Context } from "hono";
-import { setCookie } from "hono/cookie";
-import { sign } from "hono/jwt";
 
 /**
  * Retrieves a user by their ID.
@@ -63,6 +61,10 @@ export const registerUser = async (
   if (!user) {
     throw new Error("Error while creating user");
   }
+
+  const createId = init({
+    length: 15,
+  });
 
   // insert user inside schema/users
   const userData: InsertUser = {
