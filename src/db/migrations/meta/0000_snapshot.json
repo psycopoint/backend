@@ -1,5 +1,5 @@
 {
-  "id": "a2b996b1-31c9-4846-93c3-2500b4201df9",
+  "id": "2e6d5331-fe64-42b7-87a0-ff4749bc3f46",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -196,6 +196,20 @@
           "primaryKey": false,
           "notNull": false,
           "default": false
+        },
+        "recurring": {
+          "name": "recurring",
+          "type": "recurring",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'once'"
+        },
+        "recurring_end": {
+          "name": "recurring_end",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
         },
         "resource": {
           "name": "resource",
@@ -877,7 +891,7 @@
         },
         "amount": {
           "name": "amount",
-          "type": "integer",
+          "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true
         },
@@ -891,7 +905,7 @@
         },
         "payment_date": {
           "name": "payment_date",
-          "type": "timestamp",
+          "type": "timestamp(3)",
           "primaryKey": false,
           "notNull": false,
           "default": "now()"
@@ -906,9 +920,10 @@
         },
         "receipts": {
           "name": "receipts",
-          "type": "text",
+          "type": "jsonb",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "'{}'::jsonb"
         },
         "created_at": {
           "name": "created_at",
@@ -921,7 +936,7 @@
           "name": "updated_at",
           "type": "timestamp(3)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},
@@ -1273,6 +1288,17 @@
         "other"
       ]
     },
+    "public.recurring": {
+      "name": "recurring",
+      "schema": "public",
+      "values": [
+        "daily",
+        "weekly",
+        "monthly",
+        "yearly",
+        "once"
+      ]
+    },
     "public.priority": {
       "name": "priority",
       "schema": "public",
@@ -1295,7 +1321,7 @@
       "schema": "public",
       "values": [
         "pix",
-        "credit-card"
+        "credit_card"
       ]
     },
     "public.paymentStatusEnum": {

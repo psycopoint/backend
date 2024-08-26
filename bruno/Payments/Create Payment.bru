@@ -1,0 +1,27 @@
+meta {
+  name: Create Payment
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{users}}/@me/payments
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "userId": "dcu3dxa98l74ypz",
+    "amount": "250.50",
+    "method": "credit_card",
+    "paymentDate": "2024-08-26T10:30:00Z",
+    "receipts": [
+      {
+        "receiptId": "e2a4f5c0-9df6-4a89-b5f7-c3d8efebc1fa",
+        "url": "https://example.com/receipts/e2a4f5c0-9df6-4a89-b5f7-c3d8efebc1fa"
+      }
+    ],
+    "status": "paid"
+  }
+}

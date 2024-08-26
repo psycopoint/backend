@@ -1,6 +1,6 @@
 {
-  "id": "d6fab6b4-e9d7-4584-99cb-a53ded693d56",
-  "prevId": "09ecfbd4-e2d7-478b-b178-bbdf323df4ee",
+  "id": "dc8f73ac-8cf1-43f0-bc69-faeb4e5da44f",
+  "prevId": "d6fab6b4-e9d7-4584-99cb-a53ded693d56",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -875,19 +875,19 @@
           "name": "event_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "user_id": {
           "name": "user_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "patient_id": {
           "name": "patient_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "amount": {
           "name": "amount",

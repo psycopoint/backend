@@ -19,6 +19,12 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ CREATE TYPE "public"."recurring" AS ENUM('daily', 'weekly', 'monthly', 'yearly', 'once');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  CREATE TYPE "public"."priority" AS ENUM('low', 'medium', 'high');
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -31,7 +37,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "public"."methodsEnum" AS ENUM('pix', 'credit-card');
+ CREATE TYPE "public"."methodsEnum" AS ENUM('pix', 'credit_card');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -79,6 +85,8 @@ CREATE TABLE IF NOT EXISTS "events" (
 	"editable" boolean DEFAULT false,
 	"deletable" boolean DEFAULT false,
 	"all_day" boolean DEFAULT false,
+	"recurring" "recurring" DEFAULT 'once',
+	"recurring_end" timestamp,
 	"resource" jsonb,
 	"is_completed" boolean DEFAULT false,
 	"created_at" timestamp(3) DEFAULT now() NOT NULL,
@@ -177,13 +185,13 @@ CREATE TABLE IF NOT EXISTS "payments" (
 	"appointment_id" text NOT NULL,
 	"psychologist_id" text NOT NULL,
 	"patient_id" text NOT NULL,
-	"amount" integer NOT NULL,
+	"amount" numeric(10, 2) NOT NULL,
 	"status" "paymentStatusEnum" DEFAULT 'pending' NOT NULL,
-	"payment_date" timestamp DEFAULT now(),
+	"payment_date" timestamp(3) DEFAULT now(),
 	"method" "methodsEnum" DEFAULT 'pix' NOT NULL,
-	"receipts" text,
+	"receipts" jsonb DEFAULT '{}'::jsonb,
 	"created_at" timestamp(3) DEFAULT now() NOT NULL,
-	"updated_at" timestamp(3)
+	"updated_at" timestamp(3) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "psychologists" (
