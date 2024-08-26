@@ -15,6 +15,13 @@
       "when": 1724621689794,
       "tag": "0001_thin_magneto",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1724632345150,
+      "tag": "0002_fuzzy_orphan",
+      "breakpoints": true
     }
   ]
 }
