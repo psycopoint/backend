@@ -11,32 +11,32 @@
     "studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.633.0",
-    "@hono/oauth-providers": "^0.6.0",
+    "@aws-sdk/client-s3": "^3.637.0",
+    "@hono/oauth-providers": "^0.6.1",
     "@hono/zod-validator": "^0.2.2",
     "@lemonsqueezy/lemonsqueezy.js": "^3.2.0",
     "@neondatabase/serverless": "^0.9.4",
     "@paralleldrive/cuid2": "^2.2.2",
     "@types/bcryptjs": "^2.4.6",
-    "@types/bun": "^1.1.6",
+    "@types/bun": "^1.1.8",
     "bcryptjs": "^2.4.3",
     "crypto": "^1.0.1",
-    "dayjs": "^1.11.12",
+    "dayjs": "^1.11.13",
     "dotenv": "^16.4.5",
-    "drizzle-orm": "^0.32.1",
+    "drizzle-orm": "^0.32.2",
     "drizzle-zod": "^0.5.1",
-    "hono": "^4.5.1",
+    "hono": "^4.5.10",
     "hono-sessions": "^0.5.8",
-    "jose": "^5.6.3",
+    "jose": "^5.8.0",
     "next-auth": "^4.24.7",
     "postgres": "^3.4.4",
     "resend": "^3.5.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240529.0",
+    "@cloudflare/workers-types": "^4.20240821.1",
     "@types/crypto-js": "^4.2.2",
-    "drizzle-kit": "^0.23.0",
-    "wrangler": "^3.57.2"
+    "drizzle-kit": "^0.23.2",
+    "wrangler": "^3.73.0"
   }
 }
