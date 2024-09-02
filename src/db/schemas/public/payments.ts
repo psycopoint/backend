@@ -48,7 +48,7 @@ export const payments = pgTable("payments", {
   method: methodsEnum("method").notNull().default("pix"),
   receipts: jsonb("receipts")
     .$type<SelectReceipt[]>()
-    .default(sql`'{}'::jsonb`), // Armazenando como JSONB para suportar múltiplos recibos
+    .default(sql`'[]'::jsonb`), // Armazenando como JSONB para suportar múltiplos recibos
   createdAt: timestamp("created_at", { mode: "string", precision: 3 })
     .defaultNow()
     .notNull(),

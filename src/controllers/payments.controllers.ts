@@ -31,6 +31,7 @@ import {
   getPaymentsService,
   updatePaymentService,
 } from "@/services/payments.services";
+import { SelectReceipt } from "@/types/payments";
 
 const factory = createFactory();
 
@@ -107,7 +108,7 @@ export const createPayment = factory.createHandlers(
     const data = await createPaymentService(c, db, {
       ...values,
       id: createId(),
-      receipts: [],
+      receipts: (values.receipts as SelectReceipt[]) || [],
     });
     return c.json({ data });
   }
