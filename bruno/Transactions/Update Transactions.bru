@@ -1,17 +1,17 @@
 meta {
-  name: Update Payment
+  name: Update Transactions
   type: http
   seq: 3
 }
 
 patch {
-  url: {{users}}/@me/payments/:paymentId
+  url: {{users}}/@me/transactions/:transactionId
   body: json
   auth: none
 }
 
 params:path {
-  paymentId: hazkubq2ko
+  transactionId: 
 }
 
 body:json {

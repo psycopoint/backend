@@ -1,7 +1,7 @@
 import {
-  InsertPayment,
+  InsertTransaction,
   insertEventSchema,
-  insertPaymentSchema,
+  insertTransactionSchema,
 } from "@/db/schemas";
 import {
   createEventService,
@@ -25,37 +25,37 @@ import { z } from "zod";
 
 import { init } from "@paralleldrive/cuid2";
 import {
-  createPaymentService,
-  deletePaymentService,
-  getPaymentService,
-  getPaymentsService,
-  updatePaymentService,
-} from "@/services/payments.services";
-import { SelectReceipt } from "@/types/payments";
+  createTransactionService,
+  deleteTransactionService,
+  getTransactionService,
+  getTransactionsService,
+  updateTransactionService,
+} from "@/services/transactions.services";
+import { SelectReceipt } from "@/types/transactions";
 
 const factory = createFactory();
 
-// get all events
-export const getPayments = factory.createHandlers(async (c) => {
+// get all transactions
+export const getTransactions = factory.createHandlers(async (c) => {
   // connect to db
   const sql = neon(c.env.DATABASE_URL);
   const db = drizzle(sql);
 
   try {
-    const payments = await getPaymentsService(c, db);
+    const transactions = await getTransactionsService(c, db);
 
-    return c.json({ data: payments });
+    return c.json({ data: transactions, message: "success" });
   } catch (error) {
     return handleError(c, error);
   }
 });
 
-// get payment by id
-export const getPayment = factory.createHandlers(
+// get transaction by id
+export const getTransaction = factory.createHandlers(
   zValidator(
     "param",
     z.object({
-      paymentId: z.string(),
+      transactionId: z.string(),
     })
   ),
   async (c) => {
@@ -63,23 +63,23 @@ export const getPayment = factory.createHandlers(
     const sql = neon(c.env.DATABASE_URL);
     const db = drizzle(sql);
 
-    const { paymentId } = c.req.valid("param");
+    const { transactionId } = c.req.valid("param");
 
     try {
-      const data = await getPaymentService(c, db, paymentId);
+      const data = await getTransactionService(c, db, transactionId);
 
-      return c.json({ data });
+      return c.json({ data, message: "success" });
     } catch (error) {
       return handleError(c, error);
     }
   }
 );
 
-// create payment
-export const createPayment = factory.createHandlers(
+// create transaction
+export const createTransaction = factory.createHandlers(
   zValidator(
     "json",
-    insertPaymentSchema.pick({
+    insertTransactionSchema.pick({
       amount: true,
       eventId: true,
       method: true,
@@ -88,6 +88,7 @@ export const createPayment = factory.createHandlers(
       receipts: true,
       status: true,
       userId: true,
+      transactionType: true,
     })
   ),
   async (c) => {
@@ -105,26 +106,27 @@ export const createPayment = factory.createHandlers(
       length: 10,
     });
 
-    const data = await createPaymentService(c, db, {
+    const data = await createTransactionService(c, db, {
       ...values,
       id: createId(),
+      amount: values.amount as string,
       receipts: (values.receipts as SelectReceipt[]) || [],
     });
     return c.json({ data });
   }
 );
 
-// update payment
-export const updatePayment = factory.createHandlers(
+// update transaction
+export const updateTransaction = factory.createHandlers(
   zValidator(
     "param",
     z.object({
-      paymentId: z.string(),
+      transactionId: z.string(),
     })
   ),
   zValidator(
     "json",
-    insertPaymentSchema.pick({
+    insertTransactionSchema.pick({
       amount: true,
       eventId: true,
       method: true,
@@ -140,25 +142,25 @@ export const updatePayment = factory.createHandlers(
     const sql = neon(c.env.DATABASE_URL);
     const db = drizzle(sql);
 
-    const { paymentId } = c.req.valid("param");
+    const { transactionId } = c.req.valid("param");
     const values = c.req.valid("json");
 
-    const data = await updatePaymentService(
+    const data = await updateTransactionService(
       c,
       db,
-      { ...values, id: paymentId },
-      paymentId
+      { ...values, id: transactionId },
+      transactionId
     );
     return c.json({ data });
   }
 );
 
-// delete payment
-export const deletePayment = factory.createHandlers(
+// delete transaction
+export const deleteTransaction = factory.createHandlers(
   zValidator(
     "param",
     z.object({
-      paymentId: z.string(),
+      transactionId: z.string(),
     })
   ),
   async (c) => {
@@ -166,10 +168,10 @@ export const deletePayment = factory.createHandlers(
     const sql = neon(c.env.DATABASE_URL);
     const db = drizzle(sql);
 
-    const { paymentId } = c.req.valid("param");
+    const { transactionId } = c.req.valid("param");
 
     try {
-      const data = await deletePaymentService(c, db, paymentId);
+      const data = await deleteTransactionService(c, db, transactionId);
 
       if (!data) {
         return c.json({ error: "Not found" }, 404);

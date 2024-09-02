@@ -12,8 +12,9 @@ import { events } from "./events";
 import { relations, sql } from "drizzle-orm";
 import { createId } from "@paralleldrive/cuid2";
 import { createInsertSchema } from "drizzle-zod";
-import { SelectReceipt } from "@/types/payments";
+import { SelectReceipt } from "@/types/transactions";
 import { users } from "../auth/users";
+import { z } from "zod";
 
 // Enums para status de pagamento e métodos de pagamento
 export const paymentStatusEnum = pgEnum("paymentStatusEnum", [
@@ -21,9 +22,20 @@ export const paymentStatusEnum = pgEnum("paymentStatusEnum", [
   "pending",
   "overdue",
 ]);
-export const methodsEnum = pgEnum("methodsEnum", ["pix", "credit_card"]);
+export const methodsEnum = pgEnum("methodsEnum", [
+  "pix",
+  "credit_card",
+  "bank_transfer",
+  "cash",
+  "other",
+]);
 
-export const payments = pgTable("payments", {
+export const transactionTypeEnum = pgEnum("transactionTypeEnum", [
+  "payment",
+  "expense",
+]);
+
+export const transactions = pgTable("transactions", {
   id: text("id")
     .$defaultFn(() => createId())
     .primaryKey(),
@@ -39,9 +51,11 @@ export const payments = pgTable("payments", {
     onDelete: "cascade",
   }),
 
+  transactionType: transactionTypeEnum("transaction_type").notNull(),
+
   amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
   status: paymentStatusEnum("status").notNull().default("pending"),
-  paymentDate: timestamp("payment_date", {
+  paymentDate: timestamp("transaction_date", {
     mode: "string",
     precision: 3,
   }).defaultNow(),
@@ -61,23 +75,25 @@ export const payments = pgTable("payments", {
 });
 
 // RELAÇÕES
-export const paymentsRelations = relations(payments, ({ one }) => ({
+export const transactionsRelations = relations(transactions, ({ one }) => ({
   session: one(events, {
-    fields: [payments.eventId],
+    fields: [transactions.eventId],
     references: [events.id],
   }),
   user: one(users, {
-    fields: [payments.userId],
+    fields: [transactions.userId],
     references: [users.id],
   }),
   patient: one(patients, {
-    fields: [payments.patientId],
+    fields: [transactions.patientId],
     references: [patients.id],
   }),
 }));
 
 // Schema para validação de inserções
-export const insertPaymentSchema = createInsertSchema(payments);
+export const insertTransactionSchema = createInsertSchema(transactions, {
+  amount: z.union([z.number(), z.string()]),
+});
 
-export type InsertPayment = typeof payments.$inferInsert;
-export type SelectPayment = typeof payments.$inferSelect;
+export type InsertTransaction = typeof transactions.$inferInsert;
+export type SelectTransaction = typeof transactions.$inferSelect;

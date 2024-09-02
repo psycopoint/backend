@@ -20,12 +20,12 @@ import anamnesis from "./anamnesis.route";
 import diagrams from "./diagrams.route";
 import events from "@/routes/events.route";
 import {
-  createPayment,
-  deletePayment,
-  getPayment,
-  getPayments,
-  updatePayment,
-} from "@/controllers/payments.controllers";
+  createTransaction,
+  deleteTransaction,
+  getTransaction,
+  getTransactions,
+  updateTransaction,
+} from "@/controllers/transactions.controllers";
 
 const app = new Hono<{
   Bindings: Env;
@@ -34,19 +34,19 @@ const app = new Hono<{
   };
 }>();
 
-// get all payments
-app.get("/", ...getPayments);
+// get all transactions
+app.get("/", ...getTransactions);
 
-// get payment by id
-app.get("/:paymentId", ...getPayment);
+// get transaction by id
+app.get("/:transactionId", ...getTransaction);
 
-//  create a payment
-app.post("/", ...createPayment);
+//  create a transaction
+app.post("/", ...createTransaction);
 
-//  update payment
-app.patch("/:paymentId", ...updatePayment);
+//  update transaction
+app.patch("/:transactionId", ...updateTransaction);
 
-// delete payment
-app.delete("/:paymentId", ...deletePayment);
+// delete transaction
+app.delete("/:transactionId", ...deleteTransaction);
 
 export default app;
