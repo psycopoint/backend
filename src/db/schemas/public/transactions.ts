@@ -47,10 +47,6 @@ export const transactions = pgTable("transactions", {
     onDelete: "cascade",
   }),
 
-  patientId: text("patient_id").references(() => patients.id, {
-    onDelete: "cascade",
-  }),
-
   transactionType: transactionTypeEnum("transaction_type").notNull(),
 
   amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
@@ -62,7 +58,10 @@ export const transactions = pgTable("transactions", {
   method: methodsEnum("method").notNull().default("pix"),
   receipts: jsonb("receipts")
     .$type<SelectReceipt[]>()
-    .default(sql`'[]'::jsonb`), // Armazenando como JSONB para suportar múltiplos recibos
+    .default(sql`'[]'::jsonb`),
+  data: jsonb("data")
+    .$type<any>() // TODO: create a type for it
+    .default(sql`'{}'::jsonb`),
   createdAt: timestamp("created_at", { mode: "string", precision: 3 })
     .defaultNow()
     .notNull(),
@@ -83,10 +82,6 @@ export const transactionsRelations = relations(transactions, ({ one }) => ({
   user: one(users, {
     fields: [transactions.userId],
     references: [users.id],
-  }),
-  patient: one(patients, {
-    fields: [transactions.patientId],
-    references: [patients.id],
   }),
 }));
 
