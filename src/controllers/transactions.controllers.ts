@@ -84,11 +84,11 @@ export const createTransaction = factory.createHandlers(
       eventId: true,
       method: true,
       paymentDate: true,
-      patientId: true,
       receipts: true,
       status: true,
       userId: true,
       transactionType: true,
+      data: true,
     })
   ),
   async (c) => {
@@ -131,10 +131,10 @@ export const updateTransaction = factory.createHandlers(
       eventId: true,
       method: true,
       paymentDate: true,
-      patientId: true,
       receipts: true,
       status: true,
       userId: true,
+      data: true,
     })
   ),
   async (c) => {
