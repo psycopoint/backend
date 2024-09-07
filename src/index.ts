@@ -19,13 +19,17 @@ const app = new Hono<{
   };
 }>().basePath("/v1");
 
-// app.use("*", async (c, next) => {
-//   const csrfMiddleware = csrf({
-//     origin: ["https://api.psycohub.com", "http://localhost:3000"],
-//   });
+app.use("*", async (c, next) => {
+  const csrfMiddleware = csrf({
+    origin: [
+      "https://psycohub.com",
+      "https://www.psycohub.com",
+      "https://app.psycohub.com",
+    ],
+  });
 
-//   return csrfMiddleware(c, next);
-// });
+  return csrfMiddleware(c, next);
+});
 
 // CORS
 app.use("*", async (c, next) => {
@@ -54,12 +58,13 @@ app.use("*", async (c, next) => {
     // },
 
     cookieOptions: {
-      sameSite: "none", // Recommended for basic CSRF protection in modern browsers
-      path: "/", // Required for this library to work properly
-      httpOnly: true, // Recommended to avoid XSS attacks
-      secure: true,
+      sameSite: "none", // Allow cross-site cookies
+      path: "/", // Cookie should be available site-wide
+      httpOnly: true, // Prevent JavaScript access
+      secure: true, // Cookie only sent over HTTPS
+      domain: ".psycohub.com", // Ensure the cookie is set for the correct domain
     },
-    sessionCookieName: "psicohub.session",
+    sessionCookieName: "psicopoint.session",
   });
 
   return sessionMid(c, next);
