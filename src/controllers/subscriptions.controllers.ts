@@ -5,7 +5,6 @@ import { createFactory } from "hono/factory";
 import { subscriptions } from "@/db/schemas";
 import { eq } from "drizzle-orm";
 import { createId } from "@paralleldrive/cuid2";
-import { createCheckout, getSubscription } from "@lemonsqueezy/lemonsqueezy.js";
 import { getAuth } from "@/utils/get-auth";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";

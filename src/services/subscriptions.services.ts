@@ -1,7 +1,5 @@
 import { subscriptions } from "@/db/schemas";
-import { setupLemon } from "@/lib/ls";
 import { getAuth } from "@/utils/get-auth";
-import { createCheckout, getSubscription } from "@lemonsqueezy/lemonsqueezy.js";
 import { neon } from "@neondatabase/serverless";
 import { createId } from "@paralleldrive/cuid2";
 import { eq } from "drizzle-orm";
@@ -24,9 +22,6 @@ export const getCurrentSubscriptionService = async (
   if (!user) {
     throw new Error("Not authenticated");
   }
-
-  // SETUP LEMON
-  setupLemon(c);
 
   const [subscription] = await db
     .select()
