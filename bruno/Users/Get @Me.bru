@@ -5,9 +5,13 @@ meta {
 }
 
 get {
-  url: https://api.psycohub.com/v1/users/@me
+  url: {{url}}/users/@me
   body: none
   auth: bearer
+}
+
+headers {
+  ~psicopoint.session: {{token}}
 }
 
 auth:bearer {

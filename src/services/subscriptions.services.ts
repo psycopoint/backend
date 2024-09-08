@@ -11,6 +11,8 @@ import { Context } from "hono";
 import * as crypto from "node:crypto";
 import { Buffer } from "node:buffer";
 import { upsertSubscription } from "@/utils/subscription";
+import { createStripe } from "@/lib/stripe";
+import Stripe from "stripe";
 
 // GET CURRENT SUBSCRIPTION
 export const getCurrentSubscriptionService = async (
@@ -38,100 +40,49 @@ export const getCurrentSubscriptionService = async (
 export const generateCheckoutUrlService = async (
   c: Context,
   db: NeonHttpDatabase,
-  variantId: string
-): Promise<string | undefined> => {
+  priceId: string
+  // variantId: string
+): Promise<string> => {
   const user = await getAuth(c, db);
 
   if (!user) {
     throw new Error("Not authenticated");
   }
 
-  // SETUP LEMON
-  setupLemon(c);
+  const stripe = createStripe(c);
 
-  // get the existing subscription inside db
-  const [existing] = await db
-    .select()
-    .from(subscriptions)
-    .where(eq(subscriptions.userId, user.id));
-
-  // verify if there's a existing subscription inside db
-  if (existing) {
-    const subscription = await getSubscription(existing.subscriptionId);
-
-    // create a portalUrl do redirect the customer to
-    const portalUrl = subscription.data?.data.attributes.urls.customer_portal;
-
-    if (!portalUrl) {
-      throw new Error("Internal Error");
-    }
-
-    return portalUrl;
-  }
-
-  // create the checkout if there's no subscription
-  const checkout = await createCheckout(
-    c.env.LEMONSQUEEZY_STORE_ID,
-    variantId,
-    {
-      checkoutData: {
-        custom: {
-          user_id: user.id,
-        },
+  const session = await stripe?.checkout.sessions.create({
+    mode: "subscription",
+    success_url: `${c.env.BACKEND_URL}/subscription/stripe/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${c.env.FRONTEND_URL}/billing`,
+    line_items: [
+      {
+        price: priceId,
+        quantity: 1,
       },
-      productOptions: {
-        redirectUrl: `${c.env.FRONTEND_URL!}/`,
-      },
-    }
-  );
+    ],
+  });
 
-  const checkoutUrl = checkout.data?.data.attributes.url;
-
-  if (!checkoutUrl) {
-    throw new Error("Internal error");
-  }
-
-  return checkoutUrl;
+  return session.url as string;
 };
 
-// SUBSCRIPTION WEBHOOK
-export const subscriptionWebhookService = async (
-  c: Context,
-  db: NeonHttpDatabase,
-  text: string
-) => {
-  // SETUP LEMON
-  setupLemon(c);
+// GET SESSION INFORMATION
+export const getSessionInfoService = async (c: Context, sessionId: string) => {
+  const stripe = createStripe(c);
 
-  const hmac = crypto.createHmac("sha256", c.env.LEMONSQUEEZY_WEBHOOK_SECRET);
-  const digest = Buffer.from(hmac.update(text).digest("hex"), "utf8");
-  const signature = Buffer.from(c.req.header("x-signature") as string, "utf8");
+  const session = await stripe.checkout.sessions.retrieve(sessionId);
 
-  if (!crypto.timingSafeEqual(digest, signature)) {
-    throw new Error("Unauthorized");
-  }
+  const subscription = await stripe.subscriptions.retrieve(
+    session?.subscription as string
+  );
 
-  const payload = JSON.parse(text);
+  const payment = await stripe.paymentMethods.retrieve(
+    subscription?.default_payment_method as string
+  );
 
-  const event = payload.meta.event_name;
+  const product = await stripe.products.retrieve(
+    subscription.items.data[0].plan.product as string
+  );
 
-  const subscriptionId = payload.data.id;
-  const userId = payload.meta.custom_data.user_id;
-  const status = payload.data.attributes.status;
-
-  const [existing] = await db
-    .select()
-    .from(subscriptions)
-    .where(eq(subscriptions.subscriptionId, subscriptionId));
-
-  if (event === "subscription_created" || event === "subscription_updated") {
-    await upsertSubscription(
-      db,
-      existing,
-      subscriptionId,
-      userId,
-      status,
-      payload.data.attributes
-    );
-  }
+  return { session, subscription, payment, product };
 };

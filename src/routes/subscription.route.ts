@@ -4,7 +4,9 @@ import {
 } from "@/controllers/anamnesis.controllers";
 import {
   getCurrentSubscription,
+  getSessionInfo,
   goToCheckoutUrl,
+  goToPortalUrl,
   subscriptionWebhook,
 } from "@/controllers/subscriptions.controllers";
 import { Env } from "@/types/bindings";
@@ -20,7 +22,9 @@ const app = new Hono<{
 }>();
 
 app.get("/current", ...getCurrentSubscription);
-app.post("/checkout", ...goToCheckoutUrl);
-app.post("/webhook", ...subscriptionWebhook);
+app.post("/stripe/checkout", ...goToCheckoutUrl);
+app.get("/stripe/success", ...getSessionInfo);
+app.post("/stripe/webhook", ...subscriptionWebhook);
+app.post("/stripe/portal", ...goToPortalUrl);
 
 export default app;

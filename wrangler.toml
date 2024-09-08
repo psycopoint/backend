@@ -5,7 +5,9 @@ compatibility_flags = [ "nodejs_compat" ]
 
 [vars]
 PROJECT_NAME = "psicohub"
-FRONTEND_URL = "https://app.psycohub.com"
+FRONTEND_URL = "http://localhost:3000"
+BACKEND_URL = "http://127.0.0.1:3001/v1"
+# FRONTEND_URL = "https://app.psycohub.com"
 COOKIE_DOMAIN = ".psycohub.com"
 
 

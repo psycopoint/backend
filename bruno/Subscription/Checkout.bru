@@ -5,11 +5,11 @@ meta {
 }
 
 post {
-  url: {{url}}/subscription/checkout?variant=123
+  url: {{url}}/subscription/checkout
   body: none
-  auth: none
+  auth: bearer
 }
 
-params:query {
-  variant: 123
+auth:bearer {
+  token: {{token}}
 }

@@ -8,14 +8,14 @@ export const subscriptions = pgTable("subscriptions", {
     .notNull()
     .unique()
     .references(() => psychologists.userId, { onDelete: "cascade" }),
-  userName: text("user_name").notNull(),
+  customerId: text("customer_id"),
   status: text("status").notNull(),
-  statusFormatted: text("status_formatted").notNull(),
   subscriptionId: text("subscription_id").notNull().unique(),
   renewsAt: text("renews_at"),
-  endsAt: text("ends_at"),
+  cancelAt: text("cancel_at"),
+  canceledAt: text("canceled_at"),
+  endedAt: text("ended_at"),
   productName: text("product_name"),
-  variantName: text("variant_name"),
   trialEndsAt: text("trial_ends_at"),
   cardBrand: text("visa"),
   billingAnchor: integer("billing_anchor"),
