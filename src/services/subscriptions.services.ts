@@ -79,5 +79,9 @@ export const getSessionInfoService = async (c: Context, sessionId: string) => {
     subscription.items.data[0].plan.product as string
   );
 
-  return { session, subscription, payment, product };
+  const price = await stripe.prices.retrieve(
+    subscription.items.data[0].price.id as string
+  );
+
+  return { session, subscription, payment, product, price };
 };

@@ -9,6 +9,9 @@ export const subscriptions = pgTable("subscriptions", {
     .unique()
     .references(() => psychologists.userId, { onDelete: "cascade" }),
   customerId: text("customer_id"),
+  pricing: text("pricing"),
+  quantity: integer("quantity").default(1),
+  subscribedAt: text("subscribed_at"),
   status: text("status").notNull(),
   subscriptionId: text("subscription_id").notNull().unique(),
   renewsAt: text("renews_at"),

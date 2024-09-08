@@ -58,6 +58,7 @@ app.use("*", async (c, next) => {
       path: "/", // Required for this library to work properly
       httpOnly: true, // Recommended to avoid XSS attacks
       secure: true,
+      maxAge: 86400,
     },
     sessionCookieName: "psicopoint.session",
   });

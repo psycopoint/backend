@@ -19,6 +19,8 @@ import { z } from "zod";
 import dayjs from "dayjs";
 import Stripe from "stripe";
 import { createStripe } from "@/lib/stripe";
+import { Resend } from "resend";
+import { sendLoginEmail } from "@/utils/resend";
 
 const factory = createFactory();
 
@@ -117,10 +119,13 @@ export const getSessionInfo = factory.createHandlers(
           cardBrand: stripeInfo.payment.card?.brand,
           billingAnchor: stripeInfo.subscription?.billing_cycle_anchor,
           cardLastFour: stripeInfo.payment.card?.last4,
+          pricing: String(stripeInfo.price.unit_amount),
+          quantity: stripeInfo.subscription.items.data[0].quantity as number,
+          subscribedAt: String(stripeInfo.subscription.start_date),
         });
       }
 
-      return c.redirect(`${c.env.FRONTEND_URL}/billing`);
+      return c.redirect(`${c.env.FRONTEND_URL}/billing?success=true`);
     } catch (error) {
       return handleError(c, error);
     }
@@ -137,6 +142,11 @@ export const subscriptionWebhook = factory.createHandlers(async (c) => {
 
   try {
     const sig = c.req.header("stripe-signature");
+
+    if (!sig) {
+      return c.text("", 400);
+    }
+
     const body = await c.req.text();
 
     let event;
@@ -165,6 +175,14 @@ export const subscriptionWebhook = factory.createHandlers(async (c) => {
               )
             : null;
 
+        const customer = (await stripe.customers.retrieve(
+          event.data.object.customer as string
+        )) as Stripe.Customer;
+
+        const price = await stripe.prices.retrieve(
+          subscription.items.data[0].price.id as string
+        );
+
         // Atualizar a assinatura no banco de dados
         await db
           .update(subscriptions)
@@ -187,8 +205,19 @@ export const subscriptionWebhook = factory.createHandlers(async (c) => {
             endedAt: subscription.ended_at
               ? dayjs.unix(subscription.ended_at).toISOString()
               : null,
+            pricing: String(price.unit_amount),
+            quantity: subscription.items.data[0].quantity as number,
+            subscribedAt: String(subscription.created),
           })
           .where(eq(subscriptions.subscriptionId, subscription.id as string));
+
+        // send email
+        // await sendLoginEmail(
+        //   c,
+        //   customer.email as string,
+        //   "Bem-vindo ao Psicopoint",
+        //   `Created`
+        // );
 
         break;
       // ... manipular outros tipos de eventos se necessário
