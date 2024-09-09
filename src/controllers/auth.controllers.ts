@@ -1,7 +1,11 @@
 import { sessions } from "@/db/schemas";
 
-import { getUserByEmail, registerUser } from "@/services/auth.services";
-import { handleSession } from "@/utils/auth";
+import {
+  getUserByEmail,
+  handleSession,
+  registerUser,
+} from "@/services/auth.services";
+
 import { getAuth } from "@/utils/get-auth";
 import { zValidator } from "@hono/zod-validator";
 import { neon } from "@neondatabase/serverless";

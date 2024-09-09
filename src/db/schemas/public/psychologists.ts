@@ -6,13 +6,11 @@ import {
   date,
   jsonb,
   pgEnum,
-  unique,
 } from "drizzle-orm/pg-core";
 
 import { createInsertSchema } from "drizzle-zod";
 import { relations, sql } from "drizzle-orm";
 import { clinics, users } from "@/db/schemas";
-import { createId } from "@paralleldrive/cuid2";
 import {
   AdditionalEmails,
   AdditionalPhones,

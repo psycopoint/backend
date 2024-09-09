@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, jsonb } from "drizzle-orm/pg-core";
 import { psychologists } from "./psychologists";
 
 export const subscriptions = pgTable("subscriptions", {
@@ -19,9 +19,9 @@ export const subscriptions = pgTable("subscriptions", {
   canceledAt: text("canceled_at"),
   endedAt: text("ended_at"),
   productName: text("product_name"),
+  metadata: jsonb("metadata").default("{}"),
   trialEndsAt: text("trial_ends_at"),
   cardBrand: text("visa"),
-  billingAnchor: integer("billing_anchor"),
   cardLastFour: text("card_last_four"),
 });
 

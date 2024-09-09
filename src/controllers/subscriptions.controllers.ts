@@ -1,5 +1,3 @@
-import * as crypto from "node:crypto";
-
 import { createFactory } from "hono/factory";
 
 import { subscriptions } from "@/db/schemas";
@@ -19,8 +17,6 @@ import { z } from "zod";
 import dayjs from "dayjs";
 import Stripe from "stripe";
 import { createStripe } from "@/lib/stripe";
-import { Resend } from "resend";
-import { sendLoginEmail } from "@/utils/resend";
 
 const factory = createFactory();
 
@@ -117,7 +113,7 @@ export const getSessionInfo = factory.createHandlers(
             ? dayjs.unix(stripeInfo.subscription?.trial_end).toISOString()
             : null,
           cardBrand: stripeInfo.payment.card?.brand,
-          billingAnchor: stripeInfo.subscription?.billing_cycle_anchor,
+          metadata: stripeInfo.subscription?.metadata,
           cardLastFour: stripeInfo.payment.card?.last4,
           pricing: String(stripeInfo.price.unit_amount),
           quantity: stripeInfo.subscription.items.data[0].quantity as number,
