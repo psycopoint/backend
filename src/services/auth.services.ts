@@ -118,7 +118,7 @@ export const handleSession = async (
   const session = c.get("session");
   let sessionToken = session.get("session_id");
 
-  const expiration = dayjs().add(c.env.SESSION_DURATION, "day").toDate();
+  const expiration = dayjs().add(c.env.SESSION_DURATION, "days").toDate();
 
   // remove any existing sessions for the same user
   await db.delete(sessions).where(eq(sessions.userId, userId));
