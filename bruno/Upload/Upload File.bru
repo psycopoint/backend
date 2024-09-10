@@ -1,0 +1,16 @@
+meta {
+  name: Upload File
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{url}}/file/upload
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  file: @file(C:\Users\francyelton.nobre\Desktop\METROCASA_LOGO_VISTA_CUPECÊ-02.png)
+  path: /teste
+}

@@ -43,6 +43,12 @@ export const handleError = (c: Context, error: unknown) => {
       case "REDIRECT_TO_PROFILE":
         return c.redirect("/users/@me");
 
+      case "File size is too large":
+        return c.json({
+          data: null,
+          message: error.message,
+        });
+
       default:
         console.error("Error fetching users data:", error);
         return c.json({ error: "Internal Server Error" }, 500);

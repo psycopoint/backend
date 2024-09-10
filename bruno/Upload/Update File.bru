@@ -1,0 +1,17 @@
+meta {
+  name: Update File
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{url}}/file/update
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  oldPath: psychologists/Francy_nsx4s8wrh3tqva0/teste/2024-09-10T15:41:58.193Z.png
+  file: @file(C:\Users\francyelton.nobre\Desktop\IMAGEM 03 ZONA SUL.jpg)
+  newPath: /teste/123TESTEAQUI
+}

@@ -1,0 +1,44 @@
+meta {
+  name: Update Documentss
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{users}}/@me/documents/:documentId
+  body: multipartForm
+  auth: none
+}
+
+params:path {
+  documentId: tya0nctge1
+}
+
+body:json {
+  {
+    "data": {
+      "testeDado": "teste 123"
+    },
+    "title": "true",
+    "type": "true",
+    "patientId": "bh0fx6dya7",
+    "description": "true"
+  }
+}
+
+body:multipart-form {
+  oldPath: /patients/TESTE/documents
+  values: '''
+    {
+      "data": {
+        "testeDado": "teste 123"
+      },
+      "title": "true",
+      "type": "true",
+      "patientId": "bh0fx6dya7",
+      "description": "true"
+    }
+  '''
+  file: @file(C:\Users\francyelton.nobre\Desktop\METROCASA_LOGO_VISTA_CUPECÊ-02.png)
+  newPath: /patients/TESTE/documents/1234
+}

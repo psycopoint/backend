@@ -11,6 +11,7 @@ import { Session, sessionMiddleware, CookieStore } from "hono-sessions";
 import authRoute from "@routes/auth.route";
 import usersRoute from "@routes/users.route";
 import subscriptionRoute from "@routes/subscription.route";
+import uploadRoute from "@routes/upload.route";
 
 const app = new Hono<{
   Bindings: Env;
@@ -44,7 +45,7 @@ app.use("*", async (c, next) => {
   const sessionMid = sessionMiddleware({
     store,
     encryptionKey: c.env.SESSION_SECRET, // Required for CookieStore, recommended for others
-    expireAfterSeconds: 86400, // 1 days
+    expireAfterSeconds: c.env.SESSEION_DURATION * 86400, // 1 days
     // cookieOptions: {
     //   sameSite: "none", // Recommended for basic CSRF protection in modern browsers
     //   path: "/", // Required for this library to work properly
@@ -58,7 +59,7 @@ app.use("*", async (c, next) => {
       path: "/", // Required for this library to work properly
       httpOnly: true, // Recommended to avoid XSS attacks
       secure: true,
-      maxAge: 86400,
+      maxAge: c.env.SESSEION_DURATION * 86400,
     },
     sessionCookieName: "psicopoint.session",
   });
@@ -71,6 +72,6 @@ app.use("*", async (c, next) => {
 app.route("/auth", authRoute);
 app.route("/users", usersRoute);
 app.route("/subscription", subscriptionRoute);
-// app.route("/patients", patients);
+app.route("/file", uploadRoute);
 
 export default app;

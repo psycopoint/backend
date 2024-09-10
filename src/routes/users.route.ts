@@ -15,6 +15,7 @@ import { Session } from "hono-sessions";
 import patients from "@/routes/patients.route";
 import events from "@/routes/events.route";
 import transactions from "@/routes/transactions.route";
+import documents from "@/routes/documents.route";
 
 const app = new Hono<{
   Bindings: Env;
@@ -44,5 +45,7 @@ app.route("/@me/patients", patients);
 app.route("/@me/events", events);
 // NESTING TRANSACTIONS ROUTE
 app.route("/@me/transactions", transactions);
+// NESTING DOCUMENTS ROUTE
+app.route("/@me/documents", documents);
 
 export default app;

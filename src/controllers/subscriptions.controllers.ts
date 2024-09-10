@@ -92,7 +92,11 @@ export const getSessionInfo = factory.createHandlers(
     const user = await getAuth(c, db);
 
     try {
-      const stripeInfo = await getSessionInfoService(c, session_id as string);
+      const stripeInfo = await getSessionInfoService(
+        c,
+        db,
+        session_id as string
+      );
 
       // insert subscription inside db
       if (

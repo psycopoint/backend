@@ -1,0 +1,17 @@
+meta {
+  name: Delete Folder
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{url}}/file/delete/folder
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "folder": "psychologists/kp_ee8e0e37282141379f0d5179aa64bdea"
+  }
+}

@@ -62,7 +62,17 @@ export const generateCheckoutUrlService = async (
 };
 
 // GET SESSION INFORMATION
-export const getSessionInfoService = async (c: Context, sessionId: string) => {
+export const getSessionInfoService = async (
+  c: Context,
+  db: NeonHttpDatabase,
+  sessionId: string
+) => {
+  const user = await getAuth(c, db);
+
+  if (!user) {
+    throw new Error("Not authenticated");
+  }
+
   const stripe = createStripe(c);
 
   const session = await stripe.checkout.sessions.retrieve(sessionId);

@@ -1,0 +1,17 @@
+meta {
+  name: Delete File
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{url}}/file/delete
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "path": "psychologists/Francy_nsx4s8wrh3tqva0/teste/2024-09-10T15:21:15.640Z.png"
+  }
+}

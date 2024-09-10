@@ -1,0 +1,27 @@
+meta {
+  name: Delete Document
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{users}}/@me/documents/:documentId
+  body: json
+  auth: none
+}
+
+params:path {
+  documentId: qgrw4xsl5h
+}
+
+body:json {
+  {
+    "data": {
+      "testeDado": "teste 123"
+    },
+    "title": "true",
+    "type": "true",
+    "patientId": "bh0fx6dya7",
+    "description": "true"
+  }
+}
