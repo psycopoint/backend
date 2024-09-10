@@ -12,6 +12,7 @@ import authRoute from "@routes/auth.route";
 import usersRoute from "@routes/users.route";
 import subscriptionRoute from "@routes/subscription.route";
 import uploadRoute from "@routes/upload.route";
+import dayjs from "dayjs";
 
 const app = new Hono<{
   Bindings: Env;
@@ -59,7 +60,8 @@ app.use("*", async (c, next) => {
       path: "/", // Required for this library to work properly
       httpOnly: true, // Recommended to avoid XSS attacks
       secure: true,
-      maxAge: c.env.SESSEION_DURATION * 86400,
+      // maxAge: c.env.SESSEION_DURATION * 86400,
+      expires: dayjs().add(c.env.SESSEION_DURATION, "day").toDate(),
     },
     sessionCookieName: "psicopoint.session",
   });
