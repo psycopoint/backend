@@ -1,10 +1,12 @@
 import {
   InsertDocument,
+  documentTypeEnum,
   insertDocumentSchema,
 } from "@/db/schemas/public/documents";
 import {
   createDocumentService,
   deleteDocumentService,
+  generateDocumentService,
   getDocumentService,
   getDocumentsService,
   updateDocumentService,
@@ -19,22 +21,97 @@ import { drizzle } from "drizzle-orm/neon-http";
 import { createFactory } from "hono/factory";
 import { z } from "zod";
 
+import { stream, streamText, streamSSE } from "hono/streaming";
+import { PDFDocument, StandardFonts } from "pdf-lib";
+import { insertAnamnesisSchema, insertDiagramsSchema } from "@/db/schemas";
+import { createDiagramPdf, createDocumentPdf } from "@/utils/documents";
+
 const factory = createFactory();
 
-// GET ALL DOCUMENTS
-export const getDocuments = factory.createHandlers(async (c) => {
-  // connect to db
-  const sql = neon(c.env.DATABASE_URL);
-  const db = drizzle(sql);
+// GENERATE DOCUMENT
+export const generatePdf = factory.createHandlers(
+  zValidator(
+    "param",
+    z.object({
+      documentType: z.enum([
+        "pdf",
+        "docx",
+        "image",
+        "diagram",
+        "receipt",
+        "document",
+        "other",
+      ]),
+    })
+  ),
+  async (c) => {
+    // connect to db
+    const sql = neon(c.env.DATABASE_URL);
+    const db = drizzle(sql);
 
-  try {
-    const data = await getDocumentsService(c, db);
+    const { documentType } = c.req.valid("param");
+    const values = await c.req.json();
 
-    return c.json({ message: "success", data });
-  } catch (error) {
-    return handleError(c, error);
+    console.log(values);
+
+    let pdf;
+
+    switch (documentType) {
+      case "document":
+        pdf = await createDocumentPdf({
+          patient: values.patient,
+          document: values.document,
+        });
+      case "diagram":
+        pdf = await createDiagramPdf({
+          patient: values.patient,
+          diagram: values.diagram,
+        });
+        break;
+        break;
+      case "pdf":
+        pdf = await createDocumentPdf({
+          patient: values.patient,
+          document: values.document,
+        });
+        break;
+
+      default:
+        break;
+    }
+
+    // TODO: verify this error
+    return c.body(pdf as any, 200, {
+      "Content-Type": "application/pdf",
+      "Content-Disposition": 'attachment; filename="document.pdf"',
+    });
   }
-});
+);
+
+// GET ALL DOCUMENTS BY PATIENT ID
+export const getDocuments = factory.createHandlers(
+  zValidator(
+    "param",
+    z.object({
+      patientId: z.string().optional(),
+    })
+  ),
+  async (c) => {
+    // connect to db
+    const sql = neon(c.env.DATABASE_URL);
+    const db = drizzle(sql);
+
+    const { patientId } = c.req.valid("param");
+
+    try {
+      const data = await getDocumentsService(c, db, patientId);
+
+      return c.json({ message: "success", data });
+    } catch (error) {
+      return handleError(c, error);
+    }
+  }
+);
 
 // GET DOCUMENT BY ID
 export const getDocument = factory.createHandlers(
@@ -52,7 +129,7 @@ export const getDocument = factory.createHandlers(
     const { documentId } = c.req.valid("param");
 
     try {
-      const data = await getDocumentService(c, db, documentId);
+      const data = await getDocumentsService(c, db, documentId);
 
       return c.json({ message: "success", data });
     } catch (error) {
@@ -64,26 +141,13 @@ export const getDocument = factory.createHandlers(
 // CREATE DOCUMENT
 export const createDocument = factory.createHandlers(
   zValidator(
-    "form",
-    z.object({
-      file: z.instanceof(File).optional(),
-      path: z.string().optional(),
-      values: z
-        .string()
-        .refine(
-          (val) => {
-            try {
-              const parsed = JSON.parse(val);
-              return typeof parsed === "object" && parsed !== null;
-            } catch {
-              return false;
-            }
-          },
-          {
-            message: "Invalid JSON format",
-          }
-        )
-        .transform((val) => JSON.parse(val)),
+    "json",
+    insertDocumentSchema.pick({
+      data: true,
+      description: true,
+      patientId: true,
+      title: true,
+      type: true,
     })
   ),
   async (c) => {
@@ -91,7 +155,13 @@ export const createDocument = factory.createHandlers(
     const sql = neon(c.env.DATABASE_URL);
     const db = drizzle(sql);
 
-    const { file, values, path } = c.req.valid("form");
+    const user = await getAuth(c, db);
+
+    if (!user) {
+      throw new Error("Not authenticated");
+    }
+
+    const values = c.req.valid("json");
 
     const createId = init({
       length: 10,
@@ -99,9 +169,9 @@ export const createDocument = factory.createHandlers(
 
     try {
       const data = await createDocumentService(c, db, {
-        file: file ? file : null,
-        values: { ...values, id: createId() },
-        path,
+        ...values,
+        id: createId(),
+        psychologistId: user.id,
       });
 
       return c.json({ message: "susccess", data });
@@ -145,27 +215,14 @@ export const updateDocument = factory.createHandlers(
     })
   ),
   zValidator(
-    "form",
-    z.object({
-      file: z.instanceof(File).optional(),
-      newPath: z.string().optional(),
-      oldPath: z.string().optional(),
-      values: z
-        .string()
-        .refine(
-          (val) => {
-            try {
-              const parsed = JSON.parse(val);
-              return typeof parsed === "object" && parsed !== null;
-            } catch {
-              return false;
-            }
-          },
-          {
-            message: "Invalid JSON format",
-          }
-        )
-        .transform((val) => JSON.parse(val)),
+    "json",
+    insertDocumentSchema.pick({
+      data: true,
+      description: true,
+      patientId: true,
+      psychologistId: true,
+      title: true,
+      type: true,
     })
   ),
   async (c) => {
@@ -174,8 +231,7 @@ export const updateDocument = factory.createHandlers(
     const db = drizzle(sql);
 
     const { documentId } = c.req.valid("param");
-
-    const { file, values, newPath, oldPath } = c.req.valid("form");
+    const values = c.req.valid("json");
 
     const createId = init({
       length: 10,
@@ -183,10 +239,8 @@ export const updateDocument = factory.createHandlers(
 
     try {
       const data = await updateDocumentService(c, db, documentId, {
-        file: file ? file : null,
-        values: { ...values, id: createId() },
-        newPath,
-        oldPath,
+        ...values,
+        id: documentId,
       });
 
       return c.json({ message: "success", data });

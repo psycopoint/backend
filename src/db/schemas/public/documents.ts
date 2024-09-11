@@ -1,8 +1,25 @@
 import { relations, sql } from "drizzle-orm";
 import { psychologists } from "./psychologists";
 import { patients } from "./patients";
-import { createInsertSchema } from "drizzle-zod";
-import { jsonb, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import {
+  jsonb,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  varchar,
+} from "drizzle-orm/pg-core";
+
+export const documentTypeEnum = pgEnum("type", [
+  "pdf",
+  "docx",
+  "image",
+  "diagram",
+  "receipt",
+  "document",
+  "other",
+]);
 
 export const documents = pgTable("documents", {
   id: text("id").primaryKey().notNull(),
@@ -10,11 +27,11 @@ export const documents = pgTable("documents", {
     .notNull()
     .references(() => psychologists.userId, { onDelete: "cascade" }),
   patientId: text("patient_id").references(() => patients.id, {
-    onDelete: "set null",
+    onDelete: "cascade",
   }),
   title: text("title").notNull(),
   description: text("description"),
-  type: varchar("type", { length: 50 }).notNull(),
+  type: documentTypeEnum("type").default("other"),
   data: jsonb("data").notNull(),
   createdAt: timestamp("created_at", { mode: "string", precision: 3 })
     .defaultNow()
@@ -37,6 +54,8 @@ export const documentRelations = relations(documents, ({ one }) => ({
     references: [patients.id],
   }),
 }));
+
+export type SelectDocumentType = typeof documents.$inferSelect;
 
 export type InsertDocument = typeof documents.$inferInsert;
 export type SelectDocument = typeof documents.$inferSelect;

@@ -1,4 +1,4 @@
-import { SelectUser } from "@/db/schemas";
+import { InsertPatient, SelectUser } from "@/db/schemas";
 import {
   InsertDocument,
   SelectDocument,
@@ -11,18 +11,43 @@ import { Context } from "hono";
 import { date } from "zod";
 import { updateFileService, uploadFileService } from "./upload.services";
 
+// GENERATE DOCUMENT
+export const generateDocumentService = async (
+  c: Context,
+  db: NeonHttpDatabase,
+  values: any
+) => {
+  const data = values;
+
+  console.log(values);
+};
+
 // GET ALL DOCUMENTS
-export const getDocumentsService = async (c: Context, db: NeonHttpDatabase) => {
+export const getDocumentsService = async (
+  c: Context,
+  db: NeonHttpDatabase,
+  patientId?: string
+) => {
   const user = await getAuth(c, db);
+  let data;
 
   if (!user) {
     throw new Error("Not authenticated");
   }
 
-  const data = await db
-    .select()
-    .from(documents)
-    .where(eq(documents.psychologistId, user.id));
+  if (patientId) {
+    // get patient documents
+    data = await db
+      .select()
+      .from(documents)
+      .where(eq(documents.patientId, patientId));
+  } else {
+    // get all psychologist's documents
+    data = await db
+      .select()
+      .from(documents)
+      .where(eq(documents.psychologistId, user.id));
+  }
 
   if (!data) {
     throw new Error("Not found");
@@ -31,7 +56,7 @@ export const getDocumentsService = async (c: Context, db: NeonHttpDatabase) => {
   return data;
 };
 
-// GET DOCUMENT BY ID
+// GET DOCUMENTS BY ID
 export const getDocumentService = async (
   c: Context,
   db: NeonHttpDatabase,
@@ -61,7 +86,7 @@ export const getDocumentService = async (
 export const createDocumentService = async (
   c: Context,
   db: NeonHttpDatabase,
-  form: { file: File | null; values: InsertDocument; path: string | undefined }
+  values: InsertDocument
 ) => {
   const user = await getAuth(c, db);
 
@@ -69,22 +94,7 @@ export const createDocumentService = async (
     throw new Error("Not authenticated");
   }
 
-  let fileUrl;
-  if (form.file && form.path) {
-    fileUrl = await uploadFileService(c, user, form.file, form.path);
-  }
-
-  const [data] = await db
-    .insert(documents)
-    .values({
-      ...form.values,
-      psychologistId: user.id,
-      data: {
-        ...(form.values.data as Record<string, any>),
-        url: fileUrl,
-      },
-    })
-    .returning();
+  const [data] = await db.insert(documents).values(values).returning();
 
   return data;
 };
@@ -120,12 +130,7 @@ export const updateDocumentService = async (
   c: Context,
   db: NeonHttpDatabase,
   documentId: string,
-  form: {
-    file: File | null;
-    values: InsertDocument;
-    oldPath: string | undefined;
-    newPath: string | undefined;
-  }
+  values: InsertDocument
 ) => {
   const user = await getAuth(c, db);
 
@@ -133,28 +138,9 @@ export const updateDocumentService = async (
     throw new Error("Not authenticated");
   }
 
-  // generate new file
-  let fileUrl;
-  if (form.file && form.newPath && form.oldPath) {
-    fileUrl = await updateFileService(
-      c,
-      user,
-      form.oldPath,
-      form.file,
-      form.newPath
-    );
-  }
-
   const [data] = await db
     .update(documents)
-    .set({
-      ...form.values,
-      psychologistId: user.id,
-      data: {
-        ...(form.values.data as Record<string, any>),
-        url: fileUrl,
-      },
-    })
+    .set(values)
     .where(
       and(eq(documents.psychologistId, user.id), eq(documents.id, documentId))
     )

@@ -1,0 +1,23 @@
+meta {
+  name: Generate Document
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{users}}/@me/documents/generate
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "data": {
+      "testeDado": "teste 123"
+    },
+    "title": "true",
+    "type": "true",
+    "patientId": "bh0fx6dya7",
+    "description": "true"
+  }
+}

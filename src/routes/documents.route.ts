@@ -5,6 +5,7 @@ import { Session } from "hono-sessions";
 import {
   createDocument,
   deleteDocument,
+  generatePdf,
   getDocument,
   getDocuments,
   updateDocument,
@@ -18,13 +19,19 @@ const app = new Hono<{
 }>();
 
 // get all documents
-app.get("/", ...getDocuments);
+app.get("/:patientId?", ...getDocuments);
+
+// // get all documents by patient id
+// app.get("/:patientId", ...getDocuments);
 
 // get document by id
 app.get("/:documentId", ...getDocument);
 
 // create document
 app.post("/", ...createDocument);
+
+// generate document
+app.post("/generate/:documentType", ...generatePdf);
 
 // delete document
 app.delete("/:documentId", ...deleteDocument);
