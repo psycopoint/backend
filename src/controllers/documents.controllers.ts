@@ -21,10 +21,12 @@ import { drizzle } from "drizzle-orm/neon-http";
 import { createFactory } from "hono/factory";
 import { z } from "zod";
 
-import { stream, streamText, streamSSE } from "hono/streaming";
-import { PDFDocument, StandardFonts } from "pdf-lib";
-import { insertAnamnesisSchema, insertDiagramsSchema } from "@/db/schemas";
-import { createDiagramPdf, createDocumentPdf } from "@/utils/documents";
+import {
+  createDiagramPdf,
+  createDocumentPdf,
+  createReceiptPdf,
+} from "@/utils/documents";
+import { getUserDataService } from "@/services/users.services";
 
 const factory = createFactory();
 
@@ -49,10 +51,10 @@ export const generatePdf = factory.createHandlers(
     const sql = neon(c.env.DATABASE_URL);
     const db = drizzle(sql);
 
+    const user = await getUserDataService(c, db);
+
     const { documentType } = c.req.valid("param");
     const values = await c.req.json();
-
-    console.log(values);
 
     let pdf;
 
@@ -62,13 +64,22 @@ export const generatePdf = factory.createHandlers(
           patient: values.patient,
           document: values.document,
         });
+
+      case "receipt":
+        pdf = await createReceiptPdf({
+          patient: values.patient,
+          document: values.document,
+          user,
+        });
+        break;
+
       case "diagram":
         pdf = await createDiagramPdf({
           patient: values.patient,
           diagram: values.diagram,
         });
         break;
-        break;
+
       case "pdf":
         pdf = await createDocumentPdf({
           patient: values.patient,
@@ -147,7 +158,8 @@ export const createDocument = factory.createHandlers(
       description: true,
       patientId: true,
       title: true,
-      type: true,
+      documentType: true,
+      fileType: true,
     })
   ),
   async (c) => {
@@ -222,7 +234,8 @@ export const updateDocument = factory.createHandlers(
       patientId: true,
       psychologistId: true,
       title: true,
-      type: true,
+      documentType: true,
+      fileType: true,
     })
   ),
   async (c) => {

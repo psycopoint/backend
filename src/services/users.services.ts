@@ -25,7 +25,10 @@ import { Context } from "hono";
  * @throws {Error} Throws an "Unauthorized" error if the user is not authenticated.
 
  */
-export const getUserDataService = async (c: Context, db: NeonHttpDatabase) => {
+export const getUserDataService = async (
+  c: Context,
+  db: NeonHttpDatabase
+): Promise<SelectUser & SelectPsychologist> => {
   const user = await getAuth(c, db);
 
   if (!user) {

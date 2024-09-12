@@ -58,12 +58,12 @@ app.use("*", async (c, next) => {
     cookieOptions: {
       sameSite: "none", // Recommended for basic CSRF protection in modern browsers
       path: "/", // Required for this library to work properly
-      httpOnly: true, // Recommended to avoid XSS attacks
+      httpOnly: false, // Recommended to avoid XSS attacks
       secure: true,
       maxAge: c.env.SESSEION_DURATION * 86400,
       // expires: dayjs().add(c.env.SESSEION_DURATION, "day").toDate(),
     },
-    sessionCookieName: "psicopoint.session",
+    sessionCookieName: "psycopoint.session",
   });
 
   //@ts-ignore

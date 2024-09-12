@@ -113,6 +113,20 @@
       "when": 1726074770940,
       "tag": "0015_small_white_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1726166291255,
+      "tag": "0016_sturdy_tana_nile",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1726168141811,
+      "tag": "0017_groovy_wildside",
+      "breakpoints": true
     }
   ]
 }

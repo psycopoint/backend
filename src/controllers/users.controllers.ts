@@ -30,6 +30,11 @@ export const getMe = factory.createHandlers(async (c) => {
   const sql = neon(c.env.DATABASE_URL);
   const db = drizzle(sql);
 
+  // const session = c.get("session");
+
+  // const token = session.get("session_id");
+  // console.log(token);
+
   try {
     const data = await getUserDataService(c, db);
 

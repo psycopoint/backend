@@ -12,14 +12,15 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const documentTypeEnum = pgEnum("type", [
-  "pdf",
-  "docx",
-  "image",
   "diagram",
   "receipt",
   "document",
+  "certificate",
+  "declaration",
   "other",
 ]);
+
+export const fileTypeEnum = pgEnum("file_type", ["pdf", "docx", "image"]);
 
 export const documents = pgTable("documents", {
   id: text("id").primaryKey().notNull(),
@@ -31,7 +32,8 @@ export const documents = pgTable("documents", {
   }),
   title: text("title").notNull(),
   description: text("description"),
-  type: documentTypeEnum("type").default("other"),
+  documentType: documentTypeEnum("document_type"),
+  fileType: fileTypeEnum("file_type").default("pdf"),
   data: jsonb("data").notNull(),
   createdAt: timestamp("created_at", { mode: "string", precision: 3 })
     .defaultNow()
