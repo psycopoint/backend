@@ -1,10 +1,17 @@
 import { z } from "zod";
 
+const AttendanceStatusEnum = z.enum(["present", "absent"]).nullish();
+
+// Define o enum para os motivos da falta
+const AbsenceReasonEnum = z
+  .enum(["illness", "emergency", "personal", "other"])
+  .nullish();
+
 // PatientSession Schema
 export const PatientSessionSchema = z.object({
   patientId: z.string(),
-  sessionMood: z.number(),
-  sessionDetails: z.string(),
+  sessionMood: z.number().optional(),
+  sessionDetails: z.string().optional(),
   patientMood: z.number().optional(),
   patientNotes: z.string().optional(),
   psychologistNotes: z.string().optional(),
@@ -15,6 +22,8 @@ export const PatientSessionSchema = z.object({
   patientConcerns: z.string().optional(),
   sessionFeedback: z.string().optional(),
   sessionDuration: z.number().optional(),
+  attendanceStatus: AttendanceStatusEnum.default(null),
+  absenceReason: AbsenceReasonEnum.default(null),
 });
 
 // SocialPost Schema
