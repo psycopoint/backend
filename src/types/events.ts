@@ -1,6 +1,8 @@
 import { z } from "zod";
 
-const AttendanceStatusEnum = z.enum(["present", "absent"]).nullish();
+const AttendanceStatusEnum = z
+  .enum(["present", "absent", "scheduled"])
+  .nullish();
 
 // Define o enum para os motivos da falta
 const AbsenceReasonEnum = z
