@@ -50,6 +50,20 @@ export const uploadFileService = async (
   return cdnUrl;
 };
 
+// UPLOAD MULTIPLE FILES
+export const uploadMultipleFilesService = async (
+  c: Context,
+  user: SelectUser,
+  files: File[],
+  path: string
+) => {
+  const uploadedFiles = await Promise.all(
+    files.map((file) => uploadFileService(c, user, file, path))
+  );
+
+  return uploadedFiles;
+};
+
 // DELETE A FILE
 export const deleteFileService = async (
   c: Context,

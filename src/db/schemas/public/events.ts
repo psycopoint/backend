@@ -24,6 +24,7 @@ export const eventTypeEnum = pgEnum("type", [
 export const recurringEnum = pgEnum("recurring", [
   "daily",
   "weekly",
+  "biweekly",
   "monthly",
   "yearly",
   "once",

@@ -12,7 +12,7 @@ import authRoute from "@routes/auth.route";
 import usersRoute from "@routes/users.route";
 import subscriptionRoute from "@routes/subscription.route";
 import uploadRoute from "@routes/upload.route";
-import dayjs from "dayjs";
+import webhooksRoute from "@/routes/webhooks.route";
 
 const app = new Hono<{
   Bindings: Env;
@@ -75,5 +75,6 @@ app.route("/auth", authRoute);
 app.route("/users", usersRoute);
 app.route("/subscription", subscriptionRoute);
 app.route("/file", uploadRoute);
+app.route("/webhooks", webhooksRoute);
 
 export default app;

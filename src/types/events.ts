@@ -24,11 +24,14 @@ export const PatientSessionSchema = z.object({
   sessionDuration: z.number().optional(),
   attendanceStatus: AttendanceStatusEnum.default(null),
   absenceReason: AbsenceReasonEnum.default(null),
+  notification: z.boolean().optional(),
 });
 
 // SocialPost Schema
 export const SocialPostSchema = z.object({
-  platform: z.enum(["twitter", "facebook", "instagram"]),
+  platform: z
+    .array(z.enum(["twitter", "facebook", "instagram", "other"]))
+    .optional(),
   content: z.string(),
   contentUrl: z.string().optional(),
   status: z.enum(["draft", "published"]),

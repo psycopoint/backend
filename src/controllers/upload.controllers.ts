@@ -3,6 +3,7 @@ import {
   deleteFolderService,
   updateFileService,
   uploadFileService,
+  uploadMultipleFilesService,
 } from "@/services/upload.services";
 import { getAuth } from "@/utils/get-auth";
 import { handleError } from "@/utils/handle-error";
@@ -27,15 +28,31 @@ export const uploadFile = factory.createHandlers(async (c) => {
   }
   const body = await c.req.parseBody();
 
-  try {
-    const url = await uploadFileService(
-      c,
-      user,
-      body["file"] as File,
-      body["path"] as string
-    );
+  const files = Object.values(body).filter(
+    (value) => value instanceof File
+  ) as File[];
 
-    return c.json({ message: "success", data: { url: url } });
+  console.log(files);
+
+  const singleFile = body["file"] as File | undefined;
+  const path = body["path"] as string;
+
+  if (files.length === 0) {
+    throw new Error("No files provided for upload");
+  }
+
+  let urls;
+
+  try {
+    if (files.length > 1) {
+      // Upload de múltiplos arquivos
+      urls = await uploadMultipleFilesService(c, user, files, path);
+      return c.json({ message: "success", data: { urls } });
+    } else {
+      // Upload de um único arquivo
+      urls = await uploadFileService(c, user, files[0], path);
+      return c.json({ message: "success", data: { urls } });
+    }
   } catch (error) {
     return handleError(c, error);
   }

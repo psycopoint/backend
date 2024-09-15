@@ -20,4 +20,7 @@ export type Env = {
   STRIPE_API_KEY: string;
   STRIPE_WEBHOOK_SECRET_KEY: string;
   STRIPE_ACCOUNT_ID: string;
+
+  TWILLIO_ACCOUNT_SID: string;
+  TWILLIO_AUTH_TOKEN: string;
 };
