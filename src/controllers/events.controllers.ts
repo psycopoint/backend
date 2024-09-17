@@ -194,6 +194,8 @@ export const updateEvent = factory.createHandlers(
     const { eventId } = c.req.valid("param");
     const values = c.req.valid("json");
 
+    console.log(values);
+
     const data = await updateEventService(
       c,
       db,
