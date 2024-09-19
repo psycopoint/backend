@@ -177,7 +177,7 @@ export const register = factory.createHandlers(
       return c.json({ error: "An error occurred during sign up." }, 500);
     }
 
-    const lucia = createLucia(c.env.DB);
+    const lucia = createLucia(db);
     const session = await lucia.createSession(user.id, {});
     const cookie = lucia.createSessionCookie(session.id);
 
@@ -216,7 +216,7 @@ export const login = factory.createHandlers(
       return c.json({ error: "Invalid email or password." }, 400);
     }
 
-    const lucia = createLucia(c.env.DB);
+    const lucia = createLucia(db);
     const session = await lucia.createSession(user.id, {});
     const cookie = lucia.createSessionCookie(session.id);
 
@@ -308,6 +308,7 @@ export const googleAuthCallback = factory.createHandlers(async (c) => {
       c.header("Set-Cookie", sessionCookie.serialize(), {
         append: true,
       });
+
       return c.redirect(`${c.env.FRONTEND_URL}/`, 302);
     }
 
