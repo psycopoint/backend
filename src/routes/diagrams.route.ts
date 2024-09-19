@@ -11,17 +11,11 @@ import {
   deleteSituation,
   getAllSituations,
 } from "@/controllers/diagrams.controllers";
-import { Env } from "@/types/bindings";
 import { Hono } from "hono";
-import { Session } from "hono-sessions";
+
 import { JwtVariables } from "hono/jwt";
 
-const app = new Hono<{
-  Bindings: Env;
-  Variables: JwtVariables & {
-    session: Session;
-  };
-}>();
+const app = new Hono();
 
 // get patient diagram
 app.get("/", ...getPatientDiagram);

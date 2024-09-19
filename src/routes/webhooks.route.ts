@@ -2,18 +2,10 @@ import {
   appointmentConfirmation,
   appointmentReminder,
 } from "@/controllers/weebhooks.controllers";
-import { createTwilio } from "@/lib/twilio";
-import { Env } from "@/types/bindings";
-import { Hono } from "hono";
-import { Session } from "hono-sessions";
-import { JwtVariables } from "hono/jwt";
 
-const app = new Hono<{
-  Bindings: Env;
-  Variables: JwtVariables & {
-    session: Session;
-  };
-}>();
+import { Hono } from "hono";
+
+const app = new Hono();
 
 // TWILLIO
 app.post("/appointments/confirm", ...appointmentConfirmation);

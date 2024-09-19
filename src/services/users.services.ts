@@ -8,7 +8,6 @@ import {
   SelectUser,
   users,
 } from "@/db/schemas";
-import { getAuth } from "@/utils/get-auth";
 import { hashPassword } from "@/utils/password";
 import { and, eq, getTableColumns, ne } from "drizzle-orm";
 import { NeonHttpDatabase } from "drizzle-orm/neon-http";
@@ -29,8 +28,7 @@ export const getUserDataService = async (
   c: Context,
   db: NeonHttpDatabase
 ): Promise<SelectUser & SelectPsychologist> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
     throw new Error("Unauthorized");
   }
@@ -63,8 +61,7 @@ export const getAllUsersDataService = async (
   c: Context,
   db: NeonHttpDatabase
 ): Promise<Object> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
     throw new Error("Unauthorized");
   }
@@ -129,8 +126,7 @@ export const getUserService = async (
   id: string,
   db: NeonHttpDatabase
 ): Promise<Object> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
     throw new Error("Unauthorized");
   }
@@ -204,11 +200,10 @@ export const getUserService = async (
  */
 export const createUserService = async (
   c: any,
-  userData: InsertUser,
-  db: NeonHttpDatabase
+  db: NeonHttpDatabase,
+  userData: InsertUser
 ): Promise<Object> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
     throw new Error("Unauthorized");
   }
@@ -295,8 +290,7 @@ export const updateUserService = async (
   updateData: InsertPsychologist,
   db: NeonHttpDatabase
 ): Promise<Object> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
     throw new Error("Unauthorized");
   }

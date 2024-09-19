@@ -1,11 +1,8 @@
 import { Hono } from "hono";
 
-import { Env } from "types/bindings";
+import { Bindings, Variables } from "types/bindings";
 import { cors } from "hono/cors";
 import { csrf } from "hono/csrf";
-import { JwtVariables } from "hono/jwt";
-
-import { Session, sessionMiddleware, CookieStore } from "hono-sessions";
 
 // ROUTES
 import authRoute from "@routes/auth.route";
@@ -14,61 +11,30 @@ import subscriptionRoute from "@routes/subscription.route";
 import uploadRoute from "@routes/upload.route";
 import webhooksRoute from "@/routes/webhooks.route";
 
+import { isAuthenticated } from "./middlewares/is-authenticated";
+import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-http";
+
 const app = new Hono<{
-  Bindings: Env;
-  Variables: JwtVariables & {
-    session: Session;
-  };
+  Bindings: Bindings;
+  Variables: Variables;
 }>().basePath("/v1");
 
-// app.use("*", async (c, next) => {
-//   const csrfMiddleware = csrf({
-//     origin: ["https://api.psycohub.com", "http://localhost:3000"],
-//   });
-
-//   return csrfMiddleware(c, next);
-// });
+app.use("*", isAuthenticated);
 
 // CORS
 app.use("*", async (c, next) => {
   const corsMiddleware = cors({
     origin: c.env.FRONTEND_URL, // allowing only localhost:3000
     allowMethods: ["GET", "POST", "PATCH", "OPTIONS", "DELETE"],
-    allowHeaders: ["Authorization", "Content-Type"],
+    allowHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   });
 
   return corsMiddleware(c, next);
 });
 
-const store = new CookieStore();
-app.use("*", async (c, next) => {
-  const sessionMid = sessionMiddleware({
-    store,
-    encryptionKey: c.env.SESSION_SECRET, // Required for CookieStore, recommended for others
-    expireAfterSeconds: c.env.SESSEION_DURATION * 86400, // 1 days
-    // cookieOptions: {
-    //   sameSite: "none", // Recommended for basic CSRF protection in modern browsers
-    //   path: "/", // Required for this library to work properly
-    //   httpOnly: true, // Recommended to avoid XSS attacks
-    //   secure: true,
-    //   domain: c.env.COOKIE_DOMAIN,
-    // },
-
-    cookieOptions: {
-      sameSite: "none", // Recommended for basic CSRF protection in modern browsers
-      path: "/", // Required for this library to work properly
-      httpOnly: false, // Recommended to avoid XSS attacks
-      secure: true,
-      maxAge: c.env.SESSEION_DURATION * 86400,
-      // expires: dayjs().add(c.env.SESSEION_DURATION, "day").toDate(),
-    },
-    sessionCookieName: "psycopoint.session",
-  });
-
-  //@ts-ignore
-  return sessionMid(c, next);
-});
+app.use("*", csrf());
 
 // ROUTES
 app.route("/auth", authRoute);

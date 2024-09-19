@@ -1,10 +1,11 @@
 import { SelectUser } from "@/db/schemas";
 import { createR2Client } from "@/lib/r2";
-import { getAuth } from "@/utils/get-auth";
+
 import {
   DeleteObjectCommand,
   DeleteObjectsCommand,
   ListObjectsV2Command,
+  ListObjectsV2CommandOutput,
   PutObjectCommand,
 } from "@aws-sdk/client-s3";
 
@@ -102,13 +103,15 @@ export const deleteFolderService = async (
 
     console.log(listParams);
 
-    const listedObjects = await R2.send(new ListObjectsV2Command(listParams));
+    const listedObjects = (await R2.send(
+      new ListObjectsV2Command(listParams)
+    )) as ListObjectsV2CommandOutput;
 
     if (!listedObjects.Contents || listedObjects.Contents.length === 0) {
       return "No objects found";
     }
 
-    // delete all objects
+    // Deletar todos os objetos
     const deleteParams = {
       Bucket: bucket,
       Delete: {
@@ -122,7 +125,7 @@ export const deleteFolderService = async (
   } catch (error) {
     if (error instanceof Error) {
       console.error("Error deleting folder:", error);
-      throw new Error(`Failed to delete folder: ${error}`);
+      throw new Error(`Failed to delete folder: ${error.message}`);
     }
   }
 };

@@ -1,6 +1,5 @@
 import { diagrams, InsertDiagram, patients, SelectDiagram } from "@/db/schemas";
 import { DiagramSituation } from "@/types/patients";
-import { getAuth } from "@/utils/get-auth";
 import { init } from "@paralleldrive/cuid2";
 import dayjs from "dayjs";
 import { and, eq } from "drizzle-orm";
@@ -21,10 +20,9 @@ export const getPatientDiagramService = async (
   db: NeonHttpDatabase,
   patientId: string
 ): Promise<SelectDiagram> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   // verify if the patient exists
@@ -63,10 +61,9 @@ export const createDiagramService = async (
   values: InsertDiagram,
   patientId: string
 ): Promise<SelectDiagram> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
   const createId = init({
     length: 10,
@@ -98,10 +95,9 @@ export const deleteDiagramService = async (
   db: NeonHttpDatabase,
   patientId: string
 ): Promise<SelectDiagram> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   // verify if the patient exists
@@ -145,10 +141,9 @@ export const updateDiagramService = async (
   patientId: string,
   values: InsertDiagram
 ): Promise<SelectDiagram> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   // verify if the patient exists
@@ -185,10 +180,9 @@ export const getSituationsService = async (
   db: NeonHttpDatabase,
   patientId: string
 ): Promise<DiagramSituation[]> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   // verify if patient exists and is associated to the authenticated psychologist
@@ -225,10 +219,9 @@ export const getSituationService = async (
   patientId: string,
   situationId: string
 ): Promise<DiagramSituation> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   // verify if patient exists and is associated to the authenticated psychologist
@@ -270,10 +263,9 @@ export const createSituationService = async (
   patientId: string,
   values: Partial<DiagramSituation>
 ): Promise<DiagramSituation> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   // Verify if patient exists and is associated with the authenticated psychologist
@@ -332,10 +324,9 @@ export const deleteSituationService = async (
   patientId: string,
   situationId: string
 ): Promise<DiagramSituation[]> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   // verify if patient exists and is associated to the authenticated psychologist
@@ -385,10 +376,9 @@ export const updateSituationService = async (
   situationId: string,
   updatedValues: Partial<DiagramSituation>
 ): Promise<DiagramSituation> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   // verify if patient exists and is associated to the authenticated psychologist

@@ -3,7 +3,6 @@ import {
   SelectTransaction,
   transactions,
 } from "@/db/schemas";
-import { getAuth } from "@/utils/get-auth";
 
 import dayjs from "dayjs";
 import { and, eq } from "drizzle-orm";
@@ -23,10 +22,9 @@ export const getTransactionsService = async (
   c: Context,
   db: NeonHttpDatabase
 ): Promise<SelectTransaction[]> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   // verify if the Transaction exists
@@ -61,10 +59,9 @@ export const getTransactionService = async (
   db: NeonHttpDatabase,
   paymentId: string
 ): Promise<SelectTransaction> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   // verify if the Transactions for the user exists
@@ -102,10 +99,9 @@ export const createTransactionService = async (
   db: NeonHttpDatabase,
   values: InsertTransaction
 ): Promise<SelectTransaction> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   const [data] = await db
@@ -135,10 +131,9 @@ export const updateTransactionService = async (
   values: any,
   paymentId: string
 ): Promise<SelectTransaction> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   console.log(values);
@@ -169,10 +164,9 @@ export const deleteTransactionService = async (
   db: NeonHttpDatabase,
   paymentId: string
 ): Promise<SelectTransaction> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   const [data] = await db

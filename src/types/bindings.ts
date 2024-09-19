@@ -1,9 +1,12 @@
-export type Env = {
+import { Session, User } from "lucia";
+
+export type Bindings = {
   PROJECT_NAME: string;
   DATABASE_URL: string;
   FRONTEND_URL: string;
   BACKEND_URL: string;
   COOKIE_DOMAIN: string;
+  JWT_SECRET_KEY: string;
 
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;
@@ -23,4 +26,9 @@ export type Env = {
 
   TWILLIO_ACCOUNT_SID: string;
   TWILLIO_AUTH_TOKEN: string;
+};
+
+export type Variables = {
+  user: User | null;
+  session: Session | null;
 };

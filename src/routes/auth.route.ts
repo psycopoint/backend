@@ -1,42 +1,32 @@
-import { Context, Hono } from "hono";
-
-import { googleAuth } from "@hono/oauth-providers/google";
+import { Hono } from "hono";
 
 import {
-  googleAuthentication,
-  resendAuthentication,
-  signout,
+  googleAuth,
+  googleAuthCallback,
+  login,
+  magicLink,
+  magicLinkCallback,
+  register,
+  validate,
 } from "@/controllers/auth.controllers";
-import { Env } from "@/types/bindings";
-import { JwtVariables } from "hono/jwt";
-import { Session } from "hono-sessions";
 
-const app = new Hono<{
-  Bindings: Env;
-  Variables: JwtVariables & {
-    session: Session;
-  };
-}>();
+const app = new Hono();
 
-// google login
-app.get(
-  "/google",
-  async (c: Context, next) => {
-    const googleAuthMiddleware = googleAuth({
-      client_id: c.env.GOOGLE_CLIENT_ID,
-      client_secret: c.env.GOOGLE_CLIENT_SECRET,
-      scope: ["openid", "email", "profile"],
-      prompt: "select_account",
-    });
-    return googleAuthMiddleware(c, next);
-  },
-  ...googleAuthentication
-);
+// register
+app.post("/register", ...register);
+
+// login with password & email
+app.post("/login", ...login);
 
 // resend login
-app.get("/resend", ...resendAuthentication);
+app.post("/magic", ...magicLink);
+app.get("/magic/callback", ...magicLinkCallback);
 
-// logout
-app.post("/signout", ...signout);
+// google login
+app.get("/google", ...googleAuth);
+app.get("/callback/google", ...googleAuthCallback);
+
+// validate
+app.get("/validate", ...validate);
 
 export default app;

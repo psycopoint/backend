@@ -1,7 +1,5 @@
 import { Hono } from "hono";
-import { Env } from "@/types/bindings";
-import { JwtVariables } from "hono/jwt";
-import { Session } from "hono-sessions";
+
 import {
   deleteFile,
   deleteFolder,
@@ -9,12 +7,7 @@ import {
   uploadFile,
 } from "@/controllers/upload.controllers";
 
-const app = new Hono<{
-  Bindings: Env;
-  Variables: JwtVariables & {
-    session: Session;
-  };
-}>();
+const app = new Hono();
 
 // upload file
 app.post("/upload", ...uploadFile);

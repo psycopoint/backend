@@ -1,7 +1,4 @@
 import { Hono } from "hono";
-import { Env } from "@/types/bindings";
-import { JwtVariables } from "hono/jwt";
-import { Session } from "hono-sessions";
 
 // ROUTES
 import {
@@ -12,12 +9,7 @@ import {
   updateTransaction,
 } from "@/controllers/transactions.controllers";
 
-const app = new Hono<{
-  Bindings: Env;
-  Variables: JwtVariables & {
-    session: Session;
-  };
-}>();
+const app = new Hono();
 
 // get all transactions
 app.get("/", ...getTransactions);

@@ -7,9 +7,6 @@ import {
 } from "@/controllers/users.controllers";
 
 import { Hono } from "hono";
-import { Env } from "@/types/bindings";
-import { JwtVariables } from "hono/jwt";
-import { Session } from "hono-sessions";
 
 // ROUTES
 import patients from "@/routes/patients.route";
@@ -17,12 +14,7 @@ import events from "@/routes/events.route";
 import transactions from "@/routes/transactions.route";
 import documents from "@/routes/documents.route";
 
-const app = new Hono<{
-  Bindings: Env;
-  Variables: JwtVariables & {
-    session: Session;
-  };
-}>();
+const app = new Hono();
 
 // get all users
 app.get("/", ...getAllUsers);

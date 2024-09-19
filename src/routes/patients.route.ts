@@ -11,21 +11,14 @@ import {
 } from "@/controllers/patients.controllers";
 
 import { Hono } from "hono";
-import { Env } from "@/types/bindings";
 import { JwtVariables } from "hono/jwt";
-import { Session } from "hono-sessions";
 
 // ROUTES
 import anamnesis from "./anamnesis.route";
 import diagrams from "./diagrams.route";
 import events from "@/routes/events.route";
 
-const app = new Hono<{
-  Bindings: Env;
-  Variables: JwtVariables & {
-    session: Session;
-  };
-}>();
+const app = new Hono();
 
 // get all patients
 app.get("/", ...getAllPatients);

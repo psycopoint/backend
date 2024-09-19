@@ -4,7 +4,7 @@ import {
   SelectDocument,
   documents,
 } from "@/db/schemas/public/documents";
-import { getAuth } from "@/utils/get-auth";
+
 import { and, eq } from "drizzle-orm";
 import { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { Context } from "hono";
@@ -28,12 +28,12 @@ export const getDocumentsService = async (
   db: NeonHttpDatabase,
   patientId?: string
 ) => {
-  const user = await getAuth(c, db);
-  let data;
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
+
+  let data;
 
   if (patientId) {
     // get patient documents
@@ -62,10 +62,9 @@ export const getDocumentService = async (
   db: NeonHttpDatabase,
   documentId: string
 ) => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   const [data] = await db
@@ -88,10 +87,9 @@ export const createDocumentService = async (
   db: NeonHttpDatabase,
   values: InsertDocument
 ) => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   const [data] = await db.insert(documents).values(values).returning();
@@ -105,10 +103,9 @@ export const deleteDocumentService = async (
   db: NeonHttpDatabase,
   documentId: string
 ) => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   const [data] = await db
@@ -132,10 +129,9 @@ export const updateDocumentService = async (
   documentId: string,
   values: InsertDocument
 ) => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   const [data] = await db

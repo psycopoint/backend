@@ -15,7 +15,7 @@ import {
   updateUserService,
 } from "@/services/users.services";
 import { handleError } from "@/utils/handle-error";
-import { getAuth } from "@/utils/get-auth";
+
 import {
   AdditionalEmails,
   AdditionalPhones,
@@ -29,11 +29,6 @@ export const getMe = factory.createHandlers(async (c) => {
   // connect to db
   const sql = neon(c.env.DATABASE_URL);
   const db = drizzle(sql);
-
-  // const session = c.get("session");
-
-  // const token = session.get("session_id");
-  // console.log(token);
 
   try {
     const data = await getUserDataService(c, db);
@@ -103,7 +98,7 @@ export const createUser = factory.createHandlers(
     const body = c.req.valid("json");
 
     try {
-      const result = await createUserService(c, body, db);
+      const result = await createUserService(c, db, body);
       return c.json(result, 200);
     } catch (error) {
       return handleError(c, error);
@@ -137,7 +132,10 @@ export const updateUser = factory.createHandlers(
     const sql = neon(c.env.DATABASE_URL);
     const db = drizzle(sql);
 
-    const user = await getAuth(c, db);
+    const user = c.get("user");
+    if (!user) {
+      throw new Error("Unauthorized");
+    }
 
     const values = c.req.valid("json");
 

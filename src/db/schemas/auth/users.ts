@@ -31,11 +31,12 @@ export const users = authSchema.table("users", {
     .$defaultFn(() => createId()),
   name: text("name"),
   email: text("email").unique().notNull(),
-  emailVerified: timestamp("emailVerified", { mode: "date" }),
+  emailVerified: timestamp("email_verified", { mode: "date" }),
   password: text("password"),
   image: text("image"),
   userType: userType("user_type").default("psychologist"),
   provider: providers("provider"),
+  providerId: text("provider_id"),
 });
 
 //  RELATIONS

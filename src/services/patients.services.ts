@@ -1,6 +1,5 @@
 import { InsertPatient, SelectPatient, patients } from "@/db/schemas";
 import { EmergencyContact } from "@/types/patients";
-import { getAuth } from "@/utils/get-auth";
 import { init } from "@paralleldrive/cuid2";
 import { and, eq } from "drizzle-orm";
 import { NeonHttpDatabase } from "drizzle-orm/neon-http";
@@ -18,10 +17,9 @@ export const getAllPatientsService = async (
   c: Context,
   db: NeonHttpDatabase
 ): Promise<SelectPatient[]> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   const data = await db
@@ -50,10 +48,9 @@ export const getPatientService = async (
   db: NeonHttpDatabase,
   patientId: string
 ): Promise<SelectPatient> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   // verify if the patient exists
@@ -92,10 +89,9 @@ export const createPatientService = async (
   db: NeonHttpDatabase,
   values: InsertPatient
 ): Promise<SelectPatient> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   const createId = init({
@@ -130,10 +126,9 @@ export const deletePatientService = async (
   db: NeonHttpDatabase,
   patientId: string
 ): Promise<SelectPatient> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   // verify if the patient exists
@@ -174,10 +169,9 @@ export const updatePatientService = async (
   patientId: string,
   values: InsertPatient
 ): Promise<SelectPatient> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   // verify if the patient exists
@@ -215,10 +209,9 @@ export const getPatientEmergencyContactsService = async (
   db: NeonHttpDatabase,
   patientId: string
 ): Promise<EmergencyContact[]> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   // verify if the patient exists
@@ -245,10 +238,9 @@ export const getPatientEmergencyContactService = async (
   patientId: string,
   contactId: string
 ): Promise<EmergencyContact> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   // verify if the patient exists
@@ -276,10 +268,9 @@ export const createEmergencyContactService = async (
   values: EmergencyContact,
   patientId: string
 ) => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   // verify if the patient exists
@@ -320,10 +311,9 @@ export const deletePatientEmergencyContactService = async (
   patientId: string,
   contactId: string
 ): Promise<EmergencyContact[]> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   // verify if the patient exists

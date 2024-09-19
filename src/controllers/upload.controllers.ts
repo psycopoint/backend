@@ -5,7 +5,7 @@ import {
   uploadFileService,
   uploadMultipleFilesService,
 } from "@/services/upload.services";
-import { getAuth } from "@/utils/get-auth";
+
 import { handleError } from "@/utils/handle-error";
 import { zValidator } from "@hono/zod-validator";
 import { neon } from "@neondatabase/serverless";
@@ -21,11 +21,11 @@ export const uploadFile = factory.createHandlers(async (c) => {
   const sql = neon(c.env.DATABASE_URL);
   const db = drizzle(sql);
 
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
+
   const body = await c.req.parseBody();
 
   const files = Object.values(body).filter(
@@ -73,10 +73,9 @@ export const updateFile = factory.createHandlers(
     const sql = neon(c.env.DATABASE_URL);
     const db = drizzle(sql);
 
-    const user = await getAuth(c, db);
-
+    const user = c.get("user");
     if (!user) {
-      throw new Error("Not authenticated");
+      throw new Error("Unauthorized");
     }
 
     const body = await c.req.parseBody();
@@ -114,10 +113,9 @@ export const deleteFile = factory.createHandlers(
     const sql = neon(c.env.DATABASE_URL);
     const db = drizzle(sql);
 
-    const user = await getAuth(c, db);
-
+    const user = c.get("user");
     if (!user) {
-      throw new Error("Not authenticated");
+      throw new Error("Unauthorized");
     }
 
     const { path } = c.req.valid("json");
@@ -147,10 +145,9 @@ export const deleteFolder = factory.createHandlers(
     const sql = neon(c.env.DATABASE_URL);
     const db = drizzle(sql);
 
-    const user = await getAuth(c, db);
-
+    const user = c.get("user");
     if (!user) {
-      throw new Error("Not authenticated");
+      throw new Error("Unauthorized");
     }
 
     const { folder } = c.req.valid("json");

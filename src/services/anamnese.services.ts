@@ -4,7 +4,6 @@ import {
   patients,
   SelectAnamnesis,
 } from "@/db/schemas";
-import { getAuth } from "@/utils/get-auth";
 import { init } from "@paralleldrive/cuid2";
 import { and, eq } from "drizzle-orm";
 import { NeonHttpDatabase } from "drizzle-orm/neon-http";
@@ -24,10 +23,9 @@ export const getPatientAnamnesisService = async (
   db: NeonHttpDatabase,
   patientId: string
 ): Promise<SelectAnamnesis> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   // verify if the patient exists
@@ -71,10 +69,9 @@ export const createAnamnesisService = async (
   values: InsertAnamnesis,
   patientId: string
 ): Promise<SelectAnamnesis> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   const createId = init({
@@ -107,10 +104,9 @@ export const deleteAnamnesisService = async (
   db: NeonHttpDatabase,
   patientId: string
 ): Promise<SelectAnamnesis> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   // verify if the patient exists
@@ -154,10 +150,9 @@ export const updateAnamnesisService = async (
   patientId: string,
   values: InsertAnamnesis
 ): Promise<SelectAnamnesis> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   // verify if the patient exists

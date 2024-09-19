@@ -4,6 +4,7 @@
 // export * from "./auth/refresh-tokens";
 export * from "./auth/users";
 export * from "./auth/sessions";
+export * from "./auth/verification-tokens";
 
 // EVENTS SCHEMAS
 export * from "./public/events";

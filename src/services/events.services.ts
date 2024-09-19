@@ -1,6 +1,6 @@
 import { InsertEvent, SelectEvent, events } from "@/db/schemas";
 import { EventData } from "@/types/events";
-import { getAuth } from "@/utils/get-auth";
+
 import { createId } from "@paralleldrive/cuid2";
 import dayjs from "dayjs";
 import { and, eq, getTableColumns, or, sql } from "drizzle-orm";
@@ -20,10 +20,9 @@ export const getEventsService = async (
   c: Context,
   db: NeonHttpDatabase
 ): Promise<SelectEvent[]> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   // verify if the event exists
@@ -58,10 +57,9 @@ export const getEventService = async (
   db: NeonHttpDatabase,
   eventId: string
 ): Promise<SelectEvent> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   // verify if the Event exists
@@ -98,10 +96,9 @@ export const createEventService = async (
   values: InsertEvent,
   patientId?: string
 ): Promise<SelectEvent> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   const [data] = await db
@@ -131,10 +128,9 @@ export const updateEventService = async (
   values: any,
   eventId: string
 ): Promise<SelectEvent> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   console.log(values);
@@ -165,10 +161,9 @@ export const deleteEventService = async (
   db: NeonHttpDatabase,
   eventId: string
 ): Promise<SelectEvent> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   const [data] = await db

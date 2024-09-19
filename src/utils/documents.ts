@@ -6,7 +6,6 @@ import {
   SelectUser,
 } from "@/db/schemas";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
-import { getAuth } from "./get-auth";
 import { convertTextualValue } from "./money";
 import dayjs from "dayjs";
 

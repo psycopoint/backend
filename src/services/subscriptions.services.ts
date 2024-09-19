@@ -1,5 +1,4 @@
 import { subscriptions } from "@/db/schemas";
-import { getAuth } from "@/utils/get-auth";
 import { neon } from "@neondatabase/serverless";
 import { createId } from "@paralleldrive/cuid2";
 import { eq } from "drizzle-orm";
@@ -17,10 +16,9 @@ export const getCurrentSubscriptionService = async (
   c: Context,
   db: NeonHttpDatabase
 ) => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   const [subscription] = await db
@@ -38,10 +36,9 @@ export const generateCheckoutUrlService = async (
   priceId: string
   // variantId: string
 ): Promise<string> => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   const stripe = createStripe(c);
@@ -67,10 +64,9 @@ export const getSessionInfoService = async (
   db: NeonHttpDatabase,
   sessionId: string
 ) => {
-  const user = await getAuth(c, db);
-
+  const user = c.get("user");
   if (!user) {
-    throw new Error("Not authenticated");
+    throw new Error("Unauthorized");
   }
 
   const stripe = createStripe(c);

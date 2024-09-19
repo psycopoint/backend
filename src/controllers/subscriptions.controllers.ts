@@ -3,7 +3,6 @@ import { createFactory } from "hono/factory";
 import { subscriptions } from "@/db/schemas";
 import { eq } from "drizzle-orm";
 import { createId } from "@paralleldrive/cuid2";
-import { getAuth } from "@/utils/get-auth";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import {
@@ -89,7 +88,10 @@ export const getSessionInfo = factory.createHandlers(
     const db = drizzle(sql);
 
     const { session_id } = c.req.valid("query");
-    const user = await getAuth(c, db);
+    const user = c.get("user");
+    if (!user) {
+      throw new Error("Unauthorized");
+    }
 
     try {
       const stripeInfo = await getSessionInfoService(

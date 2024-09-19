@@ -11,12 +11,11 @@ import {
   getDocumentsService,
   updateDocumentService,
 } from "@/services/documents.services";
-import { getAuth } from "@/utils/get-auth";
 import { handleError } from "@/utils/handle-error";
 import { zValidator } from "@hono/zod-validator";
-import { neon } from "@neondatabase/serverless";
 import { init } from "@paralleldrive/cuid2";
 import dayjs from "dayjs";
+import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { createFactory } from "hono/factory";
 import { z } from "zod";
@@ -167,10 +166,9 @@ export const createDocument = factory.createHandlers(
     const sql = neon(c.env.DATABASE_URL);
     const db = drizzle(sql);
 
-    const user = await getAuth(c, db);
-
+    const user = c.get("user");
     if (!user) {
-      throw new Error("Not authenticated");
+      throw new Error("Unauthorized");
     }
 
     const values = c.req.valid("json");
