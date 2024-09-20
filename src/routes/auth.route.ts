@@ -4,11 +4,14 @@ import {
   googleAuth,
   googleAuthCallback,
   login,
+  logout,
   magicLink,
   magicLinkCallback,
   register,
-  validate,
+  validateEmail,
+  validateSession,
 } from "@/controllers/auth.controllers";
+import { isAuthenticatedMid } from "@/middlewares/is-authenticated";
 
 const app = new Hono();
 
@@ -26,7 +29,13 @@ app.get("/magic/callback", ...magicLinkCallback);
 app.get("/google", ...googleAuth);
 app.get("/callback/google", ...googleAuthCallback);
 
-// validate
-app.get("/validate", ...validate);
+// validate email
+app.post("/validate-email", ...validateEmail);
+
+// validade session
+app.get("/validate-session", ...validateSession);
+
+// logout
+app.post("/logout", ...logout);
 
 export default app;

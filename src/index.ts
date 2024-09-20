@@ -11,21 +11,17 @@ import subscriptionRoute from "@routes/subscription.route";
 import uploadRoute from "@routes/upload.route";
 import webhooksRoute from "@/routes/webhooks.route";
 
-import { isAuthenticated } from "./middlewares/is-authenticated";
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
+import { isAuthenticatedMid } from "./middlewares/is-authenticated";
 
 const app = new Hono<{
   Bindings: Bindings;
   Variables: Variables;
 }>().basePath("/v1");
 
-app.use("*", isAuthenticated);
-
 // CORS
-app.use("/*", async (c, next) => {
+app.use("*", async (c, next) => {
   const corsMiddleware = cors({
-    origin: c.env.FRONTEND_URL || "http://localhost:3000", // allowing only localhost:3000
+    origin: c.env.FRONTEND_URL, // allowing only localhost:3000
     allowMethods: ["GET", "POST", "PATCH", "OPTIONS", "DELETE"],
     allowHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -35,6 +31,8 @@ app.use("/*", async (c, next) => {
 });
 
 app.use(csrf());
+
+app.use("*", isAuthenticatedMid);
 
 // ROUTES
 app.route("/auth", authRoute);

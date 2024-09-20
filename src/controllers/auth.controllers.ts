@@ -130,7 +130,7 @@ export const magicLinkCallback = factory.createHandlers(
   }
 );
 
-// EMAIL & PASSWORD REGISTER
+// REGISTER
 export const register = factory.createHandlers(
   zValidator(
     "json",
@@ -335,6 +335,7 @@ export const googleAuthCallback = factory.createHandlers(async (c) => {
     c.header("Set-Cookie", sessionCookie.serialize(), {
       append: true,
     });
+
     return c.redirect(`${c.env.FRONTEND_URL}/`, 302);
   } catch (e) {
     console.log(e);
@@ -346,11 +347,58 @@ export const googleAuthCallback = factory.createHandlers(async (c) => {
 });
 
 // VALIDATE SESSION
-export const validate = factory.createHandlers(async (c) => {
-  const user = c.get("user");
-  if (!user) {
+export const validateSession = factory.createHandlers(async (c) => {
+  const session = c.get("session");
+
+  if (!session) {
     return c.json({ session: false });
   }
 
   return c.json({ session: true });
+});
+
+// VALIDATE EMAIL
+export const validateEmail = factory.createHandlers(
+  zValidator(
+    "json",
+    z.object({
+      email: z.string(),
+    })
+  ),
+  async (c) => {
+    const sql = neon(c.env.DATABASE_URL);
+    const db = drizzle(sql);
+
+    const { email } = c.req.valid("json");
+
+    // verify if email exists
+    const [existingEmail] = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email));
+
+    if (!existingEmail) {
+      return c.json({ valid: true });
+    }
+
+    return c.json({ valid: false });
+  }
+);
+
+// LOGOUT
+export const logout = factory.createHandlers(async (c) => {
+  const sql = neon(c.env.DATABASE_URL);
+  const db = drizzle(sql);
+
+  const lucia = createLucia(db);
+  const session = c.get("session");
+  if (session) {
+    await lucia.invalidateSession(session.id);
+  }
+
+  const cookie = lucia.createBlankSessionCookie();
+
+  c.header("Set-Cookie", cookie.serialize(), { append: true });
+
+  return c.json({ message: "success" });
 });

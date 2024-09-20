@@ -18,8 +18,11 @@ export const createLucia = (db: NeonHttpDatabase) => {
 
   return new Lucia(adapter, {
     sessionCookie: {
+      name: "psycopoint_session",
       attributes: {
-        secure: false, // change this to true in production
+        secure: true, // change this to true in production
+        domain: "127.0.0.1",
+        sameSite: "none",
       },
     },
     getUserAttributes: (att) => {

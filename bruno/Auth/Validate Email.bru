@@ -1,0 +1,17 @@
+meta {
+  name: Validate Email
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{url}}/auth/validate-email
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "email@gmail.com"
+  }
+}

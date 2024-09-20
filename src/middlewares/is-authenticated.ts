@@ -1,10 +1,11 @@
 import { createLucia } from "@/lib/lucia";
 import { neon } from "@neondatabase/serverless";
+import dayjs from "dayjs";
 import { NeonHttpDatabase, drizzle } from "drizzle-orm/neon-http";
 import { Context, Next } from "hono";
-import { getCookie } from "hono/cookie";
+import { getCookie, setCookie } from "hono/cookie";
 
-export const isAuthenticated = async (c: Context, next: Next) => {
+export const isAuthenticatedMid = async (c: Context, next: Next) => {
   const sql = neon(c.env.DATABASE_URL);
   const db = drizzle(sql);
 
@@ -32,6 +33,7 @@ export const isAuthenticated = async (c: Context, next: Next) => {
 
   c.set("user", user);
   c.set("session", session);
+  const cretedSession = c.get("session");
 
   return next();
 };
