@@ -90,7 +90,7 @@ export const magicLinkCallback = factory.createHandlers(
     const sql = neon(c.env.DATABASE_URL);
     const db = drizzle(sql);
 
-    const lucia = createLucia(db);
+    const lucia = createLucia(c, db);
 
     const { token, email } = c.req.valid("query");
 
@@ -177,7 +177,7 @@ export const register = factory.createHandlers(
       return c.json({ error: "An error occurred during sign up." }, 500);
     }
 
-    const lucia = createLucia(db);
+    const lucia = createLucia(c, db);
     const session = await lucia.createSession(user.id, {});
     const cookie = lucia.createSessionCookie(session.id);
 
@@ -216,7 +216,7 @@ export const login = factory.createHandlers(
       return c.json({ error: "Invalid email or password." }, 400);
     }
 
-    const lucia = createLucia(db);
+    const lucia = createLucia(c, db);
     const session = await lucia.createSession(user.id, {});
     const cookie = lucia.createSessionCookie(session.id);
 
@@ -259,7 +259,7 @@ export const googleAuthCallback = factory.createHandlers(async (c) => {
   const db = drizzle(sql);
 
   const google = createGoogle(c);
-  const lucia = createLucia(db);
+  const lucia = createLucia(c, db);
 
   const cookies = parseCookies(c.req.header("Cookie") ?? "");
 
@@ -390,7 +390,7 @@ export const logout = factory.createHandlers(async (c) => {
   const sql = neon(c.env.DATABASE_URL);
   const db = drizzle(sql);
 
-  const lucia = createLucia(db);
+  const lucia = createLucia(c, db);
   const session = c.get("session");
   if (session) {
     await lucia.invalidateSession(session.id);

@@ -9,7 +9,7 @@ export const isAuthenticatedMid = async (c: Context, next: Next) => {
   const sql = neon(c.env.DATABASE_URL);
   const db = drizzle(sql);
 
-  const lucia = createLucia(db);
+  const lucia = createLucia(c, db);
 
   const sessionId = getCookie(c, lucia.sessionCookieName) ?? null;
   if (!sessionId) {

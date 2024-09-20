@@ -13,7 +13,7 @@ export const createGoogle = (c: Context) => {
   );
 };
 
-export const createLucia = (db: NeonHttpDatabase) => {
+export const createLucia = (c: Context, db: NeonHttpDatabase) => {
   const adapter = new DrizzlePostgreSQLAdapter(db, sessions, users);
 
   return new Lucia(adapter, {
@@ -21,7 +21,7 @@ export const createLucia = (db: NeonHttpDatabase) => {
       name: "psycopoint_session",
       attributes: {
         secure: true, // change this to true in production
-        domain: "127.0.0.1",
+        domain: c.env.FRONTEND_URL,
         sameSite: "none",
       },
     },
