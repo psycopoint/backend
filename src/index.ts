@@ -23,9 +23,9 @@ const app = new Hono<{
 app.use("*", isAuthenticated);
 
 // CORS
-app.use("*", async (c, next) => {
+app.use("/*", async (c, next) => {
   const corsMiddleware = cors({
-    origin: c.env.FRONTEND_URL, // allowing only localhost:3000
+    origin: c.env.FRONTEND_URL || "http://localhost:3000", // allowing only localhost:3000
     allowMethods: ["GET", "POST", "PATCH", "OPTIONS", "DELETE"],
     allowHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -34,7 +34,7 @@ app.use("*", async (c, next) => {
   return corsMiddleware(c, next);
 });
 
-app.use("*", csrf());
+app.use(csrf());
 
 // ROUTES
 app.route("/auth", authRoute);
