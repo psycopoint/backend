@@ -323,6 +323,8 @@ export const googleAuthCallback = factory.createHandlers(async (c) => {
         image: googleUserResult.picture,
         providerId: String(googleUserResult.sub),
         email: googleUserResult.email,
+        // emailVerified: googleUserResult.email_verified,
+        userType: "psychologist",
       })
       .returning();
 
