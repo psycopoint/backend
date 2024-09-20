@@ -21,8 +21,8 @@ export const createLucia = (c: Context, db: NeonHttpDatabase) => {
       name: "psycopoint_session",
       attributes: {
         secure: true, // change this to true in production
-        domain: c.env.FRONTEND_URL,
-        sameSite: "none",
+        domain: `.psycohub.com`,
+        sameSite: "strict", // strict in production & none in dev
       },
     },
     getUserAttributes: (att) => {
