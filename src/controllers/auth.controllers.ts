@@ -320,6 +320,7 @@ export const googleAuthCallback = factory.createHandlers(async (c) => {
         id: userId as string,
         name: googleUserResult.name as string,
         provider: "google",
+        image: googleUserResult.picture,
         providerId: String(googleUserResult.sub),
         email: googleUserResult.email,
       })
