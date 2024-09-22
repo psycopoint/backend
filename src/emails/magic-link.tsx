@@ -15,7 +15,7 @@ interface MagicLinkEmailProps {
   linkUrl?: string;
 }
 
-export const MagicLink = ({ loginCode, linkUrl }: MagicLinkEmailProps) => (
+export const MagicLink = ({ linkUrl }: MagicLinkEmailProps) => (
   <Html>
     <Head />
     <Preview>Fazer login</Preview>
@@ -23,7 +23,7 @@ export const MagicLink = ({ loginCode, linkUrl }: MagicLinkEmailProps) => (
       <Container style={container}>
         <Heading style={h1}>Fazer login</Heading>
         <Img
-          src={`https://media.psycohub.com/psycopoint-logo.png`}
+          src={`https://media.psycopoint.com/logo.png`}
           width="auto"
           height="22"
           alt="Logo"

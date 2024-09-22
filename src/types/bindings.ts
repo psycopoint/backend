@@ -5,8 +5,9 @@ export type Bindings = {
   DATABASE_URL: string;
   FRONTEND_URL: string;
   BACKEND_URL: string;
-  COOKIE_DOMAIN: string;
+  DOMAIN: string;
   JWT_SECRET_KEY: string;
+  LOGO_URL: string;
 
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;

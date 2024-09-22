@@ -46,7 +46,7 @@ export const uploadFileService = async (
   );
 
   // CDN building cdn URL
-  const cdnUrl = `https://media.psycohub.com/${objKey}`;
+  const cdnUrl = `https://media.psycopoint.com/${objKey}`;
 
   return cdnUrl;
 };

@@ -34,7 +34,7 @@ export const psychologists = pgTable("psychologists", {
     .$type<AdditionalPhones[] | undefined>()
     .default(sql`'[]'::jsonb`),
   website: text("website"),
-  socialLinks: jsonb("social_links").default("{}"),
+  socialLinks: jsonb("social_links").default("[]"),
   gender: genderEnum("gender"),
   birthdate: date("birthdate", { mode: "string" }),
   phone: varchar("phone", { length: 256 }),

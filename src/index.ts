@@ -30,7 +30,14 @@ app.use("*", async (c, next) => {
   return corsMiddleware(c, next);
 });
 
-app.use(csrf());
+// CSRF
+app.use("*", async (c, next) => {
+  const corsMiddleware = csrf({
+    origin: c.env.FRONTEND_URL, // allowing only localhost:3000
+  });
+
+  return corsMiddleware(c, next);
+});
 
 app.use("*", isAuthenticatedMid);
 

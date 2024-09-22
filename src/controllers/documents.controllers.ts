@@ -21,8 +21,9 @@ import { createFactory } from "hono/factory";
 import { z } from "zod";
 
 import {
-  createDiagramPdf,
+  createCertificatePdf,
   createDocumentPdf,
+  createHoursDeclarationPdf,
   createReceiptPdf,
 } from "@/utils/documents";
 import { getUserDataService } from "@/services/users.services";
@@ -35,12 +36,11 @@ export const generatePdf = factory.createHandlers(
     "param",
     z.object({
       documentType: z.enum([
-        "pdf",
-        "docx",
-        "image",
         "diagram",
         "receipt",
         "document",
+        "certificate",
+        "declaration",
         "other",
       ]),
     })
@@ -72,21 +72,20 @@ export const generatePdf = factory.createHandlers(
         });
         break;
 
-      case "diagram":
-        pdf = await createDiagramPdf({
-          patient: values.patient,
-          diagram: values.diagram,
-        });
-        break;
-
-      case "pdf":
-        pdf = await createDocumentPdf({
+      case "certificate":
+        pdf = await createCertificatePdf({
           patient: values.patient,
           document: values.document,
+          user,
         });
         break;
 
-      default:
+      case "declaration":
+        pdf = await createHoursDeclarationPdf({
+          patient: values.patient,
+          document: values.document,
+          user,
+        });
         break;
     }
 

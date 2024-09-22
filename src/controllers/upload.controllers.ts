@@ -28,6 +28,8 @@ export const uploadFile = factory.createHandlers(async (c) => {
 
   const body = await c.req.parseBody();
 
+  console.log("BODY RECEBIDO NO UPLOAD:", body);
+
   const files = Object.values(body).filter(
     (value) => value instanceof File
   ) as File[];
