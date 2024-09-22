@@ -5,12 +5,12 @@ compatibility_flags = [ "nodejs_compat_v2" ]
 
 [vars]
 PROJECT_NAME = "psycopoint"
-# FRONTEND_URL = "https://app.psycopoint.com"
-FRONTEND_URL = "http://localhost:3000"
-# BACKEND_URL = "https://api.psycopoint.com/v1"
-BACKEND_URL = "http://127.0.0.1:3001/v1"
-DOMAIN = "127.0.0.1"
-# DOMAIN = "psycopoint.com"
+FRONTEND_URL = "https://app.psycopoint.com"
+BACKEND_URL = "https://api.psycopoint.com/v1"
+DOMAIN = "psycopoint.com"
+# FRONTEND_URL = "http://localhost:3000"
+# BACKEND_URL = "http://127.0.0.1:3001/v1"
+# DOMAIN = "127.0.0.1"
 SESSION_DURATION = 7
 DEFAULT_UPLOAD_SIZE = 2
 LOGO_URL= "https://media.psycopoint.com/logo.png"
