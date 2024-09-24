@@ -9,7 +9,7 @@ config({ path: ".dev.vars" });
 const url = `${process.env.DATABASE_URL}?options=project%3D${process.env.PROJECT_NAME}`;
 const db = drizzle(postgres(url, { ssl: "require", max: 1 }));
 const main = async () => {
-  await migrate(db, { migrationsFolder: "./src/db/migrations" });
+  await migrate(db, { migrationsFolder: "./db/migrations" });
   console.log("MIGRATION FINISHED!");
   process.exit(0);
 };

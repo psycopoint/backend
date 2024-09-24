@@ -24,8 +24,8 @@ export const MagicLink = ({ magicLink }: MagicLinkProps) => (
       <Container className="mx-auto p-6 bg-white shadow-lg">
         <Img
           src="https://media.psycopoint.com/logo.png"
-          width={48}
-          height={48}
+          width={139}
+          height={27}
           alt="Psycopoint"
           className="mx-auto"
         />
@@ -45,16 +45,6 @@ export const MagicLink = ({ magicLink }: MagicLinkProps) => (
         <Text className="text-lg text-center mt-4">
           Atenciosamente,
           <br />- Equipe Psycopoint
-        </Text>
-        <Hr className="border-gray-300 mt-8" />
-        <Img
-          src="https://media.psycopoint.com/logo.png"
-          width={32}
-          height={32}
-          className="mx-auto my-4 opacity-50"
-        />
-        <Text className="text-gray-500 text-sm text-center">
-          Att, Psycopoint.
         </Text>
       </Container>
     </Body>

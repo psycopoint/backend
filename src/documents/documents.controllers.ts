@@ -13,13 +13,13 @@ import { drizzle } from "drizzle-orm/neon-http";
 import { createFactory } from "hono/factory";
 import { z } from "zod";
 
-import {
-  createCertificatePdf,
-  createDocumentPdf,
-  createHoursDeclarationPdf,
-  createReceiptPdf,
-} from "@utils/documents";
+import { createDocumentPdf } from "@utils/documents";
 import { getUserDataService } from "@src/users/users.services";
+import { convertTextualValue } from "@utils/money";
+import { events } from "@db/schemas";
+import { eq } from "drizzle-orm";
+import dayjs from "dayjs";
+import { Address } from "@type/patients";
 
 const factory = createFactory();
 
@@ -48,36 +48,126 @@ export const generatePdf = factory.createHandlers(
     const { documentType } = c.req.valid("param");
     const values = await c.req.json();
 
+    // get the event from values.data.eventId
+    const [event] = await db
+      .select()
+      .from(events)
+      .where(eq(events.id, values.document.data.eventId));
+
+    // create the PDF
     let pdf;
+    const patientGender = values.patient.gender;
+
+    const genderFormat = (gender: string, type: "portador" | "psicologo") => {
+      switch (type) {
+        case "portador":
+          if (gender === "male") return "portador";
+          if (gender === "female") return "portadora";
+          if (gender === "other") return "portador(a)";
+          break;
+        case "psicologo":
+          if (gender === "male") return "psicólogo";
+          if (gender === "female") return "psicóloga";
+          if (gender === "other") return "psicólogo(a)";
+          break;
+      }
+    };
 
     switch (documentType) {
       case "document":
         pdf = await createDocumentPdf({
-          patient: values.patient,
-          document: values.document,
+          content: {
+            text: "",
+            title: "Documento XYZ",
+            city:
+              (user.addressInfo as Address).city || "________________________",
+            crp: user.crp || "________________________",
+            name: user.name || "________________________",
+          },
         });
+        break;
 
       case "receipt":
-        pdf = await createReceiptPdf({
-          patient: values.patient,
-          document: values.document,
-          user,
+        const receiptText = `Eu ${user.name}, ${genderFormat(
+          user.gender as string,
+          "portador"
+        )} do CPF: ${user.cpf} | recebi de ${values.patient.firstName} ${
+          values.patient.lastName
+        }, ${genderFormat(
+          values.patient.gender as string,
+          "portador"
+        )} do CPF: ${values.patient.cpf} | a importância de R$ ${
+          values.document.data.amount
+        } (${convertTextualValue(values.document.data.amount)}) | ${
+          values.document.data.description
+        }`;
+
+        pdf = await createDocumentPdf({
+          content: {
+            text: receiptText,
+            title: "Recibo de Sessão",
+            city: (user.addressInfo as Address).city || "___________",
+            crp: user.crp || "___________",
+            name: user.name || "___________",
+          },
         });
         break;
 
       case "certificate":
-        pdf = await createCertificatePdf({
-          patient: values.patient,
-          document: values.document,
-          user,
+        const certificateText = `Eu ${user.name}, ${genderFormat(
+          user.gender as string,
+          "psicologo"
+        )} com registro no CRP: ${user.crp}, | atesto que ${
+          values.patient.firstName
+        } ${values.patient.lastName}, ${genderFormat(
+          values.patient.gender as string,
+          "portador"
+        )} do CPF: ${
+          values.patient.cpf
+        }, | compareceu ao atendimento psicológico no dia ${dayjs(
+          event.start
+        ).format(
+          "DD/MM/YYYY"
+        )}, e necessita de afastamento | de suas atividades laborais por ${
+          values.document.data.daysOff
+        } ${
+          parseInt(values.document.data.daysOff) === 1 ? "dia" : "dias"
+        }, devido a ${values.document.data.description}.`;
+        pdf = await createDocumentPdf({
+          content: {
+            text: certificateText,
+            title: "Declaração de Horas",
+            city: (user.addressInfo as Address).city || "___________",
+            crp: user.crp || "___________",
+            name: user.name || "___________",
+          },
         });
         break;
 
       case "declaration":
-        pdf = await createHoursDeclarationPdf({
-          patient: values.patient,
-          document: values.document,
-          user,
+        const declarationText = `Eu ${user.name}, ${genderFormat(
+          user.gender as string,
+          "psicologo"
+        )} com registro no CRP ${user.crp}, | declaro que ${
+          values.patient.firstName
+        } ${values.patient.lastName}, ${genderFormat(
+          values.patient.gender as string,
+          "portador"
+        )} do CPF: ${
+          values.patient.cpf
+        }, | compareceu ao atendimento psicológico na ${dayjs(
+          event.start
+        ).format("dddd, [dia] DD [de] YYYY")} das ${dayjs(event.start).format(
+          "hh:mmA"
+        )} às ${dayjs(event.end).format("hh:mmA")}.`;
+        pdf = await createDocumentPdf({
+          content: {
+            text: declarationText,
+            title: "Declaração de Comparecimento",
+            city: (user.addressInfo as Address).city || "___________",
+            crp: user.crp || "___________",
+            name: user.name || "___________",
+          },
         });
         break;
     }

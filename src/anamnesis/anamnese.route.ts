@@ -1,7 +1,7 @@
 import {
   getPatientAnamnesis,
   updateAnamnesis,
-} from "@src/anamnese/anamnesis.controllers";
+} from "@src/anamnesis/anamnesis.controllers";
 
 import { Hono } from "hono";
 

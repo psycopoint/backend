@@ -29,7 +29,7 @@ export const generateCheckoutUrlService = async (
   db: NeonHttpDatabase,
   priceId: string
   // variantId: string
-): Promise<string> => {
+) => {
   const user = c.get("user");
   if (!user) {
     throw new Error("Unauthorized");
@@ -49,7 +49,7 @@ export const generateCheckoutUrlService = async (
     ],
   });
 
-  return session.url as string;
+  return session;
 };
 
 // GET SESSION INFORMATION

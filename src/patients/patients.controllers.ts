@@ -27,7 +27,7 @@ import { drizzle } from "drizzle-orm/neon-http";
 import { Context } from "hono";
 import { createFactory } from "hono/factory";
 import { z } from "zod";
-import { createAnamnesisService } from "@src/anamnese/anamnese.services";
+import { createAnamnesisService } from "@src/anamnesis/anamnese.services";
 
 const factory = createFactory();
 

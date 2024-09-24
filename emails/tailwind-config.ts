@@ -1,4 +1,6 @@
-export const twConfig = {
+import { TailwindConfig } from "@react-email/components";
+
+export const twConfig: TailwindConfig = {
   theme: {
     extend: {
       colors: {
@@ -20,7 +22,7 @@ export const twConfig = {
   presets: "",
   future: "",
   experimental: "",
-  darkMode: "",
+  darkMode: false,
   corePlugins: "",
   plugins: [],
 };

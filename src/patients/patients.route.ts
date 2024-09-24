@@ -14,7 +14,7 @@ import { Hono } from "hono";
 import { JwtVariables } from "hono/jwt";
 
 // ROUTES
-import anamnesis from "@src/anamnese/anamnese.route";
+import anamnesis from "@src/anamnesis/anamnese.route";
 import diagrams from "@src/diagrams/diagrams.route";
 import events from "@src/events/events.route";
 

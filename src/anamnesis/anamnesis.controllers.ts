@@ -2,7 +2,7 @@ import { InsertAnamnesis, insertAnamnesisSchema } from "@db/schemas";
 import {
   getPatientAnamnesisService,
   updateAnamnesisService,
-} from "@src/anamnese/anamnese.services";
+} from "@src/anamnesis/anamnese.services";
 import { handleError } from "@utils/handle-error";
 import { zValidator } from "@hono/zod-validator";
 import { neon } from "@neondatabase/serverless";

@@ -68,13 +68,15 @@ export const magicLink = factory.createHandlers(
 
     // send email with token
     const { data, error } = await resend.emails.send({
-      from: `Psycopoint <suporte@${c.env.DOMAIN}>`,
+      // from: `Psycopoint <suporte@${c.env.DOMAIN}>`,
+      from: `Psycopoint <suporte@psycopoint.com>`,
       to: [email],
       subject: "Aqui está seu link de login!",
       react: MagicLink({ magicLink: url }),
     });
 
     if (error) {
+      console.log(error);
     }
 
     return c.json({ sucess: true }, 200);

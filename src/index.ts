@@ -13,6 +13,10 @@ import webhooksRoute from "@src/webhooks/webhooks.route";
 
 import { isAuthenticatedMid } from "../middlewares/is-authenticated";
 
+import dayjs from "dayjs";
+import "dayjs/locale/pt-br";
+dayjs.locale("pt-br");
+
 const app = new Hono<{
   Bindings: Bindings;
   Variables: Variables;

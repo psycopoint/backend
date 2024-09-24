@@ -1,6 +1,6 @@
 import { createFactory } from "hono/factory";
 
-import { subscriptions } from "@db/schemas";
+import { subscriptions, users } from "@db/schemas";
 import { eq } from "drizzle-orm";
 import { createId } from "@paralleldrive/cuid2";
 import { neon } from "@neondatabase/serverless";
@@ -77,7 +77,7 @@ export const goToCheckoutUrl = factory.createHandlers(
   }
 );
 
-// GET STRIPE SESSION INFORMATIO
+// GET STRIPE SESSION INFORMATION
 export const getSessionInfo = factory.createHandlers(
   zValidator(
     "query",
@@ -92,9 +92,12 @@ export const getSessionInfo = factory.createHandlers(
 
     const { session_id } = c.req.valid("query");
     const user = c.get("user");
+    console.log(user);
     if (!user) {
       throw new Error("Unauthorized");
     }
+
+    const resend = createResend(c);
 
     try {
       const stripeInfo = await getSessionInfoService(
@@ -108,26 +111,45 @@ export const getSessionInfo = factory.createHandlers(
         stripeInfo.session.status === "complete" &&
         stripeInfo.session.payment_status === "paid"
       ) {
-        await db.insert(subscriptions).values({
-          id: createId(),
-          userId: user.id,
-          customerId: stripeInfo.subscription?.customer as string,
-          status: stripeInfo.subscription?.status,
-          subscriptionId: stripeInfo.subscription?.id,
-          renewsAt: dayjs
-            .unix(stripeInfo.subscription?.current_period_end!)
-            .toISOString(),
-          productName: stripeInfo.product.name,
-          trialEndsAt: stripeInfo.subscription?.trial_end
-            ? dayjs.unix(stripeInfo.subscription?.trial_end).toISOString()
-            : null,
-          cardBrand: stripeInfo.payment.card?.brand,
-          metadata: stripeInfo.subscription?.metadata,
-          cardLastFour: stripeInfo.payment.card?.last4,
-          pricing: String(stripeInfo.price.unit_amount),
-          quantity: stripeInfo.subscription.items.data[0].quantity as number,
-          subscribedAt: String(stripeInfo.subscription.start_date),
+        const [subscriptionDb] = await db
+          .insert(subscriptions)
+          .values({
+            id: createId(),
+            userId: user.id,
+            customerId: stripeInfo.subscription?.customer as string,
+            status: stripeInfo.subscription?.status,
+            subscriptionId: stripeInfo.subscription?.id,
+            renewsAt: dayjs
+              .unix(stripeInfo.subscription?.current_period_end!)
+              .toISOString(),
+            productName: stripeInfo.product.name,
+            trialEndsAt: stripeInfo.subscription?.trial_end
+              ? dayjs.unix(stripeInfo.subscription?.trial_end).toISOString()
+              : null,
+            cardBrand: stripeInfo.payment.card?.brand,
+            metadata: stripeInfo.subscription?.metadata,
+            cardLastFour: stripeInfo.payment.card?.last4,
+            pricing: String(stripeInfo.price.unit_amount),
+            quantity: stripeInfo.subscription.items.data[0].quantity as number,
+            subscribedAt: String(stripeInfo.subscription.start_date),
+          })
+          .returning();
+
+        // send email
+        const { data, error } = await resend.emails.send({
+          // from: `Psycopoint <suporte@${c.env.DOMAIN}>`,
+          from: `Psycopoint <suporte@psycopoint.com>`,
+          to: [user.email as string],
+          subject: "Bem-vindo ao Psycopoint!",
+          react: WelcomeEmail({
+            plan: subscriptionDb.productName as
+              | "Profissional+"
+              | "Profissional",
+          }),
         });
+
+        console.log("EMAIL DATA: ", data);
+        console.log("EMAIL ERROR: ", error);
       }
 
       return c.redirect(`${c.env.FRONTEND_URL}/meu-plano?success=true`);
@@ -189,7 +211,7 @@ export const subscriptionWebhook = factory.createHandlers(async (c) => {
           subscription.items.data[0].price.id as string
         );
 
-        // Atualizar a assinatura no banco de dados
+        // UPDATE subscription inside DB
         const [subscriptionDb] = await db
           .update(subscriptions)
           .set({
@@ -230,6 +252,9 @@ export const subscriptionWebhook = factory.createHandlers(async (c) => {
           }),
         });
 
+        console.log("DATA EMAIL: ", data);
+        console.log("ERROR EMAIL: ", error);
+
         break;
       // ... manipular outros tipos de eventos se necessário
 
@@ -243,6 +268,7 @@ export const subscriptionWebhook = factory.createHandlers(async (c) => {
   }
 });
 
+// GO TO PORTAL URL
 export const goToPortalUrl = factory.createHandlers(
   zValidator(
     "query",
