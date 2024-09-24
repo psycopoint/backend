@@ -1,0 +1,17 @@
+meta {
+  name: TESTE
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{url}}/ai/teste
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "prompt": "me de dicas para nomes de plataformas de psicologos"
+  }
+}

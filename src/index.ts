@@ -10,6 +10,7 @@ import usersRoute from "@src/users/users.route";
 import subscriptionRoute from "@src/subscriptions/subscription.route";
 import uploadRoute from "@src/uploads/upload.route";
 import webhooksRoute from "@src/webhooks/webhooks.route";
+import aiRoute from "@src/ai/ai.route";
 
 import { isAuthenticatedMid } from "../middlewares/is-authenticated";
 
@@ -51,5 +52,6 @@ app.route("/users", usersRoute);
 app.route("/subscription", subscriptionRoute);
 app.route("/file", uploadRoute);
 app.route("/webhooks", webhooksRoute);
+app.route("/ai", aiRoute);
 
 export default app;

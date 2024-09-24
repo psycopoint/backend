@@ -15,9 +15,8 @@ SESSION_DURATION = 7
 DEFAULT_UPLOAD_SIZE = 2
 LOGO_URL= "https://media.psycopoint.com/logo.png"
 
-
-# [env.development]
-# route = "dev.api.psycopoint.com"
+[ai]
+binding = "AI"
 
 # [[kv_namespaces]]
 # binding = "MY_KV_NAMESPACE"
@@ -32,5 +31,3 @@ LOGO_URL= "https://media.psycopoint.com/logo.png"
 # database_name = "my-database"
 # database_id = ""
 
-# [ai]
-# binding = "AI"

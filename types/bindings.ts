@@ -1,6 +1,8 @@
 import { Session, User } from "lucia";
 
 export type Bindings = {
+  AI: Ai;
+
   PROJECT_NAME: string;
   DATABASE_URL: string;
   FRONTEND_URL: string;
