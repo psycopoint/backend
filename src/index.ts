@@ -1,17 +1,17 @@
 import { Hono } from "hono";
 
-import { Bindings, Variables } from "types/bindings";
+import { Bindings, Variables } from "@type/bindings";
 import { cors } from "hono/cors";
 import { csrf } from "hono/csrf";
 
 // ROUTES
-import authRoute from "@routes/auth.route";
-import usersRoute from "@routes/users.route";
-import subscriptionRoute from "@routes/subscription.route";
-import uploadRoute from "@routes/upload.route";
-import webhooksRoute from "@/routes/webhooks.route";
+import authRoute from "@src/auth/auth.route";
+import usersRoute from "@src/users/users.route";
+import subscriptionRoute from "@src/subscriptions/subscription.route";
+import uploadRoute from "@src/uploads/upload.route";
+import webhooksRoute from "@src/webhooks/webhooks.route";
 
-import { isAuthenticatedMid } from "./middlewares/is-authenticated";
+import { isAuthenticatedMid } from "../middlewares/is-authenticated";
 
 const app = new Hono<{
   Bindings: Bindings;

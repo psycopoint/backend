@@ -9,12 +9,15 @@
     "types": ["@cloudflare/workers-types", "bun"],
     "jsx": "react-jsx",
     "jsxImportSource": "react",
-    "baseUrl": "./src",
+    "baseUrl": "./",
     "paths": {
-      "@/*": ["*"],
+      "@src/*": ["src/*"],
       "@db/*": ["db/*"],
       "@routes/*": ["routes/*"],
-      "@lib/*": ["lib/*"]
+      "@lib/*": ["lib/*"],
+      "@type/*": ["types/*"],
+      "@emails/*": ["emails/*"],
+      "@utils/*": ["utils/*"]
     }
   }
 }
