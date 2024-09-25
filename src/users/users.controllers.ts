@@ -126,6 +126,7 @@ export const updateUser = factory.createHandlers(
       socialLinks: true,
       specialty: true,
       website: true,
+      signature: true,
     })
   ),
   async (c) => {

@@ -15,7 +15,7 @@ import {
   AdditionalEmails,
   AdditionalPhones,
   UserPreferences,
-} from "../../../types/psychologists";
+} from "@type/psychologists";
 
 export const genderEnum = pgEnum("gender", ["male", "female", "other"]);
 
@@ -41,6 +41,7 @@ export const psychologists = pgTable("psychologists", {
   addressInfo: jsonb("address_info").default([]),
   crp: varchar("crp", { length: 256 }),
   cpf: varchar("cpf", { length: 256 }),
+  signature: text("signature"),
   specialty: text("specialty"),
   preferences: jsonb("preferences")
     .$type<UserPreferences>()

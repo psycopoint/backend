@@ -28,13 +28,9 @@ export const uploadFile = factory.createHandlers(async (c) => {
 
   const body = await c.req.parseBody();
 
-  console.log("BODY RECEBIDO NO UPLOAD:", body);
-
   const files = Object.values(body).filter(
     (value) => value instanceof File
   ) as File[];
-
-  console.log(files);
 
   const singleFile = body["file"] as File | undefined;
   const path = body["path"] as string;
@@ -95,7 +91,7 @@ export const updateFile = factory.createHandlers(
         body["newPath"] as string
       );
 
-      return c.json({ message: "success" });
+      return c.json({ message: "success", data: { urls: updatedFile } });
     } catch (error) {
       return handleError(c, error);
     }

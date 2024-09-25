@@ -169,6 +169,13 @@
       "when": 1727229187646,
       "tag": "0023_slow_mauler",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1727305858707,
+      "tag": "0024_rich_songbird",
+      "breakpoints": true
     }
   ]
 }

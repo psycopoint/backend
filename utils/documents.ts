@@ -1,4 +1,5 @@
 import { PDFDocument, PDFPage, rgb, StandardFonts } from "pdf-lib";
+import Content from "twilio/lib/rest/Content";
 
 // function to center text
 const drawCenteredText = (
@@ -60,6 +61,7 @@ type DocumentTypeProps = {
     crp: string;
     city: string;
     name: string;
+    signature: string;
   };
 };
 
@@ -159,12 +161,12 @@ export const createDocumentPdf = async (values: DocumentTypeProps) => {
     );
 
     // Signature image
-    const signRes = await fetch("https://media.psycopoint.com/sign.png");
+    const signRes = await fetch(values.content.signature);
     if (!signRes.ok) throw new Error("Failed to fetch signature image");
     const signArrayBuffer = await signRes.arrayBuffer();
     const signBytes = new Uint8Array(signArrayBuffer);
     const sign = await pdfDoc.embedPng(signBytes);
-    const signDims = sign.scale(0.2);
+    const signDims = sign.scale(0.4);
     page.drawImage(sign, {
       x: (width - signDims.width) / 2,
       y: signatureLineY - 15,

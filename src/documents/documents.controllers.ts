@@ -84,6 +84,7 @@ export const generatePdf = factory.createHandlers(
               (user.addressInfo as Address).city || "________________________",
             crp: user.crp || "________________________",
             name: user.name || "________________________",
+            signature: user.signature as string,
           },
         });
         break;
@@ -109,6 +110,7 @@ export const generatePdf = factory.createHandlers(
             city: (user.addressInfo as Address).city || "___________",
             crp: user.crp || "___________",
             name: user.name || "___________",
+            signature: user.signature as string,
           },
         });
         break;
@@ -140,6 +142,7 @@ export const generatePdf = factory.createHandlers(
             city: (user.addressInfo as Address).city || "___________",
             crp: user.crp || "___________",
             name: user.name || "___________",
+            signature: user.signature as string,
           },
         });
         break;
@@ -167,6 +170,7 @@ export const generatePdf = factory.createHandlers(
             city: (user.addressInfo as Address).city || "___________",
             crp: user.crp || "___________",
             name: user.name || "___________",
+            signature: user.signature as string,
           },
         });
         break;
@@ -181,6 +185,7 @@ export const generatePdf = factory.createHandlers(
             city: (user.addressInfo as Address).city || "___________",
             crp: user.crp || "___________",
             name: user.name || "___________",
+            signature: user.signature as string,
           },
         });
 
