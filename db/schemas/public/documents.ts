@@ -17,6 +17,7 @@ export const documentTypeEnum = pgEnum("type", [
   "document",
   "certificate",
   "declaration",
+  "fowarding",
   "other",
 ]);
 

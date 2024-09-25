@@ -23,7 +23,7 @@ import { Address } from "@type/patients";
 
 const factory = createFactory();
 
-// GENERATE DOCUMENT
+// GENERATE DOCUMENT PDF
 export const generatePdf = factory.createHandlers(
   zValidator(
     "param",
@@ -34,6 +34,7 @@ export const generatePdf = factory.createHandlers(
         "document",
         "certificate",
         "declaration",
+        "fowarding",
         "other",
       ]),
     })
@@ -93,10 +94,9 @@ export const generatePdf = factory.createHandlers(
           "portador"
         )} do CPF: ${user.cpf} | recebi de ${values.patient.firstName} ${
           values.patient.lastName
-        }, ${genderFormat(
-          values.patient.gender as string,
-          "portador"
-        )} do CPF: ${values.patient.cpf} | a importância de R$ ${
+        }, ${genderFormat(patientGender as string, "portador")} do CPF: ${
+          values.patient.cpf
+        } | a importância de R$ ${
           values.document.data.amount
         } (${convertTextualValue(values.document.data.amount)}) | ${
           values.document.data.description
@@ -120,7 +120,7 @@ export const generatePdf = factory.createHandlers(
         )} com registro no CRP: ${user.crp}, | atesto que ${
           values.patient.firstName
         } ${values.patient.lastName}, ${genderFormat(
-          values.patient.gender as string,
+          patientGender as string,
           "portador"
         )} do CPF: ${
           values.patient.cpf
@@ -151,7 +151,7 @@ export const generatePdf = factory.createHandlers(
         )} com registro no CRP ${user.crp}, | declaro que ${
           values.patient.firstName
         } ${values.patient.lastName}, ${genderFormat(
-          values.patient.gender as string,
+          patientGender as string,
           "portador"
         )} do CPF: ${
           values.patient.cpf
@@ -169,6 +169,21 @@ export const generatePdf = factory.createHandlers(
             name: user.name || "___________",
           },
         });
+        break;
+
+      case "fowarding":
+        console.log(values);
+        const fowardingText = `Ao convênio, Solicito a avaliação de um ${values.document.data.fowardTo} | para o(a) paciente ${values.patient.firstName} ${values.patient.lastName}, portador(a) do CPF ${values.patient.cpf}, | encontra-se em tratamento psicológico e tem como hipótese diagnóstica o CID ${values.document.data.cid}.`;
+        pdf = await createDocumentPdf({
+          content: {
+            text: fowardingText,
+            title: "Encaminhamento de Paciente",
+            city: (user.addressInfo as Address).city || "___________",
+            crp: user.crp || "___________",
+            name: user.name || "___________",
+          },
+        });
+
         break;
     }
 
