@@ -90,14 +90,13 @@ export const generatePdf = factory.createHandlers(
         break;
 
       case "receipt":
-        const receiptText = `Eu ${user.name}, ${genderFormat(
-          user.gender as string,
-          "portador"
-        )} do CPF: ${user.cpf} | recebi de ${values.patient.firstName} ${
+        const receiptText = `Eu ${user.name}, ${
+          genderFormat(user.gender as string, "portador") || "portador(a)"
+        } do CPF: ${user.cpf} | recebi de ${values.patient.firstName} ${
           values.patient.lastName
-        }, ${genderFormat(patientGender as string, "portador")} do CPF: ${
-          values.patient.cpf
-        } | a importância de R$ ${
+        }, ${
+          genderFormat(patientGender as string, "portador") || "portador(a)"
+        } do CPF: ${values.patient.cpf} | a importância de R$ ${
           values.document.data.amount
         } (${convertTextualValue(values.document.data.amount)}) | ${
           values.document.data.description
@@ -116,15 +115,13 @@ export const generatePdf = factory.createHandlers(
         break;
 
       case "certificate":
-        const certificateText = `Eu ${user.name}, ${genderFormat(
-          user.gender as string,
-          "psicologo"
-        )} com registro no CRP: ${user.crp}, | atesto que ${
+        const certificateText = `Eu ${user.name}, ${
+          genderFormat(user.gender as string, "psicologo") || "portador(a)"
+        } com registro no CRP: ${user.crp}, | atesto que ${
           values.patient.firstName
-        } ${values.patient.lastName}, ${genderFormat(
-          patientGender as string,
-          "portador"
-        )} do CPF: ${
+        } ${values.patient.lastName}, ${
+          genderFormat(patientGender as string, "portador") || "portador(a)"
+        } do CPF: ${
           values.patient.cpf
         }, | compareceu ao atendimento psicológico no dia ${dayjs(
           event.start
@@ -148,15 +145,13 @@ export const generatePdf = factory.createHandlers(
         break;
 
       case "declaration":
-        const declarationText = `Eu ${user.name}, ${genderFormat(
-          user.gender as string,
-          "psicologo"
-        )} com registro no CRP ${user.crp}, | declaro que ${
+        const declarationText = `Eu ${user.name}, ${
+          genderFormat(user.gender as string, "psicologo") || "portador(a)"
+        } com registro no CRP ${user.crp}, | declaro que ${
           values.patient.firstName
-        } ${values.patient.lastName}, ${genderFormat(
-          patientGender as string,
-          "portador"
-        )} do CPF: ${
+        } ${values.patient.lastName}, ${
+          genderFormat(patientGender as string, "portador") || "portador(a)"
+        } do CPF: ${
           values.patient.cpf
         }, | compareceu ao atendimento psicológico na ${dayjs(
           event.start
@@ -176,8 +171,17 @@ export const generatePdf = factory.createHandlers(
         break;
 
       case "fowarding":
-        console.log(values);
-        const fowardingText = `Ao convênio, Solicito a avaliação de um ${values.document.data.fowardTo} | para o(a) paciente ${values.patient.firstName} ${values.patient.lastName}, portador(a) do CPF ${values.patient.cpf}, | encontra-se em tratamento psicológico e tem como hipótese diagnóstica o CID ${values.document.data.cid}.`;
+        const fowardingText = `Ao convênio, Solicito a avaliação de um ${
+          values.document.data.fowardTo
+        } | para o(a) paciente ${values.patient.firstName} ${
+          values.patient.lastName
+        }, ${
+          genderFormat(patientGender as string, "portador") || "portador(a)"
+        }  do CPF ${
+          values.patient.cpf
+        }, | encontra-se em tratamento psicológico e tem como hipótese diagnóstica o CID ${
+          values.document.data.cid
+        }.`;
         pdf = await createDocumentPdf({
           content: {
             text: fowardingText,
@@ -264,6 +268,7 @@ export const createDocument = factory.createHandlers(
     })
   ),
   async (c) => {
+    const values = c.req.valid("json");
     // connect to db
     const sql = neon(c.env.DATABASE_URL);
     const db = drizzle(sql);
@@ -272,8 +277,6 @@ export const createDocument = factory.createHandlers(
     if (!user) {
       throw new Error("Unauthorized");
     }
-
-    const values = c.req.valid("json");
 
     const createId = init({
       length: 10,

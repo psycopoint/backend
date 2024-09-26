@@ -3,9 +3,7 @@ import OpenAI from "openai";
 
 export const createAi = (c: Context) => {
   const openai = new OpenAI({
-    // organization: "org-RtPossFAQ3R",
-    // project: "proj_rrNEefmTQr1yxX",
-    apiKey: "sk-{...}",
+    apiKey: c.env.OPENAI_SECRET_KEY,
   });
 
   return openai;

@@ -136,8 +136,6 @@ export const updateTransactionService = async (
     throw new Error("Unauthorized");
   }
 
-  console.log(values);
-
   const [data] = await db
     .update(transactions)
     .set({
