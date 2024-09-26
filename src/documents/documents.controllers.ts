@@ -177,7 +177,7 @@ export const generatePdf = factory.createHandlers(
           values.patient.lastName
         }, ${
           genderFormat(patientGender as string, "portador") || "portador(a)"
-        }  do CPF ${
+        } do CPF ${
           values.patient.cpf
         }, | encontra-se em tratamento psicológico e tem como hipótese diagnóstica o CID ${
           values.document.data.cid
