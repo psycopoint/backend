@@ -18,6 +18,9 @@ LOGO_URL= "https://media.psycopoint.com/logo.png"
 [ai]
 binding = "AI"
 
+[observability]
+enabled = true
+
 # [[kv_namespaces]]
 # binding = "MY_KV_NAMESPACE"
 # id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"

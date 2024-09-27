@@ -50,11 +50,11 @@ export const handleError = (c: Context, error: unknown) => {
         });
 
       default:
-        console.error("Error fetching users data:", error);
+        console.error("An error ocurred:", error);
         return c.json({ error: "Internal Server Error" }, 500);
     }
   } else {
-    console.error("Error fetching users data:", error);
+    console.error("An error ocurred:", error);
     return c.json({ error: "Internal Server Error" }, 500);
   }
 };

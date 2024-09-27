@@ -53,8 +53,6 @@ export const getEvent = factory.createHandlers(
 
     const { eventId } = c.req.valid("param");
 
-    console.log({ eventId });
-
     try {
       const data = await getEventService(c, db, eventId);
 
