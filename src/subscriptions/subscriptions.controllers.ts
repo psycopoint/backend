@@ -244,7 +244,7 @@ export const subscriptionWebhook = factory.createHandlers(async (c) => {
         const { data, error } = await resend.emails.send({
           from: `Psycopoint <suporte@${c.env.DOMAIN}>`,
           to: [customer.email as string],
-          subject: "Aqui está seu link de login!",
+          subject: "Bem-vindo ao Psycopoint!",
           react: WelcomeEmail({
             plan: product?.name as "Profissional+" | "Profissional",
           }),
