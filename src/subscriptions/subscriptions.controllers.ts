@@ -246,14 +246,9 @@ export const subscriptionWebhook = factory.createHandlers(async (c) => {
           to: [customer.email as string],
           subject: "Aqui está seu link de login!",
           react: WelcomeEmail({
-            plan: subscriptionDb.productName as
-              | "Profissional+"
-              | "Profissional",
+            plan: product?.name as "Profissional+" | "Profissional",
           }),
         });
-
-        console.log("DATA EMAIL: ", data);
-        console.log("ERROR EMAIL: ", error);
 
         break;
       // ... manipular outros tipos de eventos se necessário
