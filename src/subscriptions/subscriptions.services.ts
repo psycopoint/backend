@@ -40,7 +40,7 @@ export const generateCheckoutUrlService = async (
   const session = await stripe?.checkout.sessions.create({
     mode: "subscription",
     success_url: `${c.env.BACKEND_URL}/subscription/stripe/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${c.env.FRONTEND_URL}/billing`,
+    cancel_url: `${c.env.FRONTEND_URL}/assinatura`,
     line_items: [
       {
         price: priceId,

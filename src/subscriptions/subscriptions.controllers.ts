@@ -152,7 +152,7 @@ export const getSessionInfo = factory.createHandlers(
         console.log("EMAIL ERROR: ", error);
       }
 
-      return c.redirect(`${c.env.FRONTEND_URL}/meu-plano?success=true`);
+      return c.redirect(`${c.env.FRONTEND_URL}/assinatura?success=true`);
     } catch (error) {
       return handleError(c, error);
     }
