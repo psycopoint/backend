@@ -53,6 +53,7 @@ export const events = pgTable("events", {
   recurring: recurringEnum("recurring").default("once"),
   recurringEnd: timestamp("recurring_end", { mode: "string" }),
   resource: jsonb("resource"),
+  link: text("link"),
   isCompleted: boolean("is_completed").default(false),
   createdAt: timestamp("created_at", { mode: "string", precision: 3 })
     .defaultNow()

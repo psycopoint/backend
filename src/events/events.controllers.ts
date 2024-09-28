@@ -85,6 +85,7 @@ export const createEvent = factory.createHandlers(
       resource: true,
       recurring: true,
       recurringEnd: true,
+      link: true,
     }),
     (result, c) => {
       if (result.data.type === "patient_session") {
@@ -164,6 +165,7 @@ export const updateEvent = factory.createHandlers(
       resource: true,
       recurring: true,
       recurringEnd: true,
+      link: true,
     }),
     (result, c) => {
       if (result.data.type === "patient_session") {
