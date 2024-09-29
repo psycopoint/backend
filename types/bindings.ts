@@ -2,6 +2,7 @@ import { Session, User } from "lucia";
 
 export type Bindings = {
   AI: Ai;
+  HYPERDRIVE: Hyperdrive;
 
   PROJECT_NAME: string;
   DATABASE_URL: string;

@@ -1,7 +1,8 @@
 import { InsertEvent, SelectEvent, events } from "@db/schemas";
+import { PatientSession } from "@type/events";
 
 import dayjs from "dayjs";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { Context } from "hono";
 
@@ -36,6 +37,39 @@ export const getEventsService = async (
     .select()
     .from(events)
     .where(eq(events.psychologistId, user.id));
+
+  return data as SelectEvent[];
+};
+
+export const getEventsByPatientIdService = async (
+  c: Context,
+  db: NeonHttpDatabase,
+  patientId: string
+): Promise<SelectEvent[]> => {
+  const user = c.get("user");
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+
+  // verify if the event exists
+  const [existing] = await db
+    .select()
+    .from(events)
+    .where(eq(events.psychologistId, user.id!));
+
+  if (!existing) {
+    throw new Error("Not found");
+  }
+
+  const data = await db
+    .select()
+    .from(events)
+    .where(
+      and(
+        eq(events.psychologistId, user.id),
+        eq(sql`events.data->>'patientId'`, patientId)
+      )
+    );
 
   return data as SelectEvent[];
 };
