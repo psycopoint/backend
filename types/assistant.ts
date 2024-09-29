@@ -1,3 +1,4 @@
+import { UI } from "@src/ai/tools";
 import { z } from "zod";
 
 export const AIMessageSchema = z.object({
@@ -11,6 +12,7 @@ export const responseFormat = z.object({
   content: z.string(),
   role: z.string(),
   formatedContent: z.string(),
+  ui: UI,
 });
 
 export type SelectAIMessage = z.infer<typeof AIMessageSchema>;

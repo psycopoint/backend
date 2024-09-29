@@ -1,8 +1,6 @@
 import { Hono } from "hono";
 import { Bindings, Variables } from "../../types/bindings";
-import OpenAI from "openai";
 import { createAi } from "@lib/openai";
-import { patientInfo } from "./data";
 
 import { z } from "zod";
 import { zodResponseFormat } from "openai/helpers/zod.mjs";
@@ -11,10 +9,10 @@ import { AIMessageSchema, responseFormat } from "@type/assistant";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { getPatientService } from "@src/patients/patients.services";
-import {
-  getEventsByPatientIdService,
-  getEventsService,
-} from "@src/events/events.services";
+import { getEventsByPatientIdService } from "@src/events/events.services";
+
+import { getPatientAnamnesisService } from "@src/anamnesis/anamnese.services";
+import { getPatientDiagramService } from "@src/diagrams/diagrams.services";
 
 const app = new Hono<{
   Bindings: Bindings;
@@ -67,38 +65,40 @@ app.post(
     // get patient
     const patient = await getPatientService(c, db, patientId);
     const events = await getEventsByPatientIdService(c, db, patientId);
+    const anamnesis = await getPatientAnamnesisService(c, db, patientId);
+    const diagram = await getPatientDiagramService(c, db, patientId);
 
-    const stream = await openai.chat.completions.create({
+    const response = await openai.beta.chat.completions.parse({
       model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
-          content:
-            "You are a daily assistant to a psychologist. Your role is to help the psychologist respond to questions about specific patients and provide relevant general information. It is essential that your responses are accurate and contextualized. Always frame your responses as 'assistant,' maintaining a friendly and warm tone. Focus on being approachable and engaging, ensuring your answers are helpful, empathetic, and concise. Importantly, do not include concluding phrases that offer further assistance, such as 'If you need more information, I'm here to help.' Additionally, all responses should be returned in a JSON format that includes a 'formattedContent' field, allowing for HTML formatting options, and the entire response should still be in Portuguese (Brazil).",
+          content: `You are a daily assistant/secretary to a psychologist (your boss). Your role is to help the psychologist respond to questions about specific patients and provide relevant general information. It is essential that your responses are accurate and contextualized. Always frame your responses as 'assistant,' maintaining a friendly and informal tone. Focus on being approachable and engaging, ensuring your answers are helpful, empathetic, and concise. Importantly, do not include concluding phrases that offer further assistance, such as 'If you need more information, I'm here to help.' Additionally, all responses should be returned in a JSON format that includes a 'formattedContent' field, allowing for HTML formatting options, and the entire response should still be in Portuguese (Brazil). If the user asks you to scheduler an event/appointment you should return the UI element with a button to confirm the scheduling inside the 'ui' field in the schema and ask the user if you should confirm it, else return null.
+          
+
+          `,
         },
         {
           role: "user",
           content: `Please analyze the following patient data to answer the upcoming questions: 
           Patient Data: ${JSON.stringify(patient)} 
-          Registered Events: ${JSON.stringify(events)}`,
+          Registered Events: ${JSON.stringify(events)}
+          Patient Anamnesis: ${JSON.stringify(anamnesis)}
+          Patient Diagram Conceptualization: ${JSON.stringify(diagram)},
+          `,
         },
         ...messages,
       ],
-      stream: true,
+      // stream: true,
       temperature: 1,
       response_format: zodResponseFormat(responseFormat, "event"),
     });
 
-    let responseText = "";
-    for await (const chunk of stream) {
-      if (chunk.choices) {
-        responseText += chunk.choices[0].delta.content || "";
-      }
-    }
+    const data = response.choices[0].message.parsed;
 
     // Retornando o texto como uma resposta para uso
     try {
-      return c.json({ data: JSON.parse(responseText) });
+      return c.json({ data });
     } catch (error) {
       console.error("Erro ao retornar JSON:", error);
       return c.json({ error: "Invalid response from OpenAI" });

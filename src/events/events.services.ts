@@ -1,4 +1,5 @@
 import { InsertEvent, SelectEvent, events } from "@db/schemas";
+import { createId } from "@paralleldrive/cuid2";
 import { PatientSession } from "@type/events";
 
 import dayjs from "dayjs";
@@ -136,6 +137,7 @@ export const createEventService = async (
     .insert(events)
     .values({
       ...values,
+      id: createId(),
       psychologistId: user.id,
     })
     .returning();

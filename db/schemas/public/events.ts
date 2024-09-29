@@ -8,7 +8,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { psychologists } from "./psychologists";
 import { clinics } from "./clinics";
-import { EventData } from "../../../types/events";
+import { EventData } from "@type/events";
 import { relations, sql } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 
