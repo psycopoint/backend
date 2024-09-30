@@ -12,9 +12,9 @@ const AbsenceReasonEnum = z
 // PatientSession Schema
 export const PatientSessionSchema = z.object({
   patientId: z.string(),
-  sessionMood: z.number().optional(),
+  sessionMood: z.string().optional(),
   sessionDetails: z.string().optional(),
-  patientMood: z.number().optional(),
+  patientMood: z.string().optional(),
   patientNotes: z.string().optional(),
   psychologistNotes: z.string().optional(),
   sessionFocus: z.string().optional(),
