@@ -28,6 +28,7 @@ import { Context } from "hono";
 import { createFactory } from "hono/factory";
 import { z } from "zod";
 import { createAnamnesisService } from "@src/anamnesis/anamnese.services";
+import { userPlan } from "@utils/subscription";
 
 const factory = createFactory();
 
@@ -107,9 +108,21 @@ export const createPatient = factory.createHandlers(
 
     const values = c.req.valid("json");
 
-    // const body = await c.req.parseBody();
-    // const file: File = body["file"] as File;
-    // const path: string = body["path"] as string;
+    // verify users plan to prevent inserting
+    const patients = await getAllPatientsService(c, db);
+    const userCurrentPlan = await userPlan(c, db);
+
+    if (!userCurrentPlan) {
+      if (patients.length > 3) {
+        return c.json({ error: "Patient limit reached" }, 403);
+      }
+    }
+
+    if (userCurrentPlan === "Profissional") {
+      if (patients.length > 10) {
+        return c.json({ error: "Patient limit reached" }, 403);
+      }
+    }
 
     try {
       const newPatient = await createPatientService(

@@ -20,6 +20,7 @@ import { events } from "@db/schemas";
 import { eq } from "drizzle-orm";
 import dayjs from "dayjs";
 import { Address } from "@type/patients";
+import { userPlan } from "@utils/subscription";
 
 const factory = createFactory();
 
@@ -281,6 +282,16 @@ export const createDocument = factory.createHandlers(
     const createId = init({
       length: 10,
     });
+
+    // verify users plan to prevent inserting
+    const documents = await getDocumentsService(c, db);
+    const userCurrentPlan = await userPlan(c, db);
+
+    if (!userCurrentPlan) {
+      if (documents.length > 30) {
+        return c.json({ error: "Documents limit reached" }, 403);
+      }
+    }
 
     try {
       const data = await createDocumentService(c, db, {

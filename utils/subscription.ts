@@ -1,8 +1,10 @@
 import { SelectSubscription, subscriptions } from "../db/schemas";
 import { Attributes } from "../types/subscription";
 import { createId } from "@paralleldrive/cuid2";
+import { getCurrentSubscriptionService } from "@src/subscriptions/subscriptions.services";
 import { eq } from "drizzle-orm";
 import { NeonHttpDatabase } from "drizzle-orm/neon-http";
+import { Context } from "hono";
 
 // TODO: change attributes interface
 export const upsertSubscription = async (
@@ -40,4 +42,13 @@ export const upsertSubscription = async (
       ...subscriptionData,
     });
   }
+};
+
+export const userPlan = async (
+  c: Context,
+  db: NeonHttpDatabase
+): Promise<"Profissional+" | "Profissional"> => {
+  const subscriptionData = await getCurrentSubscriptionService(c, db);
+
+  return subscriptionData.productName as "Profissional+" | "Profissional";
 };

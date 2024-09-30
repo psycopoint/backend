@@ -20,6 +20,7 @@ import { createFactory } from "hono/factory";
 import { z } from "zod";
 
 import { init } from "@paralleldrive/cuid2";
+import { userPlan } from "@utils/subscription";
 
 const factory = createFactory();
 
@@ -122,18 +123,33 @@ export const createEvent = factory.createHandlers(
       length: 10,
     });
 
-    const data = await createEventService(
-      c,
-      db,
-      {
-        ...values,
-        id: createId(),
-        data: values.data as EventData,
-        createdAt: new Date().toISOString(),
-      },
-      patientId
-    );
-    return c.json({ data });
+    // verify users plan to prevent inserting
+    const events = await getEventsService(c, db);
+    const userCurrentPlan = await userPlan(c, db);
+
+    if (!userCurrentPlan) {
+      if (events.length > 40) {
+        return c.json({ error: "Events limit reached" }, 403);
+      }
+    }
+
+    try {
+      const data = await createEventService(
+        c,
+        db,
+        {
+          ...values,
+          id: createId(),
+          data: values.data as EventData,
+          createdAt: new Date().toISOString(),
+        },
+        patientId
+      );
+
+      return c.json({ data });
+    } catch (error) {
+      return handleError(c, error);
+    }
   }
 );
 
