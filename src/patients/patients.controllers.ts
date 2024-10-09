@@ -109,18 +109,18 @@ export const createPatient = factory.createHandlers(
     const values = c.req.valid("json");
 
     // verify users plan to prevent inserting
-    const patients = await getAllPatientsService(c, db);
     const userCurrentPlan = await userPlan(c, db);
 
     if (!userCurrentPlan) {
+      const patients = await getAllPatientsService(c, db);
       if (patients.length > 3) {
         return c.json({ error: "Patient limit reached" }, 403);
       }
-    }
 
-    if (userCurrentPlan === "Profissional") {
-      if (patients.length > 10) {
-        return c.json({ error: "Patient limit reached" }, 403);
+      if (userCurrentPlan === "Profissional") {
+        if (patients.length > 10) {
+          return c.json({ error: "Patient limit reached" }, 403);
+        }
       }
     }
 

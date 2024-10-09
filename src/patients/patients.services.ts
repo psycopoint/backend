@@ -98,6 +98,8 @@ export const createPatientService = async (
     length: 10,
   });
 
+  console.log("VALORES RECEBIDOS: ", values);
+
   const patientData = {
     id: createId(),
     psychologistId: user.id,
