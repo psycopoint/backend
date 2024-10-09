@@ -1,4 +1,4 @@
-import { psychologists, users } from "@db/schemas";
+import { psychologists, sessions, users } from "@db/schemas";
 import { verificationTokens } from "@db/schemas/auth/verification-tokens";
 import MagicLink from "@emails/magic-link";
 import { GoogleUserResult, createGoogle, createLucia } from "@lib/lucia";
@@ -9,7 +9,7 @@ import { createJWT, verifyJWT } from "@utils/jose";
 import { zValidator } from "@hono/zod-validator";
 import { neon } from "@neondatabase/serverless";
 import dayjs from "dayjs";
-import { and, eq } from "drizzle-orm";
+import { and, eq, lt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
 
 import { createFactory } from "hono/factory";
@@ -221,6 +221,11 @@ export const login = factory.createHandlers(
       return c.json({ error: "Invalid email or password." }, 400);
     }
 
+    // delete old sessions
+    const now = dayjs().toDate();
+    await db.delete(sessions).where(lt(sessions.expiresAt, now));
+
+    // create new session
     const lucia = createLucia(c, db);
     const session = await lucia.createSession(user.id, {});
     const cookie = lucia.createSessionCookie(session.id);
@@ -328,7 +333,7 @@ export const googleAuthCallback = factory.createHandlers(async (c) => {
         image: googleUserResult.picture,
         providerId: String(googleUserResult.sub),
         email: googleUserResult.email,
-        // emailVerified: googleUserResult.email_verified,
+        emailVerified: dayjs().toDate(),
         userType: "psychologist",
       })
       .returning();

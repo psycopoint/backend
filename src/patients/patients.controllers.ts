@@ -110,17 +110,31 @@ export const createPatient = factory.createHandlers(
 
     // verify users plan to prevent inserting
     const userCurrentPlan = await userPlan(c, db);
+    const patients = await getAllPatientsService(c, db);
 
-    if (!userCurrentPlan) {
-      const patients = await getAllPatientsService(c, db);
-      if (patients.length > 3) {
-        return c.json({ error: "Patient limit reached" }, 403);
+    if (userCurrentPlan === "Free") {
+      // users in free plan can only add up to 3 patients
+      if (patients.length >= 3) {
+        return c.json(
+          {
+            error:
+              "Patient limit reached for Free plan. Upgrade to add more patients.",
+          },
+          403
+        );
       }
+    }
 
-      if (userCurrentPlan === "Profissional") {
-        if (patients.length > 10) {
-          return c.json({ error: "Patient limit reached" }, 403);
-        }
+    if (userCurrentPlan === "Profissional") {
+      // users in Profissional plan can add up to 10 patients
+      if (patients.length >= 10) {
+        return c.json(
+          {
+            error:
+              "Patient limit reached for Profissional plan. Upgrade to add more patients.",
+          },
+          403
+        );
       }
     }
 

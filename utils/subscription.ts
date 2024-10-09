@@ -47,8 +47,12 @@ export const upsertSubscription = async (
 export const userPlan = async (
   c: Context,
   db: NeonHttpDatabase
-): Promise<"Profissional+" | "Profissional"> => {
+): Promise<"Profissional+" | "Profissional" | "Free"> => {
   const subscriptionData = await getCurrentSubscriptionService(c, db);
+
+  if (!subscriptionData) {
+    return "Free";
+  }
 
   return subscriptionData.productName as "Profissional+" | "Profissional";
 };

@@ -127,7 +127,7 @@ export const createEvent = factory.createHandlers(
     const events = await getEventsService(c, db);
     const userCurrentPlan = await userPlan(c, db);
 
-    if (!userCurrentPlan) {
+    if (userCurrentPlan === "Free") {
       if (events.length > 40) {
         return c.json({ error: "Events limit reached" }, 403);
       }
@@ -209,8 +209,6 @@ export const updateEvent = factory.createHandlers(
 
     const { eventId } = c.req.valid("param");
     const values = c.req.valid("json");
-
-    console.log(values);
 
     const data = await updateEventService(
       c,

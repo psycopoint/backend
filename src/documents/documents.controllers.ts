@@ -287,7 +287,7 @@ export const createDocument = factory.createHandlers(
     const documents = await getDocumentsService(c, db);
     const userCurrentPlan = await userPlan(c, db);
 
-    if (!userCurrentPlan) {
+    if (userCurrentPlan === "Free") {
       if (documents.length > 30) {
         return c.json({ error: "Documents limit reached" }, 403);
       }

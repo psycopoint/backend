@@ -241,14 +241,14 @@ export const subscriptionWebhook = factory.createHandlers(async (c) => {
           .returning();
 
         // send email
-        const { data, error } = await resend.emails.send({
-          from: `Psycopoint <suporte@${c.env.DOMAIN}>`,
-          to: [customer.email as string],
-          subject: "Bem-vindo ao Psycopoint!",
-          react: WelcomeEmail({
-            plan: product?.name as "Profissional+" | "Profissional",
-          }),
-        });
+        // const { data, error } = await resend.emails.send({
+        //   from: `Psycopoint <suporte@${c.env.DOMAIN}>`,
+        //   to: [customer.email as string],
+        //   subject: "Bem-vindo ao Psycopoint!",
+        //   react: WelcomeEmail({
+        //     plan: product?.name as "Profissional+" | "Profissional",
+        //   }),
+        // });
 
         break;
       // ... manipular outros tipos de eventos se necessário

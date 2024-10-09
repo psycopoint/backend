@@ -12,6 +12,7 @@ import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { createFactory } from "hono/factory";
 import { z } from "zod";
+import { userPlan } from "@utils/subscription";
 
 const factory = createFactory();
 
@@ -24,6 +25,19 @@ export const uploadFile = factory.createHandlers(async (c) => {
   const user = c.get("user");
   if (!user) {
     throw new Error("Unauthorized");
+  }
+
+  // verify users plan to prevent inserting
+  const userCurrentPlan = await userPlan(c, db);
+
+  if (userCurrentPlan === "Free") {
+    // users in free plan can only add up to 3 patients
+    return c.json(
+      {
+        error: "Upgrade to upload files.",
+      },
+      403
+    );
   }
 
   const body = await c.req.parseBody();
