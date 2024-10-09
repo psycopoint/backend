@@ -124,10 +124,10 @@ export const createEvent = factory.createHandlers(
     });
 
     // verify users plan to prevent inserting
-    const events = await getEventsService(c, db);
     const userCurrentPlan = await userPlan(c, db);
 
     if (userCurrentPlan === "Free") {
+      const events = await getEventsService(c, db);
       if (events.length > 40) {
         return c.json({ error: "Events limit reached" }, 403);
       }
