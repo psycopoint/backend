@@ -183,6 +183,20 @@
       "when": 1727535602222,
       "tag": "0025_clear_blur",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1729106826195,
+      "tag": "0026_unusual_spiral",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1729109112724,
+      "tag": "0027_parallel_sprite",
+      "breakpoints": true
     }
   ]
 }

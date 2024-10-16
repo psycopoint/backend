@@ -205,6 +205,21 @@ export const generatePdf = factory.createHandlers(
   }
 );
 
+// GET ALL DOCUMENTS
+export const getAllDocuments = factory.createHandlers(async (c) => {
+  // connect to db
+  const sql = neon(c.env.DATABASE_URL);
+  const db = drizzle(sql);
+
+  try {
+    const data = await getDocumentsService(c, db);
+
+    return c.json({ message: "success", data });
+  } catch (error) {
+    return handleError(c, error);
+  }
+});
+
 // GET ALL DOCUMENTS BY PATIENT ID
 export const getDocuments = factory.createHandlers(
   zValidator(

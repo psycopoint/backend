@@ -30,6 +30,13 @@ export const recurringEnum = pgEnum("recurring", [
   "once",
 ]);
 
+export const eventStatusEnum = pgEnum("event_status_enum", [
+  "attended",
+  "absent",
+  "scheduled",
+  "not-scheduled",
+]);
+
 export const events = pgTable("events", {
   id: text("id").primaryKey().notNull().unique(),
   psychologistId: text("psychologist_id").references(
@@ -54,6 +61,8 @@ export const events = pgTable("events", {
   recurringEnd: timestamp("recurring_end", { mode: "string" }),
   resource: jsonb("resource"),
   link: text("link"),
+  originalEventId: text("original_event_id"),
+  status: eventStatusEnum("status").default("scheduled"),
   isCompleted: boolean("is_completed").default(false),
   createdAt: timestamp("created_at", { mode: "string", precision: 3 })
     .defaultNow()
