@@ -278,7 +278,7 @@ export const goToPortalUrl = factory.createHandlers(
     try {
       const data = await stripe.billingPortal.sessions.create({
         customer,
-        return_url: `${c.env.FRONTEND_URL}/meu-plano`,
+        return_url: `${c.env.FRONTEND_URL}/assinatura`,
       });
 
       return c.json(createApiResponse("success", data), 200);
