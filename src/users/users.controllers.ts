@@ -141,7 +141,7 @@ export const updateUser = factory.createHandlers(
 
     const values = c.req.valid("json");
 
-    console.log({ values });
+    console.log("VAUES PREFERENCES: ", values.preferences);
 
     try {
       const data = await updateUserService(

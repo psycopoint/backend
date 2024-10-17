@@ -176,6 +176,15 @@ export const register = factory.createHandlers(
     await db.insert(psychologists).values({
       userId: user.id,
       crp: crp,
+      preferences: {
+        calendar: {
+          endHour: 23,
+          slotStep: 30,
+          workView: true,
+          startHour: 8,
+          slotDuration: 1,
+        },
+      },
     });
 
     if (!user) {
@@ -340,6 +349,15 @@ export const googleAuthCallback = factory.createHandlers(async (c) => {
 
     await db.insert(psychologists).values({
       userId: user.id,
+      preferences: {
+        calendar: {
+          endHour: 23,
+          slotStep: 30,
+          workView: true,
+          startHour: 8,
+          slotDuration: 1,
+        },
+      },
     });
 
     const session = await lucia.createSession(userId, {});

@@ -1,0 +1,1 @@
+ALTER TABLE "psychologists" ALTER COLUMN "preferences" SET DEFAULT '{}'::jsonb;

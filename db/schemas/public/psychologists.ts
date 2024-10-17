@@ -45,7 +45,7 @@ export const psychologists = pgTable("psychologists", {
   specialty: text("specialty"),
   preferences: jsonb("preferences")
     .$type<UserPreferences>()
-    .default(sql`'[]'::jsonb`),
+    .default(sql`'{}'::jsonb`),
 
   createdAt: timestamp("created_at", { mode: "string", precision: 3 })
     .defaultNow()

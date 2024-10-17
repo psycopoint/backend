@@ -28,6 +28,14 @@ export const preferencesSchema = z.object({
       defaultView: z.enum(["calendar", "list"]).optional(),
     })
     .optional(),
+
+  calendar: z.object({
+    endHour: z.number().default(23),
+    slotStep: z.number().default(60),
+    workView: z.boolean().default(true),
+    startHour: z.number().default(8),
+    slotDuration: z.number().default(1),
+  }),
 });
 
 // ADICIONAL PHONES
