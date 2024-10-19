@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const AttendanceStatusEnum = z
-  .enum(["attended", "absent", "scheduled", "not-scheduled"])
+  .enum(["attended", "absent", "scheduled", "not-scheduled", "canceled"])
   .nullish();
 
 // Define o enum para os motivos da falta
