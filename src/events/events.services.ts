@@ -1,5 +1,5 @@
 import { InsertEvent, SelectEvent, events } from "@db/schemas";
-import { createId } from "@paralleldrive/cuid2";
+import { init } from "@paralleldrive/cuid2";
 import { PatientSession } from "@type/events";
 
 import dayjs from "dayjs";
@@ -132,6 +132,10 @@ export const createEventService = async (
   if (!user) {
     throw new Error("Unauthorized");
   }
+
+  const createId = init({
+    length: 10,
+  });
 
   const [data] = await db
     .insert(events)
