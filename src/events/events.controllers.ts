@@ -1,4 +1,4 @@
-import { insertEventSchema } from "@db/schemas";
+import { InsertEvent, insertEventSchema } from "@db/schemas";
 import {
   createEventService,
   deleteEventService,
@@ -217,7 +217,7 @@ export const updateEvent = factory.createHandlers(
     const data = await updateEventService(
       c,
       db,
-      { ...values, id: eventId },
+      values as InsertEvent,
       eventId
     );
     return c.json({ data });

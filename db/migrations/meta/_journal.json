@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1729448045614,
-      "tag": "0000_rare_mockingbird",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1729448451996,
-      "tag": "0001_striped_peter_parker",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1729454221942,
-      "tag": "0002_melodic_dazzler",
+      "when": 1729461443661,
+      "tag": "0000_smiling_ender_wiggin",
       "breakpoints": true
     }
   ]

@@ -178,8 +178,8 @@ export const register = factory.createHandlers(
       crp: crp,
       preferences: {
         calendar: {
-          endHour: 23,
-          slotStep: 30,
+          endHour: 22,
+          slotStep: 60,
           workView: true,
           startHour: 8,
           slotDuration: 1,
@@ -351,8 +351,8 @@ export const googleAuthCallback = factory.createHandlers(async (c) => {
       userId: user.id,
       preferences: {
         calendar: {
-          endHour: 23,
-          slotStep: 30,
+          endHour: 22,
+          slotStep: 60,
           workView: true,
           startHour: 8,
           slotDuration: 1,

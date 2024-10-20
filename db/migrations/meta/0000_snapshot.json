@@ -1,5 +1,5 @@
 {
-  "id": "d7049726-4dc1-4fe9-b481-f6d0e0d9cb17",
+  "id": "a6251820-37ad-4c4b-9ac3-d22aa1fb4375",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -207,7 +207,7 @@
         },
         "type": {
           "name": "type",
-          "type": "type",
+          "type": "event_type_enum",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
@@ -241,7 +241,7 @@
         },
         "recurring": {
           "name": "recurring",
-          "type": "recurring",
+          "type": "recurring_enum",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
@@ -727,7 +727,7 @@
           "name": "patient_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "title": {
           "name": "title",
@@ -749,6 +749,13 @@
           "primaryKey": false,
           "notNull": false,
           "default": "'active'"
+        },
+        "complete": {
+          "name": "complete",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
         },
         "priority": {
           "name": "priority",
@@ -1493,21 +1500,19 @@
         "canceled"
       ]
     },
-    "public.type": {
-      "name": "type",
+    "public.event_type_enum": {
+      "name": "event_type_enum",
       "schema": "public",
       "values": [
-        "diagram",
-        "receipt",
-        "document",
-        "certificate",
-        "declaration",
-        "fowarding",
+        "social_post",
+        "patient_session",
+        "administrative_task",
+        "unavailability",
         "other"
       ]
     },
-    "public.recurring": {
-      "name": "recurring",
+    "public.recurring_enum": {
+      "name": "recurring_enum",
       "schema": "public",
       "values": [
         "daily",
@@ -1569,6 +1574,19 @@
       "values": [
         "male",
         "female",
+        "other"
+      ]
+    },
+    "public.type": {
+      "name": "type",
+      "schema": "public",
+      "values": [
+        "diagram",
+        "receipt",
+        "document",
+        "certificate",
+        "declaration",
+        "fowarding",
         "other"
       ]
     },

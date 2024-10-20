@@ -24,16 +24,6 @@ export const getEventsService = async (
     throw new Error("Unauthorized");
   }
 
-  // verify if the event exists
-  const [existing] = await db
-    .select()
-    .from(events)
-    .where(eq(events.psychologistId, user.id!));
-
-  if (!existing) {
-    throw new Error("Not found");
-  }
-
   const data = await db
     .select()
     .from(events)
@@ -50,16 +40,6 @@ export const getEventsByPatientIdService = async (
   const user = c.get("user");
   if (!user) {
     throw new Error("Unauthorized");
-  }
-
-  // verify if the event exists
-  const [existing] = await db
-    .select()
-    .from(events)
-    .where(eq(events.psychologistId, user.id!));
-
-  if (!existing) {
-    throw new Error("Not found");
   }
 
   const data = await db

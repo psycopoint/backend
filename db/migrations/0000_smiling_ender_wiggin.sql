@@ -19,13 +19,13 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "public"."type" AS ENUM('diagram', 'receipt', 'document', 'certificate', 'declaration', 'fowarding', 'other');
+ CREATE TYPE "public"."event_type_enum" AS ENUM('social_post', 'patient_session', 'administrative_task', 'unavailability', 'other');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "public"."recurring" AS ENUM('daily', 'weekly', 'biweekly', 'monthly', 'yearly', 'once');
+ CREATE TYPE "public"."recurring_enum" AS ENUM('daily', 'weekly', 'biweekly', 'monthly', 'yearly', 'once');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -62,6 +62,12 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  CREATE TYPE "public"."gender" AS ENUM('male', 'female', 'other');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "public"."type" AS ENUM('diagram', 'receipt', 'document', 'certificate', 'declaration', 'fowarding', 'other');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -106,12 +112,12 @@ CREATE TABLE IF NOT EXISTS "events" (
 	"start" timestamp(3),
 	"end" timestamp(3),
 	"disabled" boolean DEFAULT false,
-	"type" "type" NOT NULL,
+	"type" "event_type_enum" NOT NULL,
 	"color" text,
 	"editable" boolean DEFAULT false,
 	"deletable" boolean DEFAULT false,
 	"all_day" boolean DEFAULT false,
-	"recurring" "recurring" DEFAULT 'once',
+	"recurring" "recurring_enum" DEFAULT 'once',
 	"recurring_end" timestamp,
 	"resource" jsonb,
 	"link" text,
@@ -180,10 +186,11 @@ CREATE TABLE IF NOT EXISTS "patients_diagrams" (
 CREATE TABLE IF NOT EXISTS "notes" (
 	"id" text PRIMARY KEY NOT NULL,
 	"psychologist_id" text NOT NULL,
-	"patient_id" text NOT NULL,
+	"patient_id" text,
 	"title" text,
 	"data" jsonb DEFAULT '{}'::jsonb,
 	"status" "status" DEFAULT 'active',
+	"complete" boolean DEFAULT false,
 	"priority" "priority" DEFAULT 'medium',
 	"attachments" jsonb DEFAULT '[]'::jsonb,
 	"archived" boolean DEFAULT false,

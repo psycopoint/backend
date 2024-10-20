@@ -13,7 +13,7 @@ import { relations, sql } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 
 // Enum para o tipo de evento
-export const eventTypeEnum = pgEnum("type", [
+export const eventTypeEnum = pgEnum("event_type_enum", [
   "social_post",
   "patient_session",
   "administrative_task",
@@ -21,7 +21,7 @@ export const eventTypeEnum = pgEnum("type", [
   "other",
 ]);
 // enum para o tipo de evento recorrente
-export const recurringEnum = pgEnum("recurring", [
+export const recurringEnum = pgEnum("recurring_enum", [
   "daily",
   "weekly",
   "biweekly",
