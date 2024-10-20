@@ -35,6 +35,7 @@ export const eventStatusEnum = pgEnum("event_status_enum", [
   "absent",
   "scheduled",
   "not-scheduled",
+  "canceled",
 ]);
 
 export const events = pgTable("events", {
