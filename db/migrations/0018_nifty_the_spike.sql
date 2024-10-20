@@ -1,1 +1,0 @@
-ALTER TYPE "recurring" ADD VALUE 'biweekly';

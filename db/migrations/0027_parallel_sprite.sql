@@ -1,1 +1,0 @@
-ALTER TABLE "events" ADD COLUMN "original_event_id" text;

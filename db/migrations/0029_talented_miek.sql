@@ -1,1 +1,0 @@
-ALTER TYPE "event_status_enum" ADD VALUE 'canceled';

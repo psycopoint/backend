@@ -13,13 +13,19 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "public"."type" AS ENUM('social_post', 'patient_session', 'administrative_task', 'unavailability', 'other');
+ CREATE TYPE "public"."event_status_enum" AS ENUM('attended', 'absent', 'scheduled', 'not-scheduled', 'canceled');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "public"."recurring" AS ENUM('daily', 'weekly', 'monthly', 'yearly', 'once');
+ CREATE TYPE "public"."type" AS ENUM('diagram', 'receipt', 'document', 'certificate', 'declaration', 'fowarding', 'other');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "public"."recurring" AS ENUM('daily', 'weekly', 'biweekly', 'monthly', 'yearly', 'once');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -37,7 +43,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "public"."methodsEnum" AS ENUM('pix', 'credit_card');
+ CREATE TYPE "public"."methodsEnum" AS ENUM('pix', 'credit_card', 'bank_transfer', 'cash', 'other');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -49,7 +55,19 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ CREATE TYPE "public"."transactionTypeEnum" AS ENUM('payment', 'expense');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  CREATE TYPE "public"."gender" AS ENUM('male', 'female', 'other');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "public"."file_type" AS ENUM('pdf', 'docx', 'image');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -58,18 +76,26 @@ CREATE TABLE IF NOT EXISTS "auth"."users" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text,
 	"email" text NOT NULL,
-	"emailVerified" timestamp,
+	"email_verified" timestamp,
 	"password" text,
 	"image" text,
 	"user_type" "auth"."user_type" DEFAULT 'psychologist',
 	"provider" "auth"."providers",
+	"provider_id" text,
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "auth"."sessions" (
-	"sessionToken" text PRIMARY KEY NOT NULL,
-	"userId" text NOT NULL,
-	"expires" timestamp NOT NULL
+	"id" text PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
+	"expires_at" timestamp with time zone NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "auth"."verification_tokens" (
+	"identifier" text NOT NULL,
+	"token" text NOT NULL,
+	"expires" bigint NOT NULL,
+	CONSTRAINT "verification_tokens_identifier_token_pk" PRIMARY KEY("identifier","token")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "events" (
@@ -88,6 +114,9 @@ CREATE TABLE IF NOT EXISTS "events" (
 	"recurring" "recurring" DEFAULT 'once',
 	"recurring_end" timestamp,
 	"resource" jsonb,
+	"link" text,
+	"original_event_id" text,
+	"status" "event_status_enum" DEFAULT 'scheduled',
 	"is_completed" boolean DEFAULT false,
 	"created_at" timestamp(3) DEFAULT now() NOT NULL,
 	"updated_at" timestamp(3),
@@ -151,11 +180,12 @@ CREATE TABLE IF NOT EXISTS "patients_diagrams" (
 CREATE TABLE IF NOT EXISTS "notes" (
 	"id" text PRIMARY KEY NOT NULL,
 	"psychologist_id" text NOT NULL,
+	"patient_id" text NOT NULL,
 	"title" text,
-	"content" text DEFAULT '{}'::jsonb,
+	"data" jsonb DEFAULT '{}'::jsonb,
 	"status" "status" DEFAULT 'active',
 	"priority" "priority" DEFAULT 'medium',
-	"attachments" text,
+	"attachments" jsonb DEFAULT '[]'::jsonb,
 	"archived" boolean DEFAULT false,
 	"created_at" timestamp(3) DEFAULT now() NOT NULL,
 	"updated_at" timestamp(3)
@@ -180,16 +210,17 @@ CREATE TABLE IF NOT EXISTS "patients" (
 	"updated_at" timestamp(3)
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "payments" (
+CREATE TABLE IF NOT EXISTS "transactions" (
 	"id" text PRIMARY KEY NOT NULL,
-	"appointment_id" text NOT NULL,
-	"psychologist_id" text NOT NULL,
-	"patient_id" text NOT NULL,
+	"event_id" text,
+	"user_id" text,
+	"transaction_type" "transactionTypeEnum" NOT NULL,
 	"amount" numeric(10, 2) NOT NULL,
 	"status" "paymentStatusEnum" DEFAULT 'pending' NOT NULL,
-	"payment_date" timestamp(3) DEFAULT now(),
+	"transaction_date" timestamp(3) DEFAULT now(),
 	"method" "methodsEnum" DEFAULT 'pix' NOT NULL,
-	"receipts" jsonb DEFAULT '{}'::jsonb,
+	"receipts" jsonb DEFAULT '[]'::jsonb,
+	"data" jsonb DEFAULT '{}'::jsonb,
 	"created_at" timestamp(3) DEFAULT now() NOT NULL,
 	"updated_at" timestamp(3) NOT NULL
 );
@@ -199,15 +230,16 @@ CREATE TABLE IF NOT EXISTS "psychologists" (
 	"adidional_emails" jsonb DEFAULT '[]'::jsonb,
 	"additional_phones" jsonb DEFAULT '[]'::jsonb,
 	"website" text,
-	"social_links" jsonb DEFAULT '{}',
+	"social_links" jsonb DEFAULT '[]',
 	"gender" "gender",
 	"birthdate" date,
 	"phone" varchar(256),
 	"address_info" jsonb DEFAULT '[]'::jsonb,
 	"crp" varchar(256),
 	"cpf" varchar(256),
+	"signature" text,
 	"specialty" text,
-	"preferences" jsonb DEFAULT '[]'::jsonb,
+	"preferences" jsonb DEFAULT '{}'::jsonb,
 	"created_at" timestamp(3) DEFAULT now() NOT NULL,
 	"updated_at" timestamp(3),
 	"clinic_id" text,
@@ -217,24 +249,40 @@ CREATE TABLE IF NOT EXISTS "psychologists" (
 CREATE TABLE IF NOT EXISTS "subscriptions" (
 	"id" text PRIMARY KEY NOT NULL,
 	"user_id" text NOT NULL,
-	"user_name" text NOT NULL,
+	"customer_id" text,
+	"pricing" text,
+	"quantity" integer DEFAULT 1,
+	"subscribed_at" text,
 	"status" text NOT NULL,
-	"status_formatted" text NOT NULL,
 	"subscription_id" text NOT NULL,
 	"renews_at" text,
-	"ends_at" text,
+	"cancel_at" text,
+	"canceled_at" text,
+	"ended_at" text,
 	"product_name" text,
-	"variant_name" text,
+	"metadata" jsonb DEFAULT '{}',
 	"trial_ends_at" text,
 	"visa" text,
-	"billing_anchor" integer,
 	"card_last_four" text,
 	CONSTRAINT "subscriptions_user_id_unique" UNIQUE("user_id"),
 	CONSTRAINT "subscriptions_subscription_id_unique" UNIQUE("subscription_id")
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "documents" (
+	"id" text PRIMARY KEY NOT NULL,
+	"psychologist_id" text NOT NULL,
+	"patient_id" text,
+	"title" text NOT NULL,
+	"description" text,
+	"document_type" "type",
+	"file_type" "file_type" DEFAULT 'pdf',
+	"data" jsonb NOT NULL,
+	"created_at" timestamp(3) DEFAULT now() NOT NULL,
+	"updated_at" timestamp(3)
+);
+--> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "auth"."sessions" ADD CONSTRAINT "sessions_userId_users_id_fk" FOREIGN KEY ("userId") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "auth"."sessions" ADD CONSTRAINT "sessions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -282,25 +330,25 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ ALTER TABLE "notes" ADD CONSTRAINT "notes_patient_id_patients_id_fk" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  ALTER TABLE "patients" ADD CONSTRAINT "patients_psychologist_id_psychologists_userId_fk" FOREIGN KEY ("psychologist_id") REFERENCES "public"."psychologists"("userId") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "payments" ADD CONSTRAINT "payments_appointment_id_events_id_fk" FOREIGN KEY ("appointment_id") REFERENCES "public"."events"("id") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "transactions" ADD CONSTRAINT "transactions_event_id_events_id_fk" FOREIGN KEY ("event_id") REFERENCES "public"."events"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "payments" ADD CONSTRAINT "payments_psychologist_id_psychologists_userId_fk" FOREIGN KEY ("psychologist_id") REFERENCES "public"."psychologists"("userId") ON DELETE cascade ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "payments" ADD CONSTRAINT "payments_patient_id_patients_id_fk" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "transactions" ADD CONSTRAINT "transactions_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -319,6 +367,18 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_user_id_psychologists_userId_fk" FOREIGN KEY ("user_id") REFERENCES "public"."psychologists"("userId") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "documents" ADD CONSTRAINT "documents_psychologist_id_psychologists_userId_fk" FOREIGN KEY ("psychologist_id") REFERENCES "public"."psychologists"("userId") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "documents" ADD CONSTRAINT "documents_patient_id_patients_id_fk" FOREIGN KEY ("patient_id") REFERENCES "public"."patients"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

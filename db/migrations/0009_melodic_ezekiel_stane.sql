@@ -1,1 +1,0 @@
-ALTER TABLE "subscriptions" ADD COLUMN "ended_at" text;

@@ -1,10 +1,5 @@
 import { Hono } from "hono";
 
-// ROUTES
-import patients from "@src/patients/patients.route";
-import events from "@src/events/events.route";
-import transactions from "@src/transactions/transactions.route";
-import documents from "@src/documents/documents.route";
 import {
   createUser,
   getAllUsers,
@@ -12,6 +7,13 @@ import {
   getUser,
   updateUser,
 } from "@src/users/users.controllers";
+
+// ROUTES
+import patients from "@src/patients/patients.route";
+import events from "@src/events/events.route";
+import transactions from "@src/transactions/transactions.route";
+import documents from "@src/documents/documents.route";
+import notes from "@src/notes/notes.route";
 
 const app = new Hono();
 
@@ -38,5 +40,7 @@ app.route("/@me/events", events);
 app.route("/@me/transactions", transactions);
 // NESTING DOCUMENTS ROUTE
 app.route("/@me/documents", documents);
+// NESTING NOTES ROUTE
+app.route("/@me/notes", notes);
 
 export default app;

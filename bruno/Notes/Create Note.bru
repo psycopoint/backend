@@ -1,0 +1,30 @@
+meta {
+  name: Create Note
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{users}}/@me/notes
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "title": "Follow-up Appointment",
+    "attachments": [
+      {
+        "fileName": "lab_results.pdf",
+        "fileUrl": "https://example.com/lab_results.pdf"
+      }
+    ],
+    "data": {
+      "appointmentDate": "2024-10-20T10:30:00Z",
+      "notes": "Patient shows improvement. Discussed changes in medication."
+    },
+    "archived": false,
+    "priority": "high",
+    "status": "inactive"
+  }
+}

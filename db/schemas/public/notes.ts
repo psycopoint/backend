@@ -1,5 +1,6 @@
 import {
   boolean,
+  jsonb,
   pgEnum,
   pgTable,
   text,
@@ -8,6 +9,8 @@ import {
 } from "drizzle-orm/pg-core";
 import { psychologists } from "./psychologists";
 import { relations, sql } from "drizzle-orm";
+import { patients } from "./patients";
+import { createInsertSchema } from "drizzle-zod";
 
 export const statusEnum = pgEnum("status", ["active", "inactive"]);
 export const priorityEnum = pgEnum("priority", ["low", "medium", "high"]);
@@ -17,13 +20,17 @@ export const notes = pgTable("notes", {
   psychologistId: text("psychologist_id")
     .notNull()
     .references(() => psychologists.userId),
+  patientId: text("patient_id").references(() => patients.id),
   title: text("title"),
-  data: text("data")
+  data: jsonb("data")
     .$type<any>()
     .default(sql`'{}'::jsonb`),
   status: statusEnum("status").default("active"),
+  complete: boolean("complete").default(false),
   priority: priorityEnum("priority").default("medium"),
-  attachments: text("attachments"),
+  attachments: jsonb("attachments")
+    .$type<{ fileName: string; url: string }[]>()
+    .default(sql`'[]'::jsonb`),
   archived: boolean("archived").default(false),
   createdAt: timestamp("created_at", { mode: "string", precision: 3 })
     .defaultNow()
@@ -42,5 +49,8 @@ export const notesRelations = relations(notes, ({ one, many }) => ({
   }),
 }));
 
-export type InsertNotes = typeof notes.$inferInsert;
-export type SelectNotes = typeof notes.$inferSelect;
+// TYPES
+export const insertNoteSchema = createInsertSchema(notes);
+
+export type InsertNote = typeof notes.$inferInsert;
+export type SelectNote = typeof notes.$inferSelect;

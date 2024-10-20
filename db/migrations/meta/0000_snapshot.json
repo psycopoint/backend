@@ -1,5 +1,5 @@
 {
-  "id": "2e6d5331-fe64-42b7-87a0-ff4749bc3f46",
+  "id": "d7049726-4dc1-4fe9-b481-f6d0e0d9cb17",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -26,8 +26,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "emailVerified": {
-          "name": "emailVerified",
+        "email_verified": {
+          "name": "email_verified",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false
@@ -58,6 +58,12 @@
           "typeSchema": "auth",
           "primaryKey": false,
           "notNull": false
+        },
+        "provider_id": {
+          "name": "provider_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
@@ -77,43 +83,79 @@
       "name": "sessions",
       "schema": "auth",
       "columns": {
-        "sessionToken": {
-          "name": "sessionToken",
+        "id": {
+          "name": "id",
           "type": "text",
           "primaryKey": true,
           "notNull": true
         },
-        "userId": {
-          "name": "userId",
+        "user_id": {
+          "name": "user_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "expires": {
-          "name": "expires",
-          "type": "timestamp",
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "sessions_userId_users_id_fk": {
-          "name": "sessions_userId_users_id_fk",
+        "sessions_user_id_users_id_fk": {
+          "name": "sessions_user_id_users_id_fk",
           "tableFrom": "sessions",
           "tableTo": "users",
           "schemaTo": "auth",
           "columnsFrom": [
-            "userId"
+            "user_id"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "auth.verification_tokens": {
+      "name": "verification_tokens",
+      "schema": "auth",
+      "columns": {
+        "identifier": {
+          "name": "identifier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token": {
+          "name": "token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires": {
+          "name": "expires",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "verification_tokens_identifier_token_pk": {
+          "name": "verification_tokens_identifier_token_pk",
+          "columns": [
+            "identifier",
+            "token"
+          ]
+        }
+      },
       "uniqueConstraints": {}
     },
     "public.events": {
@@ -216,6 +258,26 @@
           "type": "jsonb",
           "primaryKey": false,
           "notNull": false
+        },
+        "link": {
+          "name": "link",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "original_event_id": {
+          "name": "original_event_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "event_status_enum",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'scheduled'"
         },
         "is_completed": {
           "name": "is_completed",
@@ -661,15 +723,21 @@
           "primaryKey": false,
           "notNull": true
         },
+        "patient_id": {
+          "name": "patient_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "title": {
           "name": "title",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "content": {
-          "name": "content",
-          "type": "text",
+        "data": {
+          "name": "data",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false,
           "default": "'{}'::jsonb"
@@ -692,9 +760,10 @@
         },
         "attachments": {
           "name": "attachments",
-          "type": "text",
+          "type": "jsonb",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "'[]'::jsonb"
         },
         "archived": {
           "name": "archived",
@@ -728,6 +797,19 @@
           ],
           "columnsTo": [
             "userId"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "notes_patient_id_patients_id_fk": {
+          "name": "notes_patient_id_patients_id_fk",
+          "tableFrom": "notes",
+          "tableTo": "patients",
+          "columnsFrom": [
+            "patient_id"
+          ],
+          "columnsTo": [
+            "id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
@@ -861,8 +943,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.payments": {
-      "name": "payments",
+    "public.transactions": {
+      "name": "transactions",
       "schema": "",
       "columns": {
         "id": {
@@ -871,21 +953,22 @@
           "primaryKey": true,
           "notNull": true
         },
-        "appointment_id": {
-          "name": "appointment_id",
+        "event_id": {
+          "name": "event_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
-        "psychologist_id": {
-          "name": "psychologist_id",
+        "user_id": {
+          "name": "user_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
-        "patient_id": {
-          "name": "patient_id",
-          "type": "text",
+        "transaction_type": {
+          "name": "transaction_type",
+          "type": "transactionTypeEnum",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
@@ -903,8 +986,8 @@
           "notNull": true,
           "default": "'pending'"
         },
-        "payment_date": {
-          "name": "payment_date",
+        "transaction_date": {
+          "name": "transaction_date",
           "type": "timestamp(3)",
           "primaryKey": false,
           "notNull": false,
@@ -920,6 +1003,13 @@
         },
         "receipts": {
           "name": "receipts",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::jsonb"
+        },
+        "data": {
+          "name": "data",
           "type": "jsonb",
           "primaryKey": false,
           "notNull": false,
@@ -941,12 +1031,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "payments_appointment_id_events_id_fk": {
-          "name": "payments_appointment_id_events_id_fk",
-          "tableFrom": "payments",
+        "transactions_event_id_events_id_fk": {
+          "name": "transactions_event_id_events_id_fk",
+          "tableFrom": "transactions",
           "tableTo": "events",
           "columnsFrom": [
-            "appointment_id"
+            "event_id"
           ],
           "columnsTo": [
             "id"
@@ -954,25 +1044,13 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "payments_psychologist_id_psychologists_userId_fk": {
-          "name": "payments_psychologist_id_psychologists_userId_fk",
-          "tableFrom": "payments",
-          "tableTo": "psychologists",
+        "transactions_user_id_users_id_fk": {
+          "name": "transactions_user_id_users_id_fk",
+          "tableFrom": "transactions",
+          "tableTo": "users",
+          "schemaTo": "auth",
           "columnsFrom": [
-            "psychologist_id"
-          ],
-          "columnsTo": [
-            "userId"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "payments_patient_id_patients_id_fk": {
-          "name": "payments_patient_id_patients_id_fk",
-          "tableFrom": "payments",
-          "tableTo": "patients",
-          "columnsFrom": [
-            "patient_id"
+            "user_id"
           ],
           "columnsTo": [
             "id"
@@ -1019,7 +1097,7 @@
           "type": "jsonb",
           "primaryKey": false,
           "notNull": false,
-          "default": "'{}'"
+          "default": "'[]'"
         },
         "gender": {
           "name": "gender",
@@ -1059,6 +1137,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "signature": {
+          "name": "signature",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "specialty": {
           "name": "specialty",
           "type": "text",
@@ -1070,7 +1154,7 @@
           "type": "jsonb",
           "primaryKey": false,
           "notNull": false,
-          "default": "'[]'::jsonb"
+          "default": "'{}'::jsonb"
         },
         "created_at": {
           "name": "created_at",
@@ -1149,20 +1233,33 @@
           "primaryKey": false,
           "notNull": true
         },
-        "user_name": {
-          "name": "user_name",
+        "customer_id": {
+          "name": "customer_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
+        },
+        "pricing": {
+          "name": "pricing",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        },
+        "subscribed_at": {
+          "name": "subscribed_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "status": {
           "name": "status",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "status_formatted": {
-          "name": "status_formatted",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -1179,8 +1276,20 @@
           "primaryKey": false,
           "notNull": false
         },
-        "ends_at": {
-          "name": "ends_at",
+        "cancel_at": {
+          "name": "cancel_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "canceled_at": {
+          "name": "canceled_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ended_at": {
+          "name": "ended_at",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -1191,11 +1300,12 @@
           "primaryKey": false,
           "notNull": false
         },
-        "variant_name": {
-          "name": "variant_name",
-          "type": "text",
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "'{}'"
         },
         "trial_ends_at": {
           "name": "trial_ends_at",
@@ -1206,12 +1316,6 @@
         "visa": {
           "name": "visa",
           "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "billing_anchor": {
-          "name": "billing_anchor",
-          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
@@ -1255,6 +1359,107 @@
           ]
         }
       }
+    },
+    "public.documents": {
+      "name": "documents",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "psychologist_id": {
+          "name": "psychologist_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "patient_id": {
+          "name": "patient_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "document_type": {
+          "name": "document_type",
+          "type": "type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "file_type": {
+          "name": "file_type",
+          "type": "file_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'pdf'"
+        },
+        "data": {
+          "name": "data",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(3)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "documents_psychologist_id_psychologists_userId_fk": {
+          "name": "documents_psychologist_id_psychologists_userId_fk",
+          "tableFrom": "documents",
+          "tableTo": "psychologists",
+          "columnsFrom": [
+            "psychologist_id"
+          ],
+          "columnsTo": [
+            "userId"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "documents_patient_id_patients_id_fk": {
+          "name": "documents_patient_id_patients_id_fk",
+          "tableFrom": "documents",
+          "tableTo": "patients",
+          "columnsFrom": [
+            "patient_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
     }
   },
   "enums": {
@@ -1277,14 +1482,27 @@
         "admin"
       ]
     },
+    "public.event_status_enum": {
+      "name": "event_status_enum",
+      "schema": "public",
+      "values": [
+        "attended",
+        "absent",
+        "scheduled",
+        "not-scheduled",
+        "canceled"
+      ]
+    },
     "public.type": {
       "name": "type",
       "schema": "public",
       "values": [
-        "social_post",
-        "patient_session",
-        "administrative_task",
-        "unavailability",
+        "diagram",
+        "receipt",
+        "document",
+        "certificate",
+        "declaration",
+        "fowarding",
         "other"
       ]
     },
@@ -1294,6 +1512,7 @@
       "values": [
         "daily",
         "weekly",
+        "biweekly",
         "monthly",
         "yearly",
         "once"
@@ -1321,7 +1540,10 @@
       "schema": "public",
       "values": [
         "pix",
-        "credit_card"
+        "credit_card",
+        "bank_transfer",
+        "cash",
+        "other"
       ]
     },
     "public.paymentStatusEnum": {
@@ -1333,6 +1555,14 @@
         "overdue"
       ]
     },
+    "public.transactionTypeEnum": {
+      "name": "transactionTypeEnum",
+      "schema": "public",
+      "values": [
+        "payment",
+        "expense"
+      ]
+    },
     "public.gender": {
       "name": "gender",
       "schema": "public",
@@ -1340,6 +1570,15 @@
         "male",
         "female",
         "other"
+      ]
+    },
+    "public.file_type": {
+      "name": "file_type",
+      "schema": "public",
+      "values": [
+        "pdf",
+        "docx",
+        "image"
       ]
     }
   },

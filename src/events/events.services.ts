@@ -162,7 +162,7 @@ export const createEventService = async (
 export const updateEventService = async (
   c: Context,
   db: NeonHttpDatabase,
-  values: any,
+  values: InsertEvent,
   eventId: string
 ): Promise<SelectEvent> => {
   const user = c.get("user");

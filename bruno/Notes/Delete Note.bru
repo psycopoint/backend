@@ -1,0 +1,34 @@
+meta {
+  name: Delete Note
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{users}}/@me/notes/:noteId
+  body: json
+  auth: none
+}
+
+params:path {
+  noteId: z5bq3fxrsm
+}
+
+body:json {
+  {
+    "title": "Follow-up Appointment",
+    "attachments": [
+      {
+        "fileName": "lab_results.pdf",
+        "fileUrl": "https://example.com/lab_results.pdf"
+      }
+    ],
+    "data": {
+      "appointmentDate": "2024-10-20T10:30:00Z",
+      "notes": "Patient shows improvement. Discussed changes in medication."
+    },
+    "archived": false,
+    "priority": "high",
+    "status": "inactive"
+  }
+}

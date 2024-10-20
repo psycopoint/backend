@@ -1,1 +1,0 @@
-ALTER TABLE "psychologists" ADD COLUMN "signature" text;

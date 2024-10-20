@@ -1,0 +1,29 @@
+meta {
+  name: Get Note by ID
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{users}}/@me/notes/:noteId
+  body: none
+  auth: none
+}
+
+params:path {
+  noteId: e67ptfqd6k
+}
+
+body:json {
+  {
+    "title": "Teste 123456",
+    "attachments": [],
+    "data": {
+      "appointmentDate": "2024-10-20T10:30:00Z",
+      "notes": "Patient shows improvement. Discussed changes in medication."
+    },
+    "archived": false,
+    "priority": "low",
+    "status": "active"
+  }
+}
