@@ -27,10 +27,6 @@ export const getAllPatientsService = async (
     .from(patients)
     .where(eq(patients.psychologistId, user.id!));
 
-  if (data.length <= 0) {
-    throw new Error("No data");
-  }
-
   return data as SelectPatient[];
 };
 
@@ -97,8 +93,6 @@ export const createPatientService = async (
   const createId = init({
     length: 10,
   });
-
-  console.log("VALORES RECEBIDOS: ", values);
 
   const patientData = {
     id: createId(),
