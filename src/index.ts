@@ -12,6 +12,8 @@ import uploadRoute from "@src/uploads/upload.route";
 import webhooksRoute from "@src/webhooks/webhooks.route";
 import aiRoute from "@src/ai/ai.route";
 
+import psicoIdRoute from "@src/psico-id/id.route";
+
 import { isAuthenticatedMid } from "../middlewares/is-authenticated";
 
 import dayjs from "dayjs";
@@ -43,6 +45,9 @@ app.use("*", async (c, next) => {
 
   return corsMiddleware(c, next);
 });
+
+// PUBLIC ROUTES
+app.route("/psico-id", psicoIdRoute);
 
 app.use("*", isAuthenticatedMid);
 
