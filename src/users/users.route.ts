@@ -14,6 +14,7 @@ import events from "@src/events/events.route";
 import transactions from "@src/transactions/transactions.route";
 import documents from "@src/documents/documents.route";
 import notes from "@src/notes/notes.route";
+import psicoid from "@src/psicoid/id.route";
 
 const app = new Hono();
 

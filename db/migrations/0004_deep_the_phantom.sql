@@ -1,0 +1,1 @@
+ALTER TABLE "psico_id" ALTER COLUMN "id" SET DATA TYPE text;

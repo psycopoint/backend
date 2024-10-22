@@ -1,0 +1,29 @@
+meta {
+  name: Delete Link
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{url}}/psicoid/links/:linkId
+  body: json
+  auth: none
+}
+
+params:path {
+  linkId: c273l06aup9ukh
+}
+
+body:json {
+  {
+    "clickCount": 0,
+    "description": "Link para XYZ",
+    "icon": "facebook",
+    "isActive": true,
+    "order": 2,
+    "target": "_blank",
+    "title": "Facebook",
+    "type": "website",
+    "url": "https://link123.com.br"
+  }
+}

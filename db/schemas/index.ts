@@ -20,4 +20,4 @@ export * from "./public/transactions";
 export * from "./public/psychologists";
 export * from "./public/subscriptions";
 export * from "./public/documents";
-export * from "./public/psico-id";
+export * from "./public/psicoid";

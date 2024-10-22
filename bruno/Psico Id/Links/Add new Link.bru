@@ -1,0 +1,25 @@
+meta {
+  name: Add new Link
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{url}}/psicoid/links
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "clickCount": 0,
+    "description": "Link para XYZ",
+    "icon": "facebook",
+    "isActive": true,
+    "order": 2,
+    "target": "_blank",
+    "title": "Facebook",
+    "type": "website",
+    "url": "https://link123.com.br"
+  }
+}

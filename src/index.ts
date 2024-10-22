@@ -12,7 +12,7 @@ import uploadRoute from "@src/uploads/upload.route";
 import webhooksRoute from "@src/webhooks/webhooks.route";
 import aiRoute from "@src/ai/ai.route";
 
-import psicoIdRoute from "@src/psico-id/id.route";
+import psicoIdRoute from "@src/psicoid/id.route";
 
 import { isAuthenticatedMid } from "../middlewares/is-authenticated";
 
@@ -47,11 +47,10 @@ app.use("*", async (c, next) => {
 });
 
 // PUBLIC ROUTES
-app.route("/psico-id", psicoIdRoute);
-
 app.use("*", isAuthenticatedMid);
 
 // ROUTES
+app.route("/psicoid", psicoIdRoute);
 app.route("/auth", authRoute);
 app.route("/users", usersRoute);
 app.route("/subscription", subscriptionRoute);

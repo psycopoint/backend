@@ -19,8 +19,12 @@ export const notes = pgTable("notes", {
   id: text("id").primaryKey(),
   psychologistId: text("psychologist_id")
     .notNull()
-    .references(() => psychologists.userId),
-  patientId: text("patient_id").references(() => patients.id),
+    .references(() => psychologists.userId, {
+      onDelete: "set null",
+    }),
+  patientId: text("patient_id").references(() => patients.id, {
+    onDelete: "set null",
+  }),
   title: text("title"),
   data: jsonb("data")
     .$type<any>()

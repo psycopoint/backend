@@ -1,0 +1,1 @@
+ALTER TABLE "psico_id" ALTER COLUMN "user_tag" DROP NOT NULL;

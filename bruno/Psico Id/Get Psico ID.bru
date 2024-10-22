@@ -1,0 +1,82 @@
+meta {
+  name: Get Psico ID
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{url}}/psicoid/@francy.horray
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "enabled": true,
+    "bio": "I'm a licensed psychologist helping individuals achieve mental wellness.",
+    "website": "https://example.com",
+    "userTag": "psico_tag123",
+    "links": [
+      {
+        "title": "Personal Website",
+        "url": "https://mywebsite.com",
+        "icon": "https://mywebsite.com/icon.png",
+        "type": "website",
+        "description": "Visit my official website for more information.",
+        "order": 1,
+        "createdAt": "2024-10-22T10:00:00Z",
+        "isActive": true,
+        "clickCount": 150,
+        "target": "_blank"
+      },
+      {
+        "title": "LinkedIn",
+        "url": "https://linkedin.com/in/psico",
+        "type": "social",
+        "order": 2,
+        "createdAt": "2024-10-20T10:00:00Z",
+        "isActive": true,
+        "clickCount": 50,
+        "target": "_self"
+      },
+      {
+        "title": "Blog",
+        "url": "https://blog.com",
+        "type": "other",
+        "description": "Read my blog for mental health tips.",
+        "order": 3,
+        "createdAt": "2024-10-15T12:30:00Z",
+        "isActive": true,
+        "clickCount": 75,
+        "target": "_blank"
+      }
+    ],
+    "themeColor": "purple",
+    "showContactForm": true,
+    "showAvailability": false,
+    "layoutStyle": "grid",
+    "socialMedia": [
+      {
+        "title": "Instagram",
+        "url": "https://instagram.com/psico",
+        "type": "social",
+        "order": 1,
+        "createdAt": "2024-10-12T08:00:00Z",
+        "isActive": true,
+        "clickCount": 300,
+        "target": "_blank"
+      },
+      {
+        "title": "Facebook",
+        "url": "https://facebook.com/psico",
+        "type": "social",
+        "order": 2,
+        "createdAt": "2024-10-10T10:00:00Z",
+        "isActive": true,
+        "clickCount": 200,
+        "target": "_top"
+      }
+    ]
+  }
+  
+}

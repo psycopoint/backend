@@ -2,7 +2,7 @@ import { createFactory } from "hono/factory";
 
 import { subscriptions, users } from "@db/schemas";
 import { eq } from "drizzle-orm";
-import { createId } from "@paralleldrive/cuid2";
+import { createId, init } from "@paralleldrive/cuid2";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import {
@@ -19,6 +19,11 @@ import { createStripe } from "@lib/stripe";
 import { createApiResponse } from "@utils/response";
 import { createResend } from "@lib/resend";
 import WelcomeEmail from "@emails/welcome";
+import {
+  createPsicoIdService,
+  getPsicoIdServiceByUserId,
+} from "@src/psicoid/id.services";
+import { createPsicoId } from "@src/psicoid/id.controllers";
 
 const factory = createFactory();
 
@@ -159,7 +164,7 @@ export const getSessionInfo = factory.createHandlers(
   }
 );
 
-// SUBSCRIPTION WEEBHOOK TO CREATE SUBS INSIDE DB
+// SUBSCRIPTION WEEBHOOK TO CREATE SUBSCRIPTION INSIDE DB
 export const subscriptionWebhook = factory.createHandlers(async (c) => {
   // connect to db
   const sql = neon(c.env.DATABASE_URL);
@@ -167,6 +172,10 @@ export const subscriptionWebhook = factory.createHandlers(async (c) => {
 
   const stripe = createStripe(c);
   const resend = createResend(c);
+
+  const createId = init({
+    length: 14,
+  });
 
   try {
     const sig = c.req.header("stripe-signature");
@@ -189,7 +198,7 @@ export const subscriptionWebhook = factory.createHandlers(async (c) => {
       case "customer.subscription.updated":
         const subscription = event.data.object as Stripe.Subscription;
 
-        // Recuperar detalhes adicionais se necessário
+        // get additional detail if nedeed
         const paymentMethod = subscription.default_payment_method
           ? await stripe.paymentMethods.retrieve(
               subscription.default_payment_method as string
@@ -211,7 +220,7 @@ export const subscriptionWebhook = factory.createHandlers(async (c) => {
           subscription.items.data[0].price.id as string
         );
 
-        // UPDATE subscription inside DB
+        // update subscription inside database
         const [subscriptionDb] = await db
           .update(subscriptions)
           .set({
@@ -240,7 +249,18 @@ export const subscriptionWebhook = factory.createHandlers(async (c) => {
           .where(eq(subscriptions.subscriptionId, subscription.id as string))
           .returning();
 
-        // send email
+        // CREATE PSICOID IF THRES NO CREATED
+        const existingPsicoId = await getPsicoIdServiceByUserId(c, db);
+
+        if (!existingPsicoId) {
+          await createPsicoIdService(c, db, {
+            id: createId(),
+            userId: subscriptionDb.userId,
+            userTag: `@${customer.email?.split("@")[0]}`,
+          });
+        }
+
+        // send email informing about update
         // const { data, error } = await resend.emails.send({
         //   from: `Psycopoint <suporte@${c.env.DOMAIN}>`,
         //   to: [customer.email as string],
