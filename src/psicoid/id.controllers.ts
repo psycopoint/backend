@@ -15,8 +15,8 @@ import {
   createLinkService,
   createPsicoIdService,
   deleteLinkService,
-  getPsicoIdByUserTagService,
-  getPsicoIdServiceByUserId,
+  getPsicoIdService,
+  updateClickCountService,
   updateLinkService,
   updatePsicoIdService,
 } from "./id.services";
@@ -30,7 +30,7 @@ export const getPsicoId = factory.createHandlers(
   zValidator(
     "param",
     z.object({
-      userTag: z.string(),
+      userTag: z.string().optional(),
     })
   ),
   async (c) => {
@@ -40,14 +40,7 @@ export const getPsicoId = factory.createHandlers(
     const { userTag } = c.req.valid("param");
 
     try {
-      const user = c.get("user") as SelectUser;
-
-      let data;
-      if (user) {
-        data = await getPsicoIdServiceByUserId(c, db);
-      } else {
-        data = await getPsicoIdByUserTagService(c, db, userTag);
-      }
+      const data = await getPsicoIdService(c, db, userTag);
 
       return c.json(createApiResponse("success", data), 200);
     } catch (error) {
@@ -227,6 +220,31 @@ export const updateLink = factory.createHandlers(
       const data = await updateLinkService(c, db, linkId, values as InsertLink);
 
       return c.json(createApiResponse("success", data), 200);
+    } catch (error) {
+      return handleError(c, error);
+    }
+  }
+);
+
+export const updateClickCount = factory.createHandlers(
+  zValidator(
+    "json",
+    z.object({
+      linkId: z.string(),
+      userTag: z.string(),
+    })
+  ),
+  async (c) => {
+    // connect to db
+    const sql = neon(c.env.DATABASE_URL);
+    const db = drizzle(sql);
+
+    const { linkId, userTag } = c.req.valid("json");
+
+    try {
+      await updateClickCountService(c, db, linkId, userTag);
+
+      return c.json(createApiResponse("success", []), 200);
     } catch (error) {
       return handleError(c, error);
     }

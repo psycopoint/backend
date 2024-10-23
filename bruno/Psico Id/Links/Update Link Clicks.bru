@@ -1,0 +1,18 @@
+meta {
+  name: Update Link Clicks
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{url}}/psicoid/links/clicks
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "userTag": "@francy.horray",
+    "linkId": "gskagozv9c2l9d"
+  }
+}

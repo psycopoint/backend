@@ -21,7 +21,7 @@ import { createResend } from "@lib/resend";
 import WelcomeEmail from "@emails/welcome";
 import {
   createPsicoIdService,
-  getPsicoIdServiceByUserId,
+  getPsicoIdService,
 } from "@src/psicoid/id.services";
 import { createPsicoId } from "@src/psicoid/id.controllers";
 
@@ -250,7 +250,7 @@ export const subscriptionWebhook = factory.createHandlers(async (c) => {
           .returning();
 
         // CREATE PSICOID IF THRES NO CREATED
-        const existingPsicoId = await getPsicoIdServiceByUserId(c, db);
+        const existingPsicoId = await getPsicoIdService(c, db);
 
         if (!existingPsicoId) {
           await createPsicoIdService(c, db, {
