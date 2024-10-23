@@ -14,7 +14,7 @@ import { sql } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const psicoLinkTypeEnum = z.enum(["website", "social", "other"]);
+export const psicoLinkTypeEnum = z.enum(["website", "social", "cta", "other"]);
 export type PsicoIdLinkType = z.infer<typeof psicoLinkTypeEnum>;
 
 export const psicoIdLinkSchema = z.object({
@@ -33,6 +33,21 @@ export const psicoIdLinkSchema = z.object({
 });
 
 export type TPsicoIdLinks = z.infer<typeof psicoIdLinkSchema>;
+
+export const psicoIdLeadSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string().email(),
+  phone: z.string(),
+  message: z.string().optional(),
+  source: z.string().optional(),
+  status: z.enum(["new", "contacted", "converted", "closed"]).default("new"),
+  createdAt: z.union([z.date(), z.string()]).optional(),
+  updatedAt: z.union([z.date(), z.string()]).optional(),
+  internalNotes: z.string().optional(),
+  referralId: z.string().optional(),
+  interestArea: z.string().optional(),
+});
 
 export const themeColorEnum = pgEnum("theme_color_enum", [
   "blue",
@@ -66,9 +81,15 @@ export const psicoId = pgTable("psico_id", {
   website: varchar("website", { length: 255 }),
   userTag: text("user_tag").unique(),
 
-  // Links adicionais
+  // additio adicionais
   links: jsonb("links")
     .$type<TPsicoIdLinks[] | null>()
+    .default(sql`'[]'::jsonb`),
+  ctaButton: boolean("cta_button").default(true),
+
+  // Links adicionais
+  leads: jsonb("leads")
+    .$type<SelectPsicoIdLead[] | null>()
     .default(sql`'[]'::jsonb`),
 
   // Personalização
@@ -78,8 +99,13 @@ export const psicoId = pgTable("psico_id", {
   layoutStyle: layoutStyleEnum("layout_style").default("list"), // Padrão de layout (ex: grid, lista, etc.)
 
   // Data de criação e atualização
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  createdAt: timestamp("created_at", { mode: "string", precision: 3 })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", {
+    mode: "string",
+    precision: 3,
+  }).$onUpdate(() => sql`CURRENT_TIMESTAMP(3)`),
 });
 
 // TYPES
@@ -89,3 +115,5 @@ export type InsertPsicoId = typeof psicoId.$inferInsert;
 export type SelectPsicoId = typeof psicoId.$inferSelect;
 export type InsertLink = TPsicoIdLinks;
 export type SelectLink = Omit<TPsicoIdLinks, "id" | "createdAt" | "updatedAt">;
+export type InsertPsicoIdLead = z.infer<typeof psicoIdLeadSchema>;
+export type SelectPsicoIdLead = Partial<z.infer<typeof psicoIdLeadSchema>>;

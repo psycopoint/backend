@@ -1,0 +1,1 @@
+ALTER TABLE "psico_id" ADD COLUMN "cta_button" boolean DEFAULT true;

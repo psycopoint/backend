@@ -1,8 +1,10 @@
 import {
   InsertLink,
   InsertPsicoId,
+  InsertPsicoIdLead,
   SelectLink,
   SelectPsicoId,
+  SelectPsicoIdLead,
   SelectPsychologist,
   SelectUser,
   TPsicoIdLinks,
@@ -16,7 +18,7 @@ import { and, eq, getTableColumns } from "drizzle-orm";
 import { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { Context } from "hono";
 
-// get psicoId by username
+// get psicoId
 export const getPsicoIdService = async (
   c: Context,
   db: NeonHttpDatabase,
@@ -151,7 +153,7 @@ export const createPsicoIdService = async (
   return data;
 };
 
-// create psicoId
+// upadte psicoId
 export const updatePsicoIdService = async (
   c: Context,
   db: NeonHttpDatabase,
@@ -163,7 +165,7 @@ export const updatePsicoIdService = async (
     throw new Error("Unauthorized");
   }
 
-  if (!values || userTag) {
+  if (!values || !userTag) {
     throw new Error("Missing body");
   }
 
@@ -174,6 +176,32 @@ export const updatePsicoIdService = async (
     .returning();
 
   return data;
+};
+
+// validate userTag
+export const validateUserTagService = async (
+  c: Context,
+  db: NeonHttpDatabase,
+  userTag: string
+): Promise<boolean> => {
+  const user = c.get("user") as SelectUser;
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+
+  if (!userTag) {
+    throw new Error("Missing body");
+  }
+
+  // search the current suer tag
+  const [existing] = await db
+    .select()
+    .from(psicoId)
+    .where(eq(psicoId.userTag, userTag));
+
+  if (existing) return false;
+
+  return true;
 };
 
 // LINKS
@@ -362,4 +390,139 @@ export const deleteLinkService = async (
     .returning();
 
   return filteredLinks;
+};
+
+// LEADS
+
+// add a new lead
+export const createLeadService = async (
+  c: Context,
+  db: NeonHttpDatabase,
+  values: InsertPsicoIdLead,
+  userTag: string
+): Promise<InsertPsicoIdLead> => {
+  if (!values) {
+    throw new Error("Missing body");
+  }
+
+  const createId = init({
+    length: 14,
+  });
+
+  // get current leads
+  const [existing] = await db
+    .select()
+    .from(psicoId)
+    .where(eq(psicoId.userTag, userTag));
+  const leads = existing.leads || [];
+
+  const newLead: InsertPsicoIdLead = {
+    ...values,
+    id: createId(),
+    status: "new",
+  };
+
+  const updatedData: InsertPsicoId = {
+    ...existing,
+    leads: [...leads, newLead],
+  };
+
+  const [data] = await db
+    .update(psicoId)
+    .set(updatedData)
+    .where(eq(psicoId.userTag, userTag))
+    .returning();
+
+  return newLead;
+};
+
+// update lead
+export const updateLeadService = async (
+  c: Context,
+  db: NeonHttpDatabase,
+  values: InsertPsicoIdLead,
+  leadId: string
+): Promise<InsertPsicoIdLead> => {
+  const user = c.get("user") as SelectUser;
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+
+  if (!leadId || !values) {
+    throw new Error("Missing body");
+  }
+
+  // get current links
+  const [existing] = await db
+    .select()
+    .from(psicoId)
+    .where(eq(psicoId.userId, user.id));
+
+  const leads = existing.leads ?? [];
+
+  // find the link to update
+  const leadIndex = leads.findIndex((lead) => lead.id === leadId);
+  if (leadIndex === -1) {
+    throw new Error("Lead not found");
+  }
+
+  // update the link with the new values
+  const updatedLead = {
+    ...leads[leadIndex],
+    ...values,
+  };
+
+  // replace the old link with the updated link
+  leads[leadIndex] = updatedLead;
+
+  const updatedData: InsertPsicoId = {
+    ...existing,
+    leads: leads,
+  };
+
+  const [data] = await db
+    .update(psicoId)
+    .set(updatedData)
+    .where(eq(psicoId.userId, user.id))
+    .returning();
+
+  return updatedLead;
+};
+
+// delete a lead
+export const deleteLeadService = async (
+  c: Context,
+  db: NeonHttpDatabase,
+  leadId: string
+): Promise<SelectPsicoIdLead[]> => {
+  const user = c.get("user") as SelectUser;
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+
+  if (!leadId) {
+    throw new Error("Missing body");
+  }
+
+  // get current leads
+  const [existing] = await db
+    .select()
+    .from(psicoId)
+    .where(eq(psicoId.userId, user.id));
+
+  const leads = existing.leads || [];
+  const filteredLeads = leads.filter((leads) => leads.id !== leadId);
+
+  const updatedData: InsertPsicoId = {
+    ...existing,
+    leads: filteredLeads,
+  };
+
+  const [data] = await db
+    .update(psicoId)
+    .set(updatedData)
+    .where(eq(psicoId.userId, user.id))
+    .returning();
+
+  return filteredLeads;
 };

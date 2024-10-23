@@ -1,0 +1,32 @@
+meta {
+  name: Delete Lead
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{url}}/psicoid/leads/:leadId
+  body: json
+  auth: none
+}
+
+params:path {
+  leadId: wmxixrxuaz7i2l
+}
+
+body:json {
+  {
+    "id": "123e4567-e89b-12d3-a456-426614174000",
+    "name": "John Doe",
+    "email": "johndoe@example.com",
+    "phone": "+1234567890",
+    "message": "I'm interested in scheduling a consultation.",
+    "source": "website",
+    "status": "new",
+    "createdAt": "2024-10-23T10:30:00Z",
+    "updatedAt": "2024-10-23T11:00:00Z",
+    "internalNotes": "Lead showed interest in anxiety counseling",
+    "referralId": "098e7654-d32b-34c1-a654-526174311000",
+    "interestArea": "Anxiety counseling"
+  }
+}

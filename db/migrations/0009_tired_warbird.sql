@@ -1,0 +1,1 @@
+ALTER TABLE "psico_id" ADD COLUMN "leads" jsonb DEFAULT '[]'::jsonb;

@@ -1,29 +1,38 @@
 import { Hono } from "hono";
 import {
+  createLead,
   createLink,
   createPsicoId,
+  deleteLead,
   deleteLink,
   getPsicoId,
   updateClickCount,
+  updateLead,
   updateLink,
   updatePsicoId,
+  validatePsicoIdUserTag,
 } from "./id.controllers";
+
+// ROUTES
+import links from "./links.route";
+import leads from "./leads.route";
 
 const app = new Hono();
 
-// LINKS
-app.post("/links", ...createLink);
-app.delete("/links/:linkId", ...deleteLink);
-app.patch("/links/:linkId", ...updateLink);
-app.post("/links/clicks", ...updateClickCount);
-
 // get psicoid by userTab
 app.get("/:userTag?", ...getPsicoId);
+
+// Validate user tag
+app.post("/validate/:userTag?", ...validatePsicoIdUserTag);
 
 // create psicoId
 app.post("/", ...createPsicoId);
 
 // update psicoId
 app.patch("/:userTag", ...updatePsicoId);
+
+// ROUTES
+app.route("/links", links);
+app.route("/leads", leads);
 
 export default app;
