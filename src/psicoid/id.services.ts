@@ -52,7 +52,9 @@ export const getPsicoIdService = async (
     );
 
   if (!psicoIdDb || !psicoIdDb.enabled) {
-    throw new Error("Not found");
+    if (!user) {
+      throw new Error("Not found");
+    }
   }
 
   // find user subscription
