@@ -296,7 +296,7 @@ export const subscriptionWebhook = factory.createHandlers(async (c) => {
         await db.insert(transactions).values({
           id: createId(),
           userId: paymentIntent.metadata?.psychologistId,
-          amount: String(paymentIntent.amount_total! - 1000 / 100),
+          amount: String(paymentIntent.amount_total!),
           eventId: paymentIntent.metadata?.id,
           data: JSON.parse(paymentIntent.metadata?.data!) as PatientSession,
           transactionType: "payment",
