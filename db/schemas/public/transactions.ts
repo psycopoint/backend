@@ -49,7 +49,7 @@ export const transactions = pgTable("transactions", {
 
   transactionType: transactionTypeEnum("transaction_type").notNull(),
 
-  amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
+  amount: numeric("amount", { precision: 10 }).notNull(),
   status: paymentStatusEnum("status").notNull().default("pending"),
   paymentDate: timestamp("transaction_date", {
     mode: "string",

@@ -1,6 +1,14 @@
 import { createFactory } from "hono/factory";
 
-import { subscriptions, users } from "@db/schemas";
+import {
+  SelectEvent,
+  SelectUser,
+  insertEventSchema,
+  insertTransactionSchema,
+  psicoId,
+  subscriptions,
+  transactions,
+} from "@db/schemas";
 import { eq } from "drizzle-orm";
 import { createId, init } from "@paralleldrive/cuid2";
 import { neon } from "@neondatabase/serverless";
@@ -9,7 +17,7 @@ import {
   generateCheckoutUrlService,
   getCurrentSubscriptionService,
   getSessionInfoService,
-} from "@src/subscriptions/subscriptions.services";
+} from "@src/subscription/subscriptions.services";
 import { handleError } from "@utils/handle-error";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
@@ -18,12 +26,15 @@ import Stripe from "stripe";
 import { createStripe } from "@lib/stripe";
 import { createApiResponse } from "@utils/response";
 import { createResend } from "@lib/resend";
-import WelcomeEmail from "@emails/welcome";
 import {
   createPsicoIdService,
   getPsicoIdService,
 } from "@src/psicoid/id.services";
 import { createPsicoId } from "@src/psicoid/id.controllers";
+
+// emails
+import WelcomeEmail from "@emails/welcome";
+import { PatientSession } from "@type/events";
 
 const factory = createFactory();
 
@@ -38,7 +49,7 @@ export const getCurrentSubscription = factory.createHandlers(async (c) => {
   return c.json({ data: subscription || null });
 });
 
-// CREATE THE CHECKOUT URL AND GO TO CHECKOUT
+// CREATE AND GO TO CHECKOUT URL
 export const goToCheckoutUrl = factory.createHandlers(
   zValidator(
     "query",
@@ -96,8 +107,8 @@ export const getSessionInfo = factory.createHandlers(
     const db = drizzle(sql);
 
     const { session_id } = c.req.valid("query");
+
     const user = c.get("user");
-    console.log(user);
     if (!user) {
       throw new Error("Unauthorized");
     }
@@ -152,9 +163,6 @@ export const getSessionInfo = factory.createHandlers(
               | "Profissional",
           }),
         });
-
-        console.log("EMAIL DATA: ", data);
-        console.log("EMAIL ERROR: ", error);
       }
 
       return c.redirect(`${c.env.FRONTEND_URL}/assinatura?success=true`);
@@ -164,37 +172,33 @@ export const getSessionInfo = factory.createHandlers(
   }
 );
 
-// SUBSCRIPTION WEEBHOOK TO CREATE SUBSCRIPTION INSIDE DB
+// SUBSCRIPTION WEEBHOOK
 export const subscriptionWebhook = factory.createHandlers(async (c) => {
   // connect to db
   const sql = neon(c.env.DATABASE_URL);
   const db = drizzle(sql);
 
-  const stripe = createStripe(c);
-  const resend = createResend(c);
+  const user = c.get("user") as SelectUser;
 
-  const createId = init({
-    length: 14,
-  });
+  const stripe = createStripe(c);
 
   try {
-    const sig = c.req.header("stripe-signature");
+    const signature = c.req.header("stripe-signature");
 
-    if (!sig) {
+    if (!signature) {
       return c.text("", 400);
     }
 
     const body = await c.req.text();
 
-    let event;
-
-    event = await stripe.webhooks.constructEventAsync(
+    const event = await stripe.webhooks.constructEventAsync(
       body,
-      sig!,
+      signature!,
       c.env.STRIPE_WEBHOOK_SECRET_KEY
     );
 
     switch (event.type) {
+      // SUBSCRIPTION
       case "customer.subscription.updated":
         const subscription = event.data.object as Stripe.Subscription;
 
@@ -221,7 +225,7 @@ export const subscriptionWebhook = factory.createHandlers(async (c) => {
         );
 
         // update subscription inside database
-        const [subscriptionDb] = await db
+        await db
           .update(subscriptions)
           .set({
             status: subscription.status,
@@ -249,15 +253,25 @@ export const subscriptionWebhook = factory.createHandlers(async (c) => {
           .where(eq(subscriptions.subscriptionId, subscription.id as string))
           .returning();
 
-        // CREATE PSICOID IF THRES NO CREATED
-        const existingPsicoId = await getPsicoIdService(c, db);
+        break;
 
-        if (!existingPsicoId) {
-          await createPsicoIdService(c, db, {
-            id: createId(),
-            userId: subscriptionDb.userId,
-            userTag: `@${customer.email?.split("@")[0]}`,
-          });
+      // PSYCHOLOGIST ACCOUNT
+      case "account.updated":
+        const account = event.data.object as Stripe.Account;
+
+        console.log("CHAMOU ACCOUNT WEBHOOK");
+        // console.log({ account });
+
+        // update the subscriptio account status
+
+        if (
+          account.capabilities?.card_payments === "active" &&
+          account.capabilities?.transfers === "active"
+        ) {
+          await db
+            .update(subscriptions)
+            .set({ accountStatus: "active" })
+            .where(eq(subscriptions.userId, user.id));
         }
 
         // send email informing about update
@@ -269,17 +283,44 @@ export const subscriptionWebhook = factory.createHandlers(async (c) => {
         //     plan: product?.name as "Profissional+" | "Profissional",
         //   }),
         // });
+        break;
+
+      // INSERT TRANSACTION INSIDE DB WHEN PAYMENT IS SUCCESSFULL
+      case "checkout.session.completed":
+        const paymentIntent = event.data.object as Stripe.Checkout.Session;
+
+        console.log(paymentIntent.amount_total!);
+        console.log("SUBTOTAL: ", paymentIntent.amount_subtotal!);
+
+        // insert inside db
+        await db.insert(transactions).values({
+          id: createId(),
+          userId: paymentIntent.metadata?.psychologistId,
+          amount: String(paymentIntent.amount_total! - 1000 / 100),
+          eventId: paymentIntent.metadata?.id,
+          data: JSON.parse(paymentIntent.metadata?.data!) as PatientSession,
+          transactionType: "payment",
+          status: paymentIntent.status === "complete" ? "paid" : "pending",
+          method:
+            paymentIntent.payment_method_types[0] === "card"
+              ? "credit_card"
+              : paymentIntent.payment_method_types[0] === "pix"
+              ? "pix"
+              : "other",
+        });
 
         break;
-      // ... manipular outros tipos de eventos se necessário
-
       // default:
-      //   console.log(`Unhandled event type ${event.type}`);
+      //   console.log(`Unhandled stripe event type ${event.type}`);
     }
 
     return c.json(createApiResponse("success"), 200);
   } catch (error) {
-    return handleError(c, error);
+    const errorMessage = `⚠️  Webhook signature verification failed. ${
+      error instanceof Error ? error.message : "Internal server error"
+    }`;
+    console.log(errorMessage);
+    return c.text(errorMessage, 400);
   }
 });
 
@@ -303,6 +344,203 @@ export const goToPortalUrl = factory.createHandlers(
 
       return c.json(createApiResponse("success", data), 200);
     } catch (error) {
+      return handleError(c, error);
+    }
+  }
+);
+
+// ############################################################################
+// ###########################    ACCOUNT    ##################################
+// ############################################################################
+
+// CREATE STRIPE ACCOUNT
+export const createStripeAccount = factory.createHandlers(async (c) => {
+  // connect to db
+  const sql = neon(c.env.DATABASE_URL);
+  const db = drizzle(sql);
+
+  const user = c.get("user") as SelectUser;
+
+  const stripe = createStripe(c);
+
+  try {
+    // verify if user already has an account configured
+    const subscription = await getCurrentSubscriptionService(c, db);
+
+    if (subscription.accountId) {
+      return c.json(
+        createApiResponse(
+          "error",
+          [],
+          "User already has an account configured."
+        ),
+        400
+      );
+    }
+
+    const account = await stripe.accounts.create({
+      email: user.email,
+      default_currency: "BRL",
+      country: "BR",
+      controller: {
+        stripe_dashboard: {
+          type: "express",
+        },
+        fees: {
+          payer: "application",
+        },
+        losses: {
+          payments: "application",
+        },
+      },
+    });
+
+    // update subscription with accountId inside db
+    await db
+      .update(subscriptions)
+      .set({ accountId: account.id })
+      .where(eq(subscriptions.userId, user.id))
+      .returning();
+
+    const accountLink = await stripe.accountLinks.create({
+      account: account.id,
+      return_url: `${c.env.FRONTEND_URL}/financeiro`,
+      refresh_url: `${c.env.FRONTEND_URL}/financeiro/${account.id}`,
+      type: "account_onboarding",
+    });
+
+    return c.json(createApiResponse("success", { url: accountLink.url }));
+  } catch (error) {
+    console.error(
+      "An error occurred when calling the Stripe API to create an account",
+      error
+    );
+    return handleError(c, error);
+  }
+});
+
+export const createAccountLink = factory.createHandlers(
+  zValidator(
+    "json",
+    z.object({
+      accountId: z.string(),
+      mode: z.enum(["account_onboarding", "account_update"]).optional(),
+    })
+  ),
+  async (c) => {
+    // connect to db
+    const sql = neon(c.env.DATABASE_URL);
+    const { accountId, mode } = c.req.valid("json");
+
+    const stripe = createStripe(c);
+
+    try {
+      const accountLink = await stripe.accountLinks.create({
+        account: accountId,
+        return_url: `${c.env.FRONTEND_URL}/financeiro`,
+        refresh_url: `${c.env.FRONTEND_URL}/financeiro/${accountId}`,
+        type: mode ?? "account_onboarding",
+      });
+
+      return c.json(createApiResponse("success", { url: accountLink.url }));
+    } catch (error) {
+      console.error(
+        "An error occurred when calling the Stripe API to create an account",
+        error
+      );
+      return handleError(c, error);
+    }
+  }
+);
+
+// GET PAYMENT LINK FOR PATIENT
+export const generatePaymentLink = factory.createHandlers(
+  zValidator(
+    "json",
+    z.object({
+      amount: z.string(),
+      method: z.enum(["card", "boleto", "pix", "apple_pay", "google_pay"]),
+      eventData: insertEventSchema.pick({
+        id: true,
+        data: true,
+        title: true,
+        createdAt: true,
+        start: true,
+        end: true,
+        psychologistId: true,
+      }),
+    })
+  ),
+  async (c) => {
+    // connect to db
+    const sql = neon(c.env.DATABASE_URL);
+    const db = drizzle(sql);
+
+    const user = c.get("user") as SelectUser;
+    const stripe = createStripe(c);
+
+    const { amount, eventData } = c.req.valid("json");
+
+    try {
+      const subscription = await getCurrentSubscriptionService(c, db);
+
+      if (!subscription || !subscription.accountId) {
+        return c.json(
+          createApiResponse(
+            "error",
+            [],
+            "User has no active subscription or didn't activate the account."
+          )
+        );
+      }
+
+      const session = await stripe.checkout.sessions.create(
+        {
+          payment_method_types: ["card"],
+          metadata: {
+            ...eventData,
+            data: JSON.stringify({
+              ...(eventData.data as PatientSession),
+            }),
+          },
+          line_items: [
+            {
+              price_data: {
+                currency: "brl",
+                product_data: {
+                  name: eventData.title,
+                },
+                unit_amount: Number(amount),
+              },
+              quantity: 1,
+            },
+          ],
+          mode: "payment",
+          success_url: `${c.env.FRONTEND_URL}/financeiro/pagamento=success&ession_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${c.env.FRONTEND_URL}/financeiro/pagamento=cancel`, // URL de cancelamento
+          payment_intent_data: {
+            application_fee_amount: 1000, // TAXA COBRADA
+            transfer_data: {
+              destination: subscription.accountId, // Conta do psicólogo no Stripe
+            },
+          },
+          // expires_at: ""
+        },
+
+        {
+          stripeAccount: c.env.STRIPE_ACCOUNT_ID, // Criar o pagamento sob a conta do psicólogo
+        }
+      );
+
+      console.log({ session });
+
+      // Retornar o link de checkout para o frontend
+      return c.json(createApiResponse("success", { url: session.url }));
+    } catch (error) {
+      console.error(
+        "An error occurred when calling the Stripe API to create an account",
+        error
+      );
       return handleError(c, error);
     }
   }

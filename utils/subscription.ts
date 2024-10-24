@@ -1,7 +1,7 @@
 import { SelectSubscription, subscriptions } from "../db/schemas";
 import { Attributes } from "../types/subscription";
 import { createId } from "@paralleldrive/cuid2";
-import { getCurrentSubscriptionService } from "@src/subscriptions/subscriptions.services";
+import { getCurrentSubscriptionService } from "@src/subscription/subscriptions.services";
 import { eq } from "drizzle-orm";
 import { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { Context } from "hono";

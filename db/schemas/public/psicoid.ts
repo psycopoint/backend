@@ -67,7 +67,7 @@ export const layoutStyleEnum = pgEnum("layout_style", [
   "carousel",
 ]);
 
-export const psicoId = pgTable("psico_id", {
+export const psicoId = pgTable("psicoid", {
   id: text("id").primaryKey().notNull(),
   userId: varchar("user_id", { length: 255 })
     .references(() => users.id, {

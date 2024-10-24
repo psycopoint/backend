@@ -1,0 +1,17 @@
+meta {
+  name: Delete Account
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{url}}/subscription/stripe/delete-account
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "accountId": "acct_1QDVg6CuwzDyM5OX"
+  }
+}

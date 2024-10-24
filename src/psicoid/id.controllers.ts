@@ -43,6 +43,7 @@ export const getPsicoId = factory.createHandlers(
     // connect to db
     const sql = neon(c.env.DATABASE_URL);
     const db = drizzle(sql);
+
     const { userTag } = c.req.valid("param");
 
     try {

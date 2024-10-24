@@ -1,0 +1,17 @@
+meta {
+  name: Account Link
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{url}}/subscription/stripe/generate-payment-link
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "accountId": "acct_1QDR7MEC3SF0fUKj"
+  }
+}

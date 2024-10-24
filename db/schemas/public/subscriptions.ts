@@ -1,6 +1,12 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, integer, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, jsonb, pgEnum } from "drizzle-orm/pg-core";
 import { psychologists } from "./psychologists";
+
+export const accountStatusEnum = pgEnum("account_status_enum", [
+  "active",
+  "pending",
+  "restricted",
+]);
 
 export const subscriptions = pgTable("subscriptions", {
   id: text("id").primaryKey(),
@@ -23,6 +29,8 @@ export const subscriptions = pgTable("subscriptions", {
   trialEndsAt: text("trial_ends_at"),
   cardBrand: text("visa"),
   cardLastFour: text("card_last_four"),
+  accountId: text("account_id"),
+  accountStatus: accountStatusEnum("account_status").default("restricted"),
 });
 
 export type InsertSubscription = typeof subscriptions.$inferInsert;

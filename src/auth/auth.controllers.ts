@@ -1,4 +1,4 @@
-import { psychologists, sessions, users } from "@db/schemas";
+import { psicoId, psychologists, sessions, users } from "@db/schemas";
 import { verificationTokens } from "@db/schemas/auth/verification-tokens";
 import MagicLink from "@emails/magic-link";
 import { GoogleUserResult, createGoogle, createLucia } from "@lib/lucia";
@@ -22,6 +22,7 @@ import {
   generateState,
 } from "arctic";
 import { setCookie } from "hono/cookie";
+import { init } from "@paralleldrive/cuid2";
 
 const factory = createFactory();
 
@@ -185,6 +186,18 @@ export const register = factory.createHandlers(
           slotDuration: 1,
         },
       },
+    });
+
+    // create psicoid
+    const createId = init({
+      length: 14,
+    });
+    await db.insert(psicoId).values({
+      id: createId(),
+      userId: user.id,
+      userTag: `@${user.email.split("@")[0]}${init({
+        length: 5,
+      })()}`,
     });
 
     if (!user) {

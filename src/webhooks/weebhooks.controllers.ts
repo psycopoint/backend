@@ -49,6 +49,7 @@ export const appointmentReminder = factory.createHandlers(
       c,
       db,
       {
+        //TODO: fix type error
         data: {
           ...event.data,
           notification: true,

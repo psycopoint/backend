@@ -7,7 +7,7 @@ import { csrf } from "hono/csrf";
 // ROUTES
 import authRoute from "@src/auth/auth.route";
 import usersRoute from "@src/users/users.route";
-import subscriptionRoute from "@src/subscriptions/subscription.route";
+import subscriptionRoute from "@src/subscription/subscription.route";
 import uploadRoute from "@src/uploads/upload.route";
 import webhooksRoute from "@src/webhooks/webhooks.route";
 import aiRoute from "@src/ai/ai.route";
@@ -38,13 +38,13 @@ app.use("*", async (c, next) => {
 });
 
 // CSRF
-app.use("*", async (c, next) => {
-  const corsMiddleware = csrf({
-    origin: c.env.FRONTEND_URL, // allowing only localhost:3000
-  });
+// app.use("*", async (c, next) => {
+//   const corsMiddleware = csrf({
+//     origin: c.env.FRONTEND_URL, // allowing only localhost:3000
+//   });
 
-  return corsMiddleware(c, next);
-});
+//   return corsMiddleware(c, next);
+// });
 
 // PUBLIC ROUTES
 app.use("*", isAuthenticatedMid);

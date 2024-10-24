@@ -5,11 +5,7 @@ meta {
 }
 
 post {
-  url: {{url}}/subscription/checkout
+  url: {{url}}/subscription/stripe/checkout
   body: none
-  auth: bearer
-}
-
-auth:bearer {
-  token: {{token}}
+  auth: none
 }
